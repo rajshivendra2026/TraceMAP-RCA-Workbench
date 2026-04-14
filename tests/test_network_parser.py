@@ -44,12 +44,15 @@ class NetworkParserTests(unittest.TestCase):
                 "sctp.stream": "4",
                 "s1ap.procedureCode": "12",
                 "s1ap.MME_UE_S1AP_ID": "991",
+                "s1ap.ENB_UE_S1AP_ID": "77",
             },
             "S1AP",
         )
 
         self.assertEqual(packet["technology"], "LTE/4G")
         self.assertEqual(packet["transaction_id"], "991")
+        self.assertEqual(packet["s1ap_mme_ue_id"], "991")
+        self.assertEqual(packet["s1ap_enb_ue_id"], "77")
         self.assertEqual(packet["message"], "Initial UE Message")
 
     def test_parses_sctp_transport_packet(self):

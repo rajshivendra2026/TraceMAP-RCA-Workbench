@@ -235,6 +235,10 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     pfcp_seqno = _clean_text(_get(raw, "pfcp.seqno"))
     pfcp_seid = _clean_text(_get(raw, "pfcp.seid"))
     pfcp_node_id = _clean_text(_get(raw, "pfcp.node_id_ipv4", "pfcp.node_id_ipv6", "pfcp.node_id_fqdn"))
+    s1ap_mme_ue_id = _clean_text(_get(raw, "s1ap.MME_UE_S1AP_ID"))
+    s1ap_enb_ue_id = _clean_text(_get(raw, "s1ap.ENB_UE_S1AP_ID"))
+    ngap_amf_ue_id = _clean_text(_get(raw, "ngap.AMF_UE_NGAP_ID"))
+    ngap_ran_ue_id = _clean_text(_get(raw, "ngap.RAN_UE_NGAP_ID"))
     transaction_id = _clean_text(
         _get(
             raw,
@@ -371,6 +375,10 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "pfcp.seqno": pfcp_seqno,
         "pfcp.seid": pfcp_seid,
         "pfcp.node_id": pfcp_node_id,
+        "s1ap_mme_ue_id": s1ap_mme_ue_id,
+        "s1ap_enb_ue_id": s1ap_enb_ue_id,
+        "ngap_amf_ue_id": ngap_amf_ue_id,
+        "ngap_ran_ue_id": ngap_ran_ue_id,
         "message": message,
         "method": method,
         "status_code": status_code,

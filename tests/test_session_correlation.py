@@ -838,6 +838,102 @@ class SessionCorrelationTests(unittest.TestCase):
 
         self.assertEqual(sessions, [])
 
+    def test_sctp_data_ppid_noise_is_suppressed(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [],
+                "s1ap": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "http": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "tcp": [],
+                "udp": [],
+                "pfcp": [],
+                "sctp": [
+                    {
+                        "frame_number": 1,
+                        "protocol": "SCTP",
+                        "technology": "Transport",
+                        "timestamp": 1.0,
+                        "src_ip": "10.1.1.1",
+                        "dst_ip": "10.1.1.2",
+                        "message": "DATA ppid=18",
+                    },
+                    {
+                        "frame_number": 2,
+                        "protocol": "SCTP",
+                        "technology": "Transport",
+                        "timestamp": 1.1,
+                        "src_ip": "10.1.1.2",
+                        "dst_ip": "10.1.1.1",
+                        "message": "DATA ppid=18",
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(sessions, [])
+
+    def test_access_aliases_merge_split_s1ap_fragments(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [],
+                "s1ap": [
+                    {
+                        "frame_number": 1,
+                        "protocol": "S1AP",
+                        "technology": "LTE/4G",
+                        "timestamp": 100.0,
+                        "src_ip": "10.0.0.1",
+                        "dst_ip": "10.0.0.2",
+                        "transaction_id": "991",
+                        "s1ap_mme_ue_id": "991",
+                        "s1ap_enb_ue_id": "77",
+                        "message": "Initial UE Message",
+                    },
+                    {
+                        "frame_number": 2,
+                        "protocol": "S1AP",
+                        "technology": "LTE/4G",
+                        "timestamp": 100.5,
+                        "src_ip": "10.0.0.3",
+                        "dst_ip": "10.0.0.4",
+                        "transaction_id": "77",
+                        "s1ap_enb_ue_id": "77",
+                        "message": "Downlink NAS Transport",
+                    },
+                ],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "http": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "tcp": [],
+                "udp": [],
+                "pfcp": [],
+                "sctp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(len(sessions[0]["s1ap_msgs"]), 2)
+
     def test_icmp_neighbor_discovery_noise_is_suppressed(self):
         sessions = build_sessions(
             {

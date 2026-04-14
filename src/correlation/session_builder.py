@@ -748,10 +748,11 @@ def _transport_attachment_score(candidate: dict, orphan: dict, window_sec: int) 
 def _session_merge_score(left: dict, right: dict, window_sec: int) -> int:
     left_desc = _session_descriptor(left)
     right_desc = _session_descriptor(right)
+    time_gap = _time_gap_seconds(left_desc["start"], left_desc["end"], right_desc["start"], right_desc["end"])
+    within_window = time_gap <= max(2, window_sec * 2)
     if _is_segmented_variant(left, right):
         if _has_procedure_restart_boundary(left, right):
             return 0
-        time_gap = _time_gap_seconds(left_desc["start"], left_desc["end"], right_desc["start"], right_desc["end"])
         if time_gap > max(3, window_sec * 2):
             return 0
 
@@ -760,14 +761,14 @@ def _session_merge_score(left: dict, right: dict, window_sec: int) -> int:
         return 120
 
     score = 0
+    if within_window and left_desc["access_ids"] & right_desc["access_ids"]:
+        score += 95
     if left_desc["subscriber_ids"] & right_desc["subscriber_ids"]:
         score += 90
 
     if left_desc["stream_ids"] & right_desc["stream_ids"]:
         score += 85
 
-    time_gap = _time_gap_seconds(left_desc["start"], left_desc["end"], right_desc["start"], right_desc["end"])
-    within_window = time_gap <= max(2, window_sec * 2)
     shared_pairs = left_desc["endpoint_pairs"] & right_desc["endpoint_pairs"]
     shared_ips = left_desc["ips"] & right_desc["ips"]
 
@@ -804,6 +805,7 @@ def _has_procedure_restart_boundary(left: dict, right: dict) -> bool:
 
 def _session_descriptor(session: dict) -> dict:
     ids = set()
+    access_ids = set()
     subscriber_ids = set()
     ips = set()
     endpoint_pairs = set()
@@ -861,6 +863,10 @@ def _session_descriptor(session: dict) -> dict:
         for value in (packet.get("transaction_id"), packet.get("message")):
             if value and packet.get("transaction_id"):
                 ids.add(f"{packet.get('protocol', 'GENERIC')}:{value}")
+        for field in ("s1ap_mme_ue_id", "s1ap_enb_ue_id", "ngap_amf_ue_id", "ngap_ran_ue_id"):
+            value = packet.get(field)
+            if value:
+                access_ids.add(f"{field}:{value}")
         for value in (packet.get("imsi"), packet.get("msisdn")):
             if value:
                 subscriber_ids.add(_norm(value))
@@ -874,6 +880,7 @@ def _session_descriptor(session: dict) -> dict:
     start, end = _session_time_bounds(session)
     return {
         "ids": ids,
+        "access_ids": access_ids,
         "subscriber_ids": {value for value in subscriber_ids if value},
         "ips": ips,
         "endpoint_pairs": endpoint_pairs,
@@ -1098,11 +1105,12 @@ def _generic_flow_summary(generic_msgs: list, dia_msgs: list, inap_msgs: list, g
         if not part:
             continue
         part_text = str(part).strip()
+        part_upper = part_text.upper()
         if not part_text:
             continue
-        if hide_transport_noise and part_text in transport_noise_messages:
+        if hide_transport_noise and _is_transport_noise_message(part_upper):
             continue
-        if hide_transport_noise and part_text.isdigit():
+        if hide_transport_noise and part_upper.isdigit():
             continue
         if hide_transport_noise and re.fullmatch(r"(?:SCTP|TCP|UDP)\s+procedure\s+\d+", part_text, flags=re.IGNORECASE):
             continue
@@ -1243,6 +1251,7 @@ def _is_low_value_transport_noise(session: dict) -> bool:
     if not generic_msgs:
         return False
     messages = [str(msg.get("message") or "").upper() for msg in generic_msgs]
+    normalized_messages = [_normalized_transport_message(message) for message in messages]
     src_ips = {msg.get("src_ip") for msg in generic_msgs if msg.get("src_ip")}
     dst_ips = {msg.get("dst_ip") for msg in generic_msgs if msg.get("dst_ip")}
     benign = {
@@ -1257,11 +1266,11 @@ def _is_low_value_transport_noise(session: dict) -> bool:
         "HEARTBEAT",
         "HEARTBEAT_ACK",
     }
-    if protocols == {"sctp"} and set(messages) <= {"INIT", "ABORT"}:
+    if protocols == {"sctp"} and set(normalized_messages) <= {"INIT", "ABORT"}:
         return True
-    if protocols == {"sctp"} and set(messages) <= {"HEARTBEAT", "HEARTBEAT_ACK"}:
+    if protocols == {"sctp"} and set(normalized_messages) <= {"HEARTBEAT", "HEARTBEAT_ACK"}:
         return True
-    if protocols == {"sctp"} and set(messages) <= {"DATA"}:
+    if protocols == {"sctp"} and set(normalized_messages) <= {"DATA"}:
         return True
     if protocols <= {"icmp", "udp"}:
         icmp_types = {str(msg.get("icmp_type") or "") for msg in generic_msgs if str(msg.get("protocol") or "").upper() == "ICMP"}
@@ -1272,9 +1281,36 @@ def _is_low_value_transport_noise(session: dict) -> bool:
             return True
         if src_ips | dst_ips <= {"127.0.0.1"}:
             return True
-    if len(generic_msgs) <= 4 and all(message in benign for message in messages):
+    if len(generic_msgs) <= 4 and all(message in benign for message in normalized_messages):
         return True
     return False
+
+
+def _normalized_transport_message(message: str) -> str:
+    text = str(message or "").strip().upper()
+    if not text:
+        return ""
+    return text.split(" PPID=", 1)[0]
+
+
+def _is_transport_noise_message(message: str) -> bool:
+    return _normalized_transport_message(message) in {
+        "UDP",
+        "TCP",
+        "DATA",
+        "SACK",
+        "HEARTBEAT",
+        "HEARTBEAT_ACK",
+        "COOKIE_ECHO",
+        "COOKIE_ACK",
+        "INIT",
+        "INIT_ACK",
+        "ABORT",
+        "SHUTDOWN",
+        "SHUTDOWN_ACK",
+        "SHUTDOWN_COMPLETE",
+        "ERROR",
+    }
 
 
 def _is_low_value_core_noise(session: dict) -> bool:
