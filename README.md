@@ -24,6 +24,43 @@ Run targeted tests with:
 ./venv/bin/python -m pytest -q
 ```
 
+## Docker
+
+The app can run in Docker, including the `tshark` dependency used for PCAP decoding.
+
+Build and start it with:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+```text
+http://localhost:5050
+```
+
+Container details:
+
+- [`/Users/shivendraraj/Downloads/Tool-2/Dockerfile`](/Users/shivendraraj/Downloads/Tool-2/Dockerfile) installs Python dependencies and `tshark`, then serves the app with `waitress`.
+- [`/Users/shivendraraj/Downloads/Tool-2/docker-compose.yml`](/Users/shivendraraj/Downloads/Tool-2/docker-compose.yml) maps port `5050` and mounts runtime directories for uploaded PCAPs, parsed outputs, features, models, and logs.
+- `data/knowledge_base/` stays baked into the image as tracked seed data.
+
+Notes:
+
+- Uploaded or learned runtime outputs under `data/raw_pcaps/`, `data/parsed/`, `data/features/`, `data/models/`, and `logs/` are mounted from the host in `docker-compose.yml`.
+- If you want completely ephemeral container runs, remove those volume mounts.
+- The container sets `TC_RCA__TSHARK__BINARY=/usr/bin/tshark` so the app does not rely on host Wireshark paths.
+
+## Remote Access
+
+There are four supported remote-access paths documented in [`/Users/shivendraraj/Downloads/Tool-2/docs/remote_access.md`](/Users/shivendraraj/Downloads/Tool-2/docs/remote_access.md):
+
+1. Tailscale for private access from anywhere
+2. Cloudflare Tunnel for public HTTPS without opening ports
+3. Caddy for HTTPS reverse proxy on a server or VM
+4. [`/Users/shivendraraj/Downloads/Tool-2/docker-compose.prod.yml`](/Users/shivendraraj/Downloads/Tool-2/docker-compose.prod.yml) as the production deployment baseline
+
 ## Seed Knowledge Base
 
 The files under [`/Users/shivendraraj/Downloads/Tool-2/data/knowledge_base`](/Users/shivendraraj/Downloads/Tool-2/data/knowledge_base) are intentionally tracked as seed data.

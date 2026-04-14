@@ -1,0 +1,14 @@
+{
+	email {$CADDY_EMAIL}
+}
+
+{$PUBLIC_DOMAIN} {
+	encode gzip zstd
+
+	@uploads path /upload /api/*
+	request_body {
+		max_size 500MB
+	}
+
+	reverse_proxy tracemap-rca:5050
+}

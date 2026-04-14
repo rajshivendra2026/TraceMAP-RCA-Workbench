@@ -1,0 +1,13 @@
+.git
+.pytest_cache
+__pycache__
+*.py[cod]
+.DS_Store
+venv
+.venv
+logs
+data/raw_pcaps
+data/parsed
+data/features
+data/models
+notebooks

@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  tracemap-rca:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tracemap-rca
+    ports:
+      - "5050:5050"
+    environment:
+      TC_RCA__TSHARK__BINARY: /usr/bin/tshark
+      TC_RCA__SERVER__HOST: 0.0.0.0
+      TC_RCA__SERVER__PORT: 5050
+    volumes:
+      - ./data/raw_pcaps:/app/data/raw_pcaps
+      - ./data/parsed:/app/data/parsed
+      - ./data/features:/app/data/features
+      - ./data/models:/app/data/models
+      - ./logs:/app/logs
+    restart: unless-stopped

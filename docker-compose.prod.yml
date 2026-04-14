@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  tracemap-rca:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tracemap-rca
+    expose:
+      - "5050"
+    environment:
+      TC_RCA__TSHARK__BINARY: /usr/bin/tshark
+      TC_RCA__SERVER__HOST: 0.0.0.0
+      TC_RCA__SERVER__PORT: 5050
+      TC_RCA__LOGGING__LOG_TO_FILE: "true"
+    volumes:
+      - ./data/raw_pcaps:/app/data/raw_pcaps
+      - ./data/parsed:/app/data/parsed
+      - ./data/features:/app/data/features
+      - ./data/models:/app/data/models
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    container_name: tracemap-caddy
+    depends_on:
+      - tracemap-rca
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
+      CADDY_EMAIL: ${CADDY_EMAIL}
+      APP_PORT: ${APP_PORT:-5050}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: tracemap-cloudflared
+    depends_on:
+      - tracemap-rca
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    restart: unless-stopped
+    profiles: ["tunnel"]
+
+volumes:
+  caddy_data:
+  caddy_config:
