@@ -1,12 +1,24 @@
+# macOS / filesystem noise
+.DS_Store
+Thumbs.db
+
+# Python caches
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 .coverage
 htmlcov/
-venv/
-.env
+*.pyo
+*.pyd
 
+# virtual environments / local config
+venv/
+.venv/
+.env
+.python-version
+
+# generated project data
 data/raw_pcaps/
 data/parsed/
 data/features/
