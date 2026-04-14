@@ -1,7 +1,7 @@
 {
-  "pattern_reuse_count": 4854,
-  "candidate_pattern_count": 352,
+  "pattern_reuse_count": 4879,
+  "candidate_pattern_count": 353,
   "validation_queue_size": 1335,
-  "last_compaction": "2026-04-14T20:42:30.615308+00:00",
-  "pattern_count": 347
+  "last_compaction": "2026-04-14T21:41:27.296683+00:00",
+  "pattern_count": 348
 }

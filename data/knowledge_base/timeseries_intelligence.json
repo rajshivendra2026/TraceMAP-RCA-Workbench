@@ -15109,9 +15109,535 @@
         "udp"
       ],
       "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:35:56.424060+00:00",
+      "session_id": "0",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "CORE_NETWORK_FAILURE",
+      "protocols": [
+        "gtp",
+        "http",
+        "pfcp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:35:56.496960+00:00",
+      "session_id": "10.0.160.121:-->10.45.168.115:-",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_5gs",
+        "ngap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:35:56.560293+00:00",
+      "session_id": "2001:420:207f:ffa2:10:0:160:1:-->2001:420:207f:ffa2:10:0:160:11:-",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "ICMP_NETWORK_FAILURE",
+      "protocols": [
+        "icmp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:01.858869+00:00",
+      "session_id": "0",
+      "pcap_source": "18Dec4G-to-5G",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "pfcp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:01.923029+00:00",
+      "session_id": "10.0.160.121:38412->10.45.168.115:38412:seg23",
+      "pcap_source": "18Dec4G-to-5G",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ngap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.637794+00:00",
+      "session_id": "10.40.255.168:-->10.8.228.118:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.695262+00:00",
+      "session_id": "081b690d",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "inap",
+        "map",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.752553+00:00",
+      "session_id": "0",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "dns",
+        "gtp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.814164+00:00",
+      "session_id": "10",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.871105+00:00",
+      "session_id": "10.40.255.174:-->10.8.228.119:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:27.924011+00:00",
+      "session_id": "10.8.228.118:-->10.40.255.170:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.468992+00:00",
+      "session_id": "10.15.187.34:-->10.74.117.19:-",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps",
+        "s1ap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.524778+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.66:56510",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.579514+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.68:35777",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.636648+00:00",
+      "session_id": "10.15.187.68:42825->10.15.194.129:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.696923+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.77:41849",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.750721+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.79:52653",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:31.807984+00:00",
+      "session_id": "10.15.187.79:46343->10.15.194.194:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:36:35.885144+00:00",
+      "session_id": "0",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_6thDec_Try2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "http",
+        "nas_5gs",
+        "ngap",
+        "pfcp",
+        "sctp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:02.871416+00:00",
+      "session_id": "10.15.187.34:-->10.74.117.19:-",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps",
+        "s1ap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:02.929708+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.66:56510",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:02.987246+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.68:35777",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:03.048827+00:00",
+      "session_id": "10.15.187.68:42825->10.15.194.129:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:03.109955+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.77:41849",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:03.163352+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.79:52653",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:37:03.219121+00:00",
+      "session_id": "10.15.187.79:46343->10.15.194.194:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:10.627591+00:00",
+      "session_id": "0",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "CORE_NETWORK_FAILURE",
+      "protocols": [
+        "gtp",
+        "http",
+        "pfcp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:10.702650+00:00",
+      "session_id": "10.0.160.121:-->10.45.168.115:-",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_5gs",
+        "ngap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:10.760925+00:00",
+      "session_id": "2001:420:207f:ffa2:10:0:160:1:-->2001:420:207f:ffa2:10:0:160:11:-",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_9thDec",
+      "root_cause": "ICMP_NETWORK_FAILURE",
+      "protocols": [
+        "icmp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:16.091709+00:00",
+      "session_id": "0",
+      "pcap_source": "18Dec4G-to-5G",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "pfcp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:16.152354+00:00",
+      "session_id": "10.0.160.121:38412->10.45.168.115:38412:seg23",
+      "pcap_source": "18Dec4G-to-5G",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ngap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:20.338723+00:00",
+      "session_id": "0",
+      "pcap_source": "29Nov_5Gto4G_IRATHO_2_6thDec_Try2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "http",
+        "nas_5gs",
+        "ngap",
+        "pfcp",
+        "sctp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.211346+00:00",
+      "session_id": "10.40.255.168:-->10.8.228.118:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.268632+00:00",
+      "session_id": "081b690d",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "inap",
+        "map",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.325938+00:00",
+      "session_id": "0",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "dns",
+        "gtp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.387118+00:00",
+      "session_id": "10",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.444428+00:00",
+      "session_id": "10.40.255.174:-->10.8.228.119:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:23.513713+00:00",
+      "session_id": "10.8.228.118:-->10.40.255.170:-",
+      "pcap_source": "3g-4g-ps-ho-sep2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "ranap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:26.935929+00:00",
+      "session_id": "10.15.187.34:-->10.74.117.19:-",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps",
+        "s1ap",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:26.995018+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.66:56510",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:27.052725+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.68:35777",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:27.112061+00:00",
+      "session_id": "10.15.187.68:42825->10.15.194.129:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:27.172703+00:00",
+      "session_id": "10.15.185.129:10251->10.15.187.77:41849",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:27.227515+00:00",
+      "session_id": "10.15.185.194:10251->10.15.187.79:52653",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T21:41:27.285803+00:00",
+      "session_id": "10.15.187.79:46343->10.15.194.194:10251",
+      "pcap_source": "X2-CSCvc91044",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
     }
   ],
-  "last_updated": "2026-04-14T20:49:09.271362+00:00",
+  "last_updated": "2026-04-14T21:41:27.285803+00:00",
   "recurring_summary": {
     "recurring_failures": [
       {
@@ -15124,7 +15650,7 @@
       },
       {
         "root_cause": "CORE_NETWORK_FAILURE",
-        "count": 23
+        "count": 25
       },
       {
         "root_cause": "UNKNOWN",
@@ -15136,7 +15662,7 @@
       },
       {
         "root_cause": "ICMP_NETWORK_FAILURE",
-        "count": 10
+        "count": 12
       },
       {
         "root_cause": "POLICY_FAILURE",
