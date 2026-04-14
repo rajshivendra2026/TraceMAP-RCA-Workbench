@@ -1,0 +1,179 @@
+# ============================================================
+# TELECOM RCA ANALYZER CONFIGURATION
+# ============================================================
+
+# IMPORTANT:
+# This file contains ONLY configuration data (YAML format).
+# Do NOT put this inside config.py.
+
+
+# ============================================================
+# TSHARK SETTINGS
+# ============================================================
+tshark:
+
+  # Path to tshark binary
+  # "auto" → auto-detect (recommended)
+  binary: "auto"
+
+  # Timeout per execution (seconds)
+  timeout_sec: 120
+
+  # Extra flags:
+  # -n → disable DNS resolution (faster)
+  # -2 → enable 2-pass decoding (important for SIP reassembly)
+  extra_flags:
+    - "-n"
+    - "-2"
+
+
+# ============================================================
+# DATA PATHS
+# ============================================================
+data:
+
+  # Input PCAP files
+  raw_pcaps: "data/raw_pcaps"
+
+  # Parsed packet outputs (debugging)
+  parsed: "data/parsed"
+
+  # Feature store for ML
+  features: "data/features"
+
+  # Trained ML models
+  models: "data/models"
+
+  # Persistent self-learning knowledge base
+  knowledge_base: "data/knowledge_base"
+
+  # Portable distilled intelligence exports
+  skill_files: "data/skill_files"
+
+
+# ============================================================
+# WEB SERVER CONFIG
+# ============================================================
+server:
+
+  # Listen on all interfaces
+  host: "0.0.0.0"
+
+  # UI port
+  port: 5050
+
+  # Flask debug should stay false in production
+  debug: false
+
+  # Upload/API controls
+  max_upload_mb: 500
+  allowed_extensions:
+    - ".pcap"
+    - ".pcapng"
+    - ".cap"
+  session_ttl_sec: 3600
+  max_cached_uploads: 20
+  cors_origins:
+    - "*"
+
+
+# ============================================================
+# CORRELATION ENGINE (CRITICAL)
+# ============================================================
+correlation:
+
+  # Time window (seconds)
+  # Used only as FILTER, not primary logic
+  window_sec: 5
+
+  # IMPORTANT:
+  # false → identity-based correlation only (RECOMMENDED)
+  # true  → allow time-only fallback (lab use only)
+  fallback_time_only: false
+
+  # Minimum Diameter packets required to confirm correlation
+  min_dia_overlap: 2
+
+
+# ============================================================
+# TRAINING CONFIG
+# ============================================================
+training:
+
+  # Random seed (reproducibility)
+  random_state: 42
+
+  # Train/test split ratio
+  test_size: 0.2
+
+  # Label noise to prevent overfitting
+  label_noise_ratio: 0.05
+
+  # Cross-validation folds
+  cv_folds: 5
+
+  # Synthetic samples per RCA class
+  synthetic_per_class: 80
+
+  # XGBoost hyperparameters
+  n_estimators: 200
+  max_depth: 6
+  learning_rate: 0.1
+  subsample: 0.8
+  colsample_bytree: 0.8
+
+
+# ============================================================
+# EVALUATION CONFIG
+# ============================================================
+evaluation:
+
+  # Ensure same PCAP not split across train/test
+  group_split: true
+
+  # Minimum samples per class
+  min_class_support: 3
+
+
+# ============================================================
+# MODEL CONFIG
+# ============================================================
+model:
+
+  # Where trained model is stored
+  path: "data/models/rca_model.pkl"
+  encoder_path: "data/models/label_encoder.pkl"
+  meta_path: "data/models/model_meta.json"
+
+
+# ============================================================
+# SELF-LEARNING RCA INTELLIGENCE
+# ============================================================
+learning:
+  enabled: true
+  compact_on_upload: false
+  compact_on_batch: true
+  export_skill_on_upload: false
+  export_skill_on_batch: false
+
+
+# ============================================================
+# AUTONOMOUS RCA INTELLIGENCE
+# ============================================================
+autonomous:
+  enabled: true
+  causal_window_ms: 5000
+  validation_confidence_threshold: 0.58
+  streaming_batch_size: 500
+  timeseries_enabled: true
+
+
+# ============================================================
+# LOGGING CONFIG
+# ============================================================
+logging:
+  level: "INFO"
+  log_to_file: true
+  log_file: "logs/app.log"
+  rotation: "10 MB"
+  retention: "14 days"

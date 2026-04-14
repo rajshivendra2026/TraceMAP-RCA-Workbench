@@ -1,0 +1,338 @@
+{
+  "391349dcae43bb78ea614f3eafa54bf59c1e2e0f": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260116T220719-4b1a09be.pcap",
+    "name": "1010_20260116T220719-4b1a09be.pcap",
+    "size": 7347946,
+    "mtime": 1776168807,
+    "learned_at": 1776173635.770848
+  },
+  "cb0e9daec2bf25280413820700b7ee745f3621c4": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260219T153846-sctp-SC126-06c81ae2.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-06c81ae2.pcap",
+    "size": 4016,
+    "mtime": 1776169916,
+    "learned_at": 1776173637.738705
+  },
+  "0633bd3b94c199ca9697bdd84707aef564ec2143": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260219T153846-sctp-SC126-57dd7d3b.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-57dd7d3b.pcap",
+    "size": 4016,
+    "mtime": 1776169264,
+    "learned_at": 1776173639.930163
+  },
+  "f4f2d8795ad23d8a72aa1f5b01ef23793fe52baf": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260219T153846-sctp-SC126-688e5883.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-688e5883.pcap",
+    "size": 4016,
+    "mtime": 1776169413,
+    "learned_at": 1776173641.9345322
+  },
+  "6ea09a41a5116b47ca5cb598cd075d003a3c45a2": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260219T153846-sctp-SC126-8fbc8c14.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-8fbc8c14.pcap",
+    "size": 4016,
+    "mtime": 1776169889,
+    "learned_at": 1776173643.979737
+  },
+  "41c12d404896cd152e27f26b460bb6b700d7345f": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/1010_20260219T153846-sctp-SC126-92de3a36.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-92de3a36.pcap",
+    "size": 4016,
+    "mtime": 1776170815,
+    "learned_at": 1776173645.990716
+  },
+  "8e282cac1ea76e81e00a7f2a8bdf189f9097fbd8": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/240075825233137-f284ea9b.pcap",
+    "name": "240075825233137-f284ea9b.pcap",
+    "size": 36797,
+    "mtime": 1776164876,
+    "learned_at": 1776173648.4402099
+  },
+  "b15d636323236410c8df2163592924d37bc7b5fd": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/310170424406941-Trace-2_1775832444958-fb423be3.pcapng",
+    "name": "310170424406941-Trace-2_1775832444958-fb423be3.pcapng",
+    "size": 76112,
+    "mtime": 1776161512,
+    "learned_at": 1776173650.847722
+  },
+  "d962c9190b25f92f01891439cf40ed57a0d59643": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/310170424406941_1775831412771-218636c8.pcapng",
+    "name": "310170424406941_1775831412771-218636c8.pcapng",
+    "size": 727208,
+    "mtime": 1776162515,
+    "learned_at": 1776173655.61698
+  },
+  "851aa2c48fc9b1432d2ca5efbed0172622f15cf8": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/310170870734809_Non-Working-3817efdd.pcapng",
+    "name": "310170870734809_Non-Working-3817efdd.pcapng",
+    "size": 2244,
+    "mtime": 1776162949,
+    "learned_at": 1776173657.686878
+  },
+  "86b8966179e62eebbb5d15c3fc241b591f452010": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/467191033558050forbidden-45172786.pcap",
+    "name": "467191033558050forbidden-45172786.pcap",
+    "size": 73606,
+    "mtime": 1776161495,
+    "learned_at": 1776173660.689617
+  },
+  "7e18e4b531cbefe29ea70e3888331d50128978e6": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/46720502080-240500000024351-240060002023371-20260407_120500_20260407_120700-f8f6910a.pcap",
+    "name": "46720502080-240500000024351-240060002023371-20260407_120500_20260407_120700-f8f6910a.pcap",
+    "size": 4383,
+    "mtime": 1776166299,
+    "learned_at": 1776173663.697393
+  },
+  "5a06d631c519f14fb64b6810554d8fafbb80f2d5": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/530058722521555_Diameter_Error-22536ea3.pcap",
+    "name": "530058722521555_Diameter_Error-22536ea3.pcap",
+    "size": 30136,
+    "mtime": 1776172167,
+    "learned_at": 1776173666.120382
+  },
+  "2e352cbdcefa6cf683f986ba511dc702e8fa4399": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/708020970129113-MAP-0d72bbe1.pcap",
+    "name": "708020970129113-MAP-0d72bbe1.pcap",
+    "size": 7164,
+    "mtime": 1776162586,
+    "learned_at": 1776173668.617831
+  },
+  "c404803efa75383acc7abc30c6266e1de4b161e0": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/7d0a835e-eaf1-4bdd-8c14-2a920e9eab1e-2a555475.pcap",
+    "name": "7d0a835e-eaf1-4bdd-8c14-2a920e9eab1e-2a555475.pcap",
+    "size": 79255,
+    "mtime": 1776161540,
+    "learned_at": 1776173671.605632
+  },
+  "11cbe35917eb17736ea09389bbf0af4313fbaf48": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/882350390067649-MAP-739c94b3.pcap",
+    "name": "882350390067649-MAP-739c94b3.pcap",
+    "size": 35869,
+    "mtime": 1776161529,
+    "learned_at": 1776173673.7189162
+  },
+  "c88f3e9734a8e2c6a52197de0a367f8955732ae8": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/MME-VOLTE-bdd3bd2d.pcap",
+    "name": "MME-VOLTE-bdd3bd2d.pcap",
+    "size": 24020,
+    "mtime": 1776173163,
+    "learned_at": 1776173676.195565
+  },
+  "c3b4ff67a4c1d72b6a2c8eeb2e557917de7878a6": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/VoWiFi-Test_1741359540224-82b642c0.pcapng",
+    "name": "VoWiFi-Test_1741359540224-82b642c0.pcapng",
+    "size": 453800,
+    "mtime": 1776163090,
+    "learned_at": 1776173678.87769
+  },
+  "44145e7ec531fb7de6f39bdf0b732d3b5a26d4b3": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/Wrong_Timestamp-Captured_05022026_1400-to-1700-8f504a7d.pcapng",
+    "name": "Wrong_Timestamp-Captured_05022026_1400-to-1700-8f504a7d.pcapng",
+    "size": 59148,
+    "mtime": 1776164927,
+    "learned_at": 1776173681.4297721
+  },
+  "2973f6dfe080e6ef829c24371ed8d94a35104043": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/ebb1621c-b8c1-4097-bfed-679dc1b70ae2-5fcee3fc.pcap",
+    "name": "ebb1621c-b8c1-4097-bfed-679dc1b70ae2-5fcee3fc.pcap",
+    "size": 225086,
+    "mtime": 1776161166,
+    "learned_at": 1776173683.8755121
+  },
+  "9fca867951b3c46cd653f2a5712fdbd79cb5d486": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/netmon_20250922034927_5gaas-1ru-node1-main_trace-f3c48019.pcap",
+    "name": "netmon_20250922034927_5gaas-1ru-node1-main_trace-f3c48019.pcap",
+    "size": 196804,
+    "mtime": 1776169141,
+    "learned_at": 1776173686.483544
+  },
+  "ff3390168693f7a0b55b52c32d17a8392c3ad9d3": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/volte-89b0fedf.pcap",
+    "name": "volte-89b0fedf.pcap",
+    "size": 24020,
+    "mtime": 1776164811,
+    "learned_at": 1776173688.96046
+  },
+  "78d5c61051261cec0feae0db50c6c098e30ef384": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-01.pcap",
+    "name": "Trace-01.pcap",
+    "size": 924671,
+    "mtime": 1773119060,
+    "learned_at": 1776173740.7917702
+  },
+  "31dfa0f049f1dc553c792c0c7d951de21a049800": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-02.pcap",
+    "name": "Trace-02.pcap",
+    "size": 211709,
+    "mtime": 1773119444,
+    "learned_at": 1776173743.430816
+  },
+  "24d2fb418c98d2213ec9c6e83afc6bca017c2103": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-03.pcap",
+    "name": "Trace-03.pcap",
+    "size": 541294,
+    "mtime": 1773120214,
+    "learned_at": 1776173746.521499
+  },
+  "ec4f479642ff9da226f937fc7979f3c464bc2513": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-04.pcap",
+    "name": "Trace-04.pcap",
+    "size": 272977,
+    "mtime": 1773120218,
+    "learned_at": 1776173749.264912
+  },
+  "6171b37564c7dfb322f7a90eba487f92dfd6d5e8": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-05.pcap",
+    "name": "Trace-05.pcap",
+    "size": 122327,
+    "mtime": 1773120218,
+    "learned_at": 1776173751.696337
+  },
+  "1263a85affb345ca0f44a8424c9087078fea06ff": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-06.pcap",
+    "name": "Trace-06.pcap",
+    "size": 163251,
+    "mtime": 1773120216,
+    "learned_at": 1776173754.284127
+  },
+  "e3ed127fdda976e06cfd1c678a9ed4766d989708": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-07.pcap",
+    "name": "Trace-07.pcap",
+    "size": 248079,
+    "mtime": 1749639508,
+    "learned_at": 1776173757.271411
+  },
+  "ee6f4ced5594dc052c93bae93f87d492c386fb8e": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-08.pcap",
+    "name": "Trace-08.pcap",
+    "size": 126142,
+    "mtime": 1750263892,
+    "learned_at": 1776173759.685587
+  },
+  "1e237017b1b914d545d06711ac0fb219602db6cd": {
+    "path": "/Users/shivendraraj/Documents/AI_Initiative_IoT/telecom-rca/data/raw_pcaps/Trace-09.pcap",
+    "name": "Trace-09.pcap",
+    "size": 257945,
+    "mtime": 1773120218,
+    "learned_at": 1776173762.553389
+  },
+  "beb120b270d3ab207ba785cf0e566759fed994b8": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/Anaritsu Trace Export/310170224654092_Mexico_Roamin_6017.pcap",
+    "name": "310170224654092_Mexico_Roamin_6017.pcap",
+    "size": 2680,
+    "mtime": 1680143435,
+    "learned_at": 1776173764.876972
+  },
+  "5fb7b61a4d6c05828c93071962b3e22e69b5840a": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/Anaritsu Trace Export/89011703272112491259_310170211249125.pcap",
+    "name": "89011703272112491259_310170211249125.pcap",
+    "size": 1023,
+    "mtime": 1679302919,
+    "learned_at": 1776173766.923676
+  },
+  "23ef2161500499b9ddb1b9b2c571e83d45ebcc73": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/Anaritsu Trace Export/89011703272138630534_SMS.pcap",
+    "name": "89011703272138630534_SMS.pcap",
+    "size": 897,
+    "mtime": 1680140605,
+    "learned_at": 1776173769.115341
+  },
+  "08e56bd5a840b06a146203a1e87fd0e549558e48": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/310170132388132 _Cancel Location.pcap",
+    "name": "310170132388132 _Cancel Location.pcap",
+    "size": 1820,
+    "mtime": 1740377019,
+    "learned_at": 1776173771.460308
+  },
+  "a670672d0ebc16685812a71ae3f1495074ebca19": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/310170442762845-20250416.pcap",
+    "name": "310170442762845-20250416.pcap",
+    "size": 14504,
+    "mtime": 1744789459,
+    "learned_at": 1776173775.0298
+  },
+  "6b926cca63b7b6898869c821968844950e358190": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/311882005878747-20250107.pcap",
+    "name": "311882005878747-20250107.pcap",
+    "size": 32448,
+    "mtime": 1736949023,
+    "learned_at": 1776173778.965247
+  },
+  "3bf21a6d058c112f79eda80c7e7808dcd6933828": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/311882008985502-20250331.pcap",
+    "name": "311882008985502-20250331.pcap",
+    "size": 263744,
+    "mtime": 1743760970,
+    "learned_at": 1776173782.8325398
+  },
+  "86b3f4802b4ca89fdcb1966f68943d0b695e1b70": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/311882008985502-20250401.pcap",
+    "name": "311882008985502-20250401.pcap",
+    "size": 19920,
+    "mtime": 1743751665,
+    "learned_at": 1776173786.3606231
+  },
+  "e2707610e2ff2d863315b99494ca48308bd035dc": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/311882008985652-20250331.pcap",
+    "name": "311882008985652-20250331.pcap",
+    "size": 18440,
+    "mtime": 1743751673,
+    "learned_at": 1776173789.496059
+  },
+  "bf1a00bcf8db81d804a52f87d7d701bac722f3cc": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/311882008985652-20250401.pcap",
+    "name": "311882008985652-20250401.pcap",
+    "size": 4452,
+    "mtime": 1743759388,
+    "learned_at": 1776173792.0551412
+  },
+  "0d66a2b4fa53d494cf410963fe9542ea43cfb36e": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/467191025119422_MO SMS_30012025.pcap",
+    "name": "467191025119422_MO SMS_30012025.pcap",
+    "size": 11241,
+    "mtime": 1738299995,
+    "learned_at": 1776173794.5840042
+  },
+  "bd3e90874ca69dbc0552c568f8c87d978ab04722": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/530058722521555_Diameter_Error.pcap",
+    "name": "530058722521555_Diameter_Error.pcap",
+    "size": 30136,
+    "mtime": 1741225998,
+    "learned_at": 1776173796.9208782
+  },
+  "fb151eafa1e5c8471bf17145d14fd5afd6505e89": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/89011703272181021946-Diameter.pcap",
+    "name": "89011703272181021946-Diameter.pcap",
+    "size": 18240,
+    "mtime": 1738658564,
+    "learned_at": 1776173799.297743
+  },
+  "29f66a9d44e9bd93c44afb0d4acf7d3dd5e05ad8": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/89011703272211534835_MAP-Trace.pcap",
+    "name": "89011703272211534835_MAP-Trace.pcap",
+    "size": 6328,
+    "mtime": 1738305083,
+    "learned_at": 1776173801.39456
+  },
+  "d5e28f72c8c644959dd095470563f6ba026e9fc7": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/89462046001000316968_MAP.pcap",
+    "name": "89462046001000316968_MAP.pcap",
+    "size": 165419,
+    "mtime": 1742454873,
+    "learned_at": 1776173804.542463
+  },
+  "b2182a41c464cf89e217ccc4bc0416ee93ebda54": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/Tele2_248030181185869_Radius-2.pcapng",
+    "name": "Tele2_248030181185869_Radius-2.pcapng",
+    "size": 13320,
+    "mtime": 1758676215,
+    "learned_at": 1776173807.9113758
+  },
+  "7e127bdb2349cd4396eb265e91bb746e64e05699": {
+    "path": "/Users/shivendraraj/Documents/IOT-5G/SF Tickets/Tele2_248030181185869_Radius.pcapng",
+    "name": "Tele2_248030181185869_Radius.pcapng",
+    "size": 1216,
+    "mtime": 1758675972,
+    "learned_at": 1776173810.311054
+  }
+}

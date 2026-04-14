@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TraceMAP RCA Workbench</title>
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand-block">
+    <div class="eyebrow">Packet And Root Cause Analysis Console</div>
+    <div class="title-box">TraceMAP RCA Workbench</div>
+  </div>
+  <div class="controls">
+    <button id="uploadBtn">Upload PCAP</button>
+    <input type="file" id="fileInput" hidden>
+    <span id="fileName" title=""></span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button onclick="switchTab('analysis')">Analysis</button>
+  <button onclick="switchTab('visual')">Visualization</button>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Session Explorer</div>
+      <select id="sessionFilter">
+        <option value="ALL">All Sessions</option>
+        <option value="FAILED">Failed</option>
+        <option value="SUCCESS">Success</option>
+      </select>
+      <input id="searchBox" placeholder="Search sessions, parties, RCA, protocol">
+      <select id="protocolFilter">
+        <option value="ALL">All Protocols</option>
+        <option value="SIP">SIP</option>
+        <option value="DIAMETER">Diameter</option>
+        <option value="INAP">INAP</option>
+        <option value="GTP">GTP</option>
+        <option value="S1AP">S1AP</option>
+        <option value="NGAP">NGAP</option>
+        <option value="RANAP">RANAP</option>
+        <option value="BSSAP">BSSAP</option>
+        <option value="MAP">MAP</option>
+        <option value="PFCP">PFCP</option>
+        <option value="HTTP">HTTP</option>
+        <option value="DNS">DNS</option>
+        <option value="ICMP">ICMP</option>
+        <option value="NAS_EPS">NAS-EPS</option>
+        <option value="NAS_5GS">NAS-5GS</option>
+        <option value="TCP">TCP</option>
+        <option value="UDP">UDP</option>
+        <option value="SCTP">SCTP</option>
+      </select>
+    </div>
+    <div class="sidebar-section sidebar-list">
+      <div id="sessionList"></div>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div id="analysisTab">
+      <div class="hero-grid">
+        <div class="panel trace-overview">
+          <div class="panel-header">
+            <h3>Trace Overview</h3>
+            <div class="panel-subtitle" id="traceType">Awaiting capture</div>
+          </div>
+          <div class="trace-headline" id="traceHeadline">Upload a capture to generate a protocol-aware investigation summary.</div>
+          <div class="trace-meta" id="traceMeta"></div>
+          <div class="trace-summary-list" id="traceSummaryList"></div>
+        </div>
+        <div class="panel findings-panel">
+          <div class="panel-header">
+            <h3>Expert Findings</h3>
+            <div class="panel-subtitle">Prioritized starting points</div>
+          </div>
+          <div id="expertFindings"></div>
+        </div>
+      </div>
+
+      <div class="panel learning-panel">
+        <div class="panel-header">
+          <h3>Learning Control</h3>
+          <div class="panel-subtitle">One-click knowledge refresh from a PCAP folder</div>
+        </div>
+        <div class="learning-grid">
+          <div>
+            <label class="learning-label" for="learningPathInput">PCAP Learning Path</label>
+            <div class="learning-controls">
+              <input id="learningPathInput" placeholder="/Users/shivendraraj/Downloads">
+              <button id="startLearningBtn">Start Learning</button>
+            </div>
+            <div id="learningStatusMessage" class="learning-status">System learning status will appear here.</div>
+          </div>
+          <div class="learning-kpis">
+            <div class="mini-panel">
+              <div class="mini-title">Unique Patterns</div>
+              <div id="learnedPatternCount" class="learning-value">0</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Learned PCAPs</div>
+              <div id="learnedPcapCount" class="learning-value">0</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">New PCAPs Pending</div>
+              <div id="learningPendingCount" class="learning-value">0</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Learning State</div>
+              <div id="learningStateLabel" class="learning-value">Idle</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Validation Queue</div>
+              <div id="validationPendingCount" class="learning-value">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Capture Analytics</h3>
+          <div class="panel-subtitle">Conversations, protocol mix, endpoints, and service health</div>
+        </div>
+          <div class="kpi-grid">
+          <div class="kpi" data-tip="Correlated sessions or conversations"><div id="kpiTotalSessions">0</div><span>Sessions</span></div>
+          <div class="kpi" data-tip="Total packets decoded across protocols"><div id="kpiTotalPackets">0</div><span>Packets</span></div>
+          <div class="kpi" data-tip="Distinct protocol families observed"><div id="kpiProtocolsSeen">0</div><span>Protocols</span></div>
+          <div class="kpi" data-tip="Telecom technology families observed"><div id="kpiTechSeen">0</div><span>Technologies</span></div>
+          <div class="kpi" data-tip="Sessions classified as normal"><div id="kpiSuccessSessions">0</div><span>Normal</span></div>
+          <div class="kpi" data-tip="Sessions classified as failed or abnormal"><div id="kpiFailedSessions">0</div><span>Abnormal</span></div>
+          <div class="kpi" data-tip="Average correlated session duration"><div id="kpiAvgDuration">0 ms</div><span>Avg Duration</span></div>
+          <div class="kpi" data-tip="Most common RCA across correlated sessions"><div id="kpiTopRca">-</div><span>Top RCA</span></div>
+          <div class="kpi" data-tip="Most active protocol in the trace"><div id="kpiTopProtocol">-</div><span>Top Protocol</span></div>
+          <div class="kpi" data-tip="Sessions involving IMS signalling"><div id="kpiImsSessions">0</div><span>IMS Sessions</span></div>
+          <div class="kpi" data-tip="2G and 3G signalling activity"><div id="kpi2g3g">0</div><span>2G/3G</span></div>
+          <div class="kpi" data-tip="LTE/4G signalling and core activity"><div id="kpi4g">0</div><span>LTE/4G</span></div>
+          <div class="kpi" data-tip="5G signalling and service activity"><div id="kpi5g">0</div><span>5G</span></div>
+          <div class="kpi" data-tip="Transport anomalies such as retransmissions or resets"><div id="kpiTcpIssues">0</div><span>TCP Issues</span></div>
+          <div class="kpi" data-tip="HTTP or HTTPS application messages"><div id="kpiHttpHttps">0</div><span>HTTP/HTTPS</span></div>
+          <div class="kpi" data-tip="SCTP control-plane transport messages"><div id="kpiSctp">0</div><span>SCTP</span></div>
+        </div>
+      </div>
+
+      <div class="analysis-grid">
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Protocol And Endpoint Intelligence</h3>
+            <div class="panel-subtitle">Conversation-oriented breakdowns</div>
+          </div>
+          <div class="breakdown-grid">
+            <div class="mini-panel">
+              <div class="mini-title">Protocol Mix</div>
+              <div id="protocolMix"></div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Technology Mix</div>
+              <div id="technologyMix"></div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Top Endpoints</div>
+              <div id="topEndpoints"></div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">RCA Distribution</div>
+              <div id="rcaDistribution"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Session RCA</h3>
+            <div class="panel-subtitle">Analyst-ready interpretation</div>
+          </div>
+          <div class="rca-hero">
+            <div>
+              <div class="rca-title" id="rcaTitle">Select a session</div>
+              <div class="rca-summary" id="rcaSummary">Detailed RCA guidance will appear here once a session is selected.</div>
+            </div>
+            <div class="rca-badges">
+              <span class="badge severity" id="rcaSeverity">Severity</span>
+              <span class="badge confidence" id="rcaConfidence">Confidence</span>
+              <span class="badge rule" id="rcaRule">Rule</span>
+            </div>
+          </div>
+          <div class="rca-detail" id="rcaNarrative">Session-level narrative will appear here.</div>
+          <div class="rca-columns">
+            <div class="mini-panel">
+              <div class="mini-title">Evidence</div>
+              <ul id="whyList" class="bullet-list"></ul>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Recommended Next Checks</div>
+              <ul id="rcaActions" class="bullet-list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Autonomous Reasoning</h3>
+            <div class="panel-subtitle">Causal chain, agent votes, and confidence calibration</div>
+          </div>
+          <div class="autonomous-grid">
+            <div class="mini-panel">
+              <div class="mini-title">Agent Votes</div>
+              <div id="agentVotes" class="autonomous-list">Select a session to inspect protocol specialist hypotheses.</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Causal Chain</div>
+              <div id="causalChain" class="autonomous-list">Causal event chain will appear here.</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Confidence Model</div>
+              <div id="confidenceModel" class="autonomous-list">Confidence calibration sources will appear here.</div>
+            </div>
+            <div class="mini-panel">
+              <div class="mini-title">Knowledge Signals</div>
+              <div id="knowledgeSignals" class="autonomous-list">Knowledge graph and time-series summary will appear here.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Details</h3>
+            <div class="panel-subtitle">Trace and session context</div>
+          </div>
+          <div id="nodeDetails" class="details-body">Upload a capture to generate trace-level summary details.</div>
+        </div>
+
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Correlation</h3>
+            <div class="panel-subtitle">Session binding confidence and technology span</div>
+          </div>
+          <div class="correlation-line"><span>Strategy</span><strong id="corr">No correlation</strong></div>
+          <div class="correlation-line"><span>Technologies</span><strong id="tech">Unknown</strong></div>
+        </div>
+
+        <div class="panel stack-panel">
+          <div class="panel-header">
+            <h3>Validation Queue</h3>
+            <div class="panel-subtitle">Sessions that need expert confirmation before reinforcing knowledge</div>
+          </div>
+          <div id="validationQueue" class="validation-queue">No pending validation items.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="visualTab" style="display:none;">
+      <div class="view-toggle segmented">
+        <button onclick="setView('ladder')">Ladder View</button>
+        <button onclick="setView('graph')">Graph View</button>
+        <button onclick="setView('causal')">Causal View</button>
+      </div>
+
+      <div id="ladderView" class="panel">
+        <div class="panel-header">
+          <h3>Session Flow Timeline</h3>
+          <div class="panel-subtitle">Cross-protocol chronological message ladder</div>
+        </div>
+        <div id="timeline"></div>
+      </div>
+
+      <div id="graphView" class="panel" style="display:none;">
+        <div class="panel-header">
+          <h3 id="graphTitle">Session Interaction Graph</h3>
+          <div id="graphSubtitle" class="panel-subtitle">Analyst-style endpoint topology with aggregated protocol paths</div>
+        </div>
+        <div class="graph-toolbar">
+          <div id="graphStats" class="graph-stats"></div>
+          <div class="graph-actions">
+            <button id="graphFitBtn" type="button">Fit Graph</button>
+            <button id="graphPhysicsBtn" type="button">Pause Physics</button>
+          </div>
+        </div>
+        <div class="graph-layout">
+          <div id="graphContainer"></div>
+          <aside class="graph-sidebar">
+            <div class="graph-sidecard">
+              <div class="mini-title">Topology Legend</div>
+              <div id="graphLegend" class="graph-legend"></div>
+            </div>
+            <div class="graph-sidecard">
+              <div class="mini-title">Graph Selection</div>
+              <div id="graphSelection" class="graph-selection">Click a node or protocol path to inspect endpoints, traffic mix, and sample messages.</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <button id="versionButton" class="version-button">Version <span id="appVersion">v0.0.0</span></button>
+</div>
+
+<div id="versionHistoryModal" class="modal-backdrop" style="display:none;">
+  <div class="modal-card">
+    <div class="panel-header">
+      <h3>Improvement History</h3>
+      <button id="closeVersionModal">Close</button>
+    </div>
+    <div id="versionHistoryContent" class="history-list"></div>
+  </div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/render.js"></script>
+<script src="js/api.js"></script>
+<script src="js/events.js"></script>
+
+</body>
+</html>

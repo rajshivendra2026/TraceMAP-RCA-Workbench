@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telecom RCA Analyzer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+:root {
+  --bg:      #0c0e14;
+  --bg2:     #111520;
+  --bg3:     #171c2c;
+  --bg4:     #1e2438;
+  --border:  #252d44;
+  --border2: #303a55;
+  --text:    #e0e6f0;
+  --text2:   #8fa3bf;
+  --text3:   #536382;
+  --sip:     #38bdf8;
+  --sip2:    #0ea5e9;
+  --dia:     #fb923c;
+  --dia2:    #f97316;
+  --inap:    #a78bfa;
+  --ok:      #4ade80;
+  --warn:    #facc15;
+  --err:     #f87171;
+  --purple:  #c084fc;
+  --mono:    'JetBrains Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Header ── */
+header{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#a78bfa);display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px}
+header h1{font-size:15px;font-weight:600;letter-spacing:-.3px}
+.hdr-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);font-size:11px;font-family:var(--mono);color:var(--text3)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--text3)}
+.status-dot.ok{background:var(--ok);box-shadow:0 0 5px var(--ok)}
+.status-dot.busy{background:var(--warn);animation:pulse 1s infinite}
+.status-dot.err{background:var(--err)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Layout ── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+aside{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.aside-sec{padding:14px 16px;border-bottom:1px solid var(--border)}
+.aside-sec:last-child{border-bottom:none}
+.sec-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+/* Drop zones */
+.dz{border:1.5px dashed var(--border2);border-radius:8px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:6px}
+.dz:hover,.dz.over{border-color:var(--sip);background:rgba(56,189,248,.04)}
+.dz.loaded{border-style:solid;border-color:var(--ok);background:rgba(74,222,128,.04)}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-family:var(--mono);margin-bottom:5px;font-weight:500}
+.tag-train{background:rgba(167,139,250,.15);color:var(--inap)}
+.tag-analysis{background:rgba(56,189,248,.15);color:var(--sip)}
+.dz-ico{font-size:18px;margin-bottom:4px}
+.dz-name{font-size:12px;font-weight:500;margin-bottom:2px}
+.dz-hint{font-size:11px;color:var(--text3)}
+
+/* Call selector */
+.call-sel-wrap{position:relative}
+.call-sel-wrap select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 26px 7px 9px;appearance:none;cursor:pointer;outline:none}
+.call-sel-wrap select:focus{border-color:var(--sip)}
+.call-sel-wrap::after{content:'▾';position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:11px}
+
+/* Stat row */
+.stat-row{display:flex;gap:5px;margin-top:9px}
+.stat{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 5px;text-align:center}
+.stat .v{font-size:17px;font-weight:600;font-family:var(--mono);line-height:1}
+.stat .l{font-size:10px;color:var(--text3);margin-top:2px}
+.v.c-sip{color:var(--sip)}.v.c-dia{color:var(--dia)}.v.c-ok{color:var(--ok)}.v.c-err{color:var(--err)}.v.c-inap{color:var(--inap)}
+
+/* Button */
+.btn-run{width:100%;padding:9px;background:linear-gradient(135deg,var(--sip2),#7c3aed);border:none;border-radius:7px;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:3px}
+.btn-run:hover{opacity:.88}
+.btn-run:active{transform:scale(.98)}
+.btn-run:disabled{opacity:.35;cursor:not-allowed}
+
+/* RCA panel */
+.rca-panel{margin-top:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px;display:none}
+.rca-panel.show{display:block}
+.rca-lbl{font-size:13px;font-weight:600;margin-bottom:3px}
+.rca-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px}
+.conf-bar{height:3px;background:var(--border2);border-radius:2px;margin-bottom:9px}
+.conf-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--sip),var(--ok));transition:width .7s ease}
+.ev-list{list-style:none}
+.ev-list li{font-size:11px;color:var(--text2);padding:2px 0 2px 12px;position:relative;line-height:1.5}
+.ev-list li::before{content:'›';position:absolute;left:0;color:var(--sip)}
+
+/* Class probs */
+.prob-row{display:flex;align-items:center;gap:7px;padding:3px 0}
+.prob-name{font-family:var(--mono);font-size:10px;color:var(--text2);width:170px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-bar-bg{flex:1;height:8px;background:var(--border);border-radius:3px;overflow:hidden}
+.prob-bar-fill{height:100%;border-radius:3px;background:var(--sip);transition:width .6s}
+.prob-pct{font-family:var(--mono);font-size:10px;color:var(--text3);width:36px;text-align:right}
+
+/* ── Main canvas ── */
+.canvas{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);padding:0 18px;flex-shrink:0}
+.tab{padding:11px 14px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text2)}
+.tab.on{color:var(--text);border-bottom-color:var(--sip)}
+
+/* Panels */
+.panels{flex:1;overflow-y:auto;padding:18px}
+.panel{display:none}
+.panel.on{display:block}
+
+/* ── Ladder ── */
+.ladder-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ladder-hdr{display:flex;border-bottom:1px solid var(--border)}
+.ldr-ent{flex:1;text-align:center;padding:9px 4px;font-size:11px;font-weight:600;font-family:var(--mono);border-right:1px solid var(--border)}
+.ldr-ent:last-child{border-right:none}
+.ent-sip{color:var(--sip);background:rgba(56,189,248,.05)}
+.ent-dia{color:var(--dia);background:rgba(251,146,60,.05)}
+.ent-inap{color:var(--inap);background:rgba(167,139,250,.05)}
+.ent-net{color:var(--text2);background:rgba(255,255,255,.02)}
+#ldr-svg{width:100%;display:block;cursor:default}
+
+/* Tooltip */
+.tooltip{position:fixed;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;font-family:var(--mono);color:var(--text2);pointer-events:none;z-index:1000;max-width:280px;display:none;box-shadow:0 4px 20px rgba(0,0,0,.4);line-height:1.7}
+.tt-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px}
+.tt-row{display:flex;gap:8px}
+.tt-key{color:var(--text3);min-width:80px}
+.tt-val{color:var(--text)}
+
+/* Legend */
+.legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.leg-line{width:22px;height:2px;border-radius:1px}
+.leg-dash{width:22px;height:0;border-top:2px dashed}
+
+/* ── Sessions ── */
+.sess-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .15s}
+.sess-card:hover{border-color:var(--border2)}
+.sess-card.sel{border-color:var(--sip);background:rgba(56,189,248,.03)}
+.sess-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.sess-cid{font-family:var(--mono);font-size:11px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.pill-ok{background:rgba(74,222,128,.15);color:var(--ok)}
+.pill-err{background:rgba(248,113,113,.15);color:var(--err)}
+.pill-warn{background:rgba(250,204,21,.15);color:var(--warn)}
+.pill-blue{background:rgba(56,189,248,.15);color:var(--sip)}
+.pill-purple{background:rgba(192,132,252,.15);color:var(--purple)}
+.pill-gray{background:rgba(100,116,130,.15);color:var(--text3)}
+.sess-flow{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-meta{display:flex;gap:10px;flex-wrap:wrap}
+.sess-meta span{font-size:11px;color:var(--text3)}
+.proto-tag{font-size:10px;padding:1px 6px;border-radius:3px}
+.pt-sip{background:rgba(56,189,248,.1);color:var(--sip)}
+.pt-dia{background:rgba(251,146,60,.1);color:var(--dia)}
+.pt-inap{background:rgba(167,139,250,.1);color:var(--inap)}
+
+/* ── Feature table ── */
+.feat-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.feat-tbl th{text-align:left;padding:7px 11px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3);font-family:var(--mono)}
+.feat-tbl td{padding:6px 11px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--mono)}
+.feat-tbl tr:hover td{background:rgba(255,255,255,.015)}
+.fv-pos{color:var(--ok);font-weight:500}
+.fv-neg{color:var(--err);font-weight:500}
+.fv-num{color:var(--sip)}
+.fv-warn{color:var(--warn);font-weight:500}
+.cat-badge{font-size:10px;padding:2px 6px;border-radius:4px}
+.cat-sip{background:rgba(56,189,248,.1);color:var(--sip)}
+.cat-dia{background:rgba(251,146,60,.1);color:var(--dia)}
+.cat-flow{background:rgba(74,222,128,.1);color:var(--ok)}
+.cat-timing{background:rgba(250,204,21,.1);color:var(--warn)}
+.cat-absence{background:rgba(248,113,113,.1);color:var(--err)}
+.cat-q850{background:rgba(192,132,252,.1);color:var(--purple)}
+.cat-inap{background:rgba(167,139,250,.1);color:var(--inap)}
+.cat-retry{background:rgba(100,116,130,.1);color:var(--text2)}
+
+/* ── SHAP ── */
+.shap-row{display:flex;align-items:center;gap:9px;padding:5px 0;border-bottom:1px solid var(--border)}
+.shap-feat{font-family:var(--mono);font-size:11px;color:var(--text2);width:195px;flex-shrink:0}
+.shap-val-chip{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border-radius:3px;padding:1px 5px;margin-left:4px}
+.shap-bar-bg{flex:1;height:12px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.shap-bar{height:100%;border-radius:3px;transition:width .6s}
+.shap-pos{background:linear-gradient(90deg,var(--sip),var(--ok))}
+.shap-neg{background:linear-gradient(90deg,var(--err),#f9a8d4)}
+.shap-score{font-family:var(--mono);font-size:11px;width:48px;text-align:right}
+
+/* ── Diameter detail ── */
+.dia-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.dia-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dia-type{font-family:var(--mono);font-size:12px;font-weight:600}
+.dia-rc{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:4px}
+.rc-ok{background:rgba(74,222,128,.15);color:var(--ok)}
+.rc-err{background:rgba(248,113,113,.15);color:var(--err)}
+.dia-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dia-field{font-size:11px}
+.dia-k{color:var(--text3);font-family:var(--mono)}
+.dia-v{color:var(--text2);font-family:var(--mono)}
+
+/* ── Log ── */
+.log-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.log-body{font-family:var(--mono);font-size:11px;line-height:1.9;padding:12px 14px;max-height:calc(100vh - 220px);overflow-y:auto}
+.ll{padding:0}.ll.info{color:var(--text2)}.ll.ok{color:var(--ok)}.ll.warn{color:var(--warn)}.ll.err{color:var(--err)}.ll.head{color:var(--sip);font-weight:600}.ll.dia{color:var(--dia)}.ll.ts{color:var(--text3)}.ll.dia{color:var(--dia)}
+
+/* ── Empty states ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--text3)}
+.empty-ico{font-size:32px;margin-bottom:10px;opacity:.5}
+.empty-ttl{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.empty-sub{font-size:12px;line-height:1.7}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Section headings inside panels */
+.panel-sec{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px}
+.panel-sec:first-child{margin-top:0}
+
+/* Backend connection banner */
+.banner{padding:8px 16px;font-size:12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:rgba(251,146,60,.06);color:var(--dia)}
+.banner.ok{background:rgba(74,222,128,.06);color:var(--ok)}
+.banner.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 16 16" fill="none">
+        <path d="M2 12L5 6L7 9L9 7L14 12" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="8" cy="3.5" r="1.8" fill="white" opacity=".6"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Telecom RCA Analyzer</h1>
+      <div class="hdr-sub">SIP · Diameter · INAP · XGBoost · SHAP</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="status-chip" id="statusChip">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusTxt">idle</span>
+    </div>
+  </div>
+</header>
+
+<!-- Backend banner -->
+<div class="banner" id="backendBanner">
+  ⚠ Backend not detected — start with: <strong style="margin-left:4px">python main.py</strong>
+  &nbsp;·&nbsp; Running in demo mode
+</div>
+
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<aside>
+
+  <!-- Training PCAP -->
+  <div class="aside-sec">
+    <div class="sec-title">Training PCAP</div>
+    <div class="dz" id="dzTrain"
+         ondragover="dzOver(event,'dzTrain')"
+         ondragleave="dzLeave('dzTrain')"
+         ondrop="dzDrop(event,'train')">
+      <input type="file" accept=".pcap,.pcapng" onchange="dzFile(event,'train')">
+      <div class="dz-tag tag-train">TRAINING</div>
+      <div class="dz-ico">📂</div>
+      <div class="dz-name" id="trainName">Drop .pcap / click</div>
+      <div class="dz-hint">Builds ML model labels</div>
+    </div>
+  </div>
+
+  <!-- Analysis PCAP -->
+  <div class="aside-sec">
+    <div class="sec-title">Analysis PCAP</div>
+    <div class="dz" id="dzAnal"
+         ondragover="dzOver(event,'dzAnal')"
+         ondragleave="dzLeave('dzAnal')"
+         ondrop="dzDrop(event,'analysis')">
+      <input type="file" accept=".pcap,.pcapng" onchange="dzFile(event,'analysis')">
+      <div class="dz-tag tag-analysis">ANALYSIS</div>
+      <div class="dz-ico">🔍</div>
+      <div class="dz-name" id="analName">Drop .pcap / click</div>
+      <div class="dz-hint">Target for RCA prediction</div>
+    </div>
+    <div class="stat-row" id="parseStats" style="display:none">
+      <div class="stat"><div class="v c-sip" id="stSip">0</div><div class="l">SIP pkts</div></div>
+      <div class="stat"><div class="v c-dia" id="stDia">0</div><div class="l">Diameter</div></div>
+      <div class="stat"><div class="v c-inap" id="stInap">0</div><div class="l">INAP</div></div>
+      <div class="stat"><div class="v c-ok" id="stSess">0</div><div class="l">Sessions</div></div>
+    </div>
+  </div>
+
+  <!-- Call ID selector -->
+  <div class="aside-sec">
+    <div class="sec-title">Call ID</div>
+    <div class="call-sel-wrap">
+      <select id="callSel" onchange="onCallSelect(this.value)">
+        <option value="">— load PCAP first —</option>
+      </select>
+    </div>
+    <div class="stat-row" id="callStats" style="display:none">
+      <div class="stat"><div class="v c-sip" id="csSip">0</div><div class="l">SIP</div></div>
+      <div class="stat"><div class="v c-dia" id="csDia">0</div><div class="l">Diameter</div></div>
+      <div class="stat"><div class="v c-ok" id="csDur">—</div><div class="l">ms</div></div>
+    </div>
+  </div>
+
+  <!-- Analyze button + RCA result -->
+  <div class="aside-sec">
+    <button class="btn-run" id="btnRun" onclick="runAnalysis()" disabled>
+      Run RCA Analysis
+    </button>
+    <div class="rca-panel" id="rcaPanel">
+      <div class="rca-lbl" id="rcaLbl"></div>
+      <div class="rca-meta" id="rcaMeta"></div>
+      <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+      <div class="panel-sec" style="margin-top:4px">Evidence</div>
+      <ul class="ev-list" id="evList"></ul>
+      <div class="panel-sec">Class probabilities</div>
+      <div id="classProbs"></div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ── Canvas ── -->
+<div class="canvas">
+  <div class="tabs">
+    <div class="tab on"  onclick="tab('flow')">SIP + Diameter Flow</div>
+    <div class="tab"     onclick="tab('diameter')">Diameter Detail</div>
+    <div class="tab"     onclick="tab('sessions')">All Sessions</div>
+    <div class="tab"     onclick="tab('features')">Features</div>
+    <div class="tab"     onclick="tab('shap')">SHAP</div>
+    <div class="tab"     onclick="tab('log')">Log</div>
+  </div>
+
+  <div class="panels">
+
+    <!-- Flow -->
+    <div class="panel on" id="tab-flow">
+      <div class="empty" id="flowEmpty">
+        <div class="empty-ico">📡</div>
+        <div class="empty-ttl">No call selected</div>
+        <div class="empty-sub">Load an analysis PCAP, select a Call ID,<br>then click Run RCA Analysis</div>
+      </div>
+      <div id="flowContent" style="display:none">
+        <div class="legend">
+          <span class="leg-item"><span class="leg-line" style="background:var(--sip)"></span>SIP request</span>
+          <span class="leg-item"><span class="leg-line" style="background:var(--ok)"></span>SIP 200 OK</span>
+          <span class="leg-item"><span class="leg-line" style="background:var(--err)"></span>SIP failure</span>
+          <span class="leg-item"><span class="leg-line" style="background:var(--warn)"></span>CANCEL</span>
+          <span class="leg-item"><span class="leg-dash" style="border-color:var(--dia)"></span>Diameter CCR/CCA</span>
+          <span class="leg-item"><span class="leg-dash" style="border-color:var(--inap)"></span>INAP</span>
+        </div>
+        <div class="ladder-wrap">
+          <div class="ladder-hdr" id="ladderHdr"></div>
+          <svg id="ldr-svg"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diameter detail -->
+    <div class="panel" id="tab-diameter">
+      <div class="empty" id="diaEmpty">
+        <div class="empty-ico">🔷</div>
+        <div class="empty-ttl">No Diameter data</div>
+        <div class="empty-sub">Run analysis on a call with Diameter messages</div>
+      </div>
+      <div id="diaContent" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="panel-sec" style="margin:0">Diameter session — CCR/CCA flow</div>
+          <span class="dia-corr-badge" id="diaCorrBadge" style="display:none"></span>
+        </div>
+        <div id="diaCards"></div>
+        <div class="panel-sec" style="margin-top:20px">Failure analysis</div>
+        <div id="diaFailAnalysis" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;color:var(--text2);line-height:1.8;font-family:var(--mono)"></div>
+      </div>
+    </div>
+
+    <!-- Sessions -->
+    <div class="panel" id="tab-sessions">
+      <div class="empty" id="sessEmpty">
+        <div class="empty-ico">📋</div>
+        <div class="empty-ttl">No sessions loaded</div>
+        <div class="empty-sub">Load an analysis PCAP to see all sessions</div>
+      </div>
+      <div id="sessCards"></div>
+    </div>
+
+    <!-- Features -->
+    <div class="panel" id="tab-features">
+      <div class="empty" id="featEmpty">
+        <div class="empty-ico">🧮</div>
+        <div class="empty-ttl">No features</div>
+        <div class="empty-sub">Run analysis to see extracted ML features</div>
+      </div>
+      <div id="featContent" style="display:none">
+        <table class="feat-tbl">
+          <thead><tr>
+            <th>Feature</th><th>Value</th><th>Category</th><th>RCA Signal</th>
+          </tr></thead>
+          <tbody id="featRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SHAP -->
+    <div class="panel" id="tab-shap">
+      <div class="empty" id="shapEmpty">
+        <div class="empty-ico">🔬</div>
+        <div class="empty-ttl">No SHAP data</div>
+        <div class="empty-sub">Run analysis to see feature contributions</div>
+      </div>
+      <div id="shapContent" style="display:none">
+        <div class="panel-sec" id="shapTitle"></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">
+          Positive (→ blue/green) = pushed toward predicted class &nbsp;·&nbsp;
+          Negative (→ red) = pushed away
+        </div>
+        <div id="shapBars"></div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="panel" id="tab-log">
+      <div class="log-wrap">
+        <div class="log-body" id="logBody">
+          <div class="ll head">[ Telecom RCA Analyzer — Ready ]</div>
+          <div class="ll info">Backend: http://localhost:5050</div>
+          <div class="ll info">Start backend with: python main.py</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════
+const API = 'http://localhost:5050';
+let backendOk = false;
+
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+const S = {
+  token:       null, // session token from /api/parse
+  sessions:    [],   // all sessions from analysis PCAP
+  current:     null, // selected session summary
+  analysis:    null, // full analysis result for current call
+  trainFile:   null,
+  analFile:    null,
+  modelMeta:   null,
+};
+
+// ════════════════════════════════════════════════════════════
+//  LOGGING
+// ════════════════════════════════════════════════════════════
+function log(msg, type='info') {
+  const body = document.getElementById('logBody');
+  const ts = new Date().toTimeString().slice(0,8);
+  const d = document.createElement('div');
+  d.className = 'll ' + type;
+  d.textContent = `[${ts}] ${msg}`;
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+}
+
+// ════════════════════════════════════════════════════════════
+//  STATUS
+// ════════════════════════════════════════════════════════════
+function setStatus(txt, type='idle') {
+  document.getElementById('statusTxt').textContent = txt;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot' + (type==='ok'?' ok':type==='busy'?' busy':type==='err'?' err':'');
+}
+
+// ════════════════════════════════════════════════════════════
+//  BACKEND CHECK
+// ════════════════════════════════════════════════════════════
+async function checkBackend() {
+  try {
+    const r = await fetch(`${API}/health`, {signal: AbortSignal.timeout(2000)});
+    if (r.ok) {
+      backendOk = true;
+      document.getElementById('backendBanner').className = 'banner ok';
+      document.getElementById('backendBanner').textContent = '✓ Backend connected — http://localhost:5050';
+      log('Backend connected at ' + API, 'ok');
+      setStatus('connected', 'ok');
+      // Check model status
+      const ms = await fetch(`${API}/api/model-status`);
+      const md = await ms.json();
+      S.modelMeta = md;
+      if (md.model_trained) {
+        log(`ML model loaded — accuracy: ${md.meta?.accuracy || '?'}`, 'ok');
+      } else {
+        log('No trained model — using rule-based RCA. Run: python train.py', 'warn');
+      }
+    }
+  } catch {
+    backendOk = false;
+    log('Backend not running — using demo mode', 'warn');
+    log('Start with: python main.py', 'warn');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  DRAG & DROP
+// ════════════════════════════════════════════════════════════
+function dzOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('over'); }
+function dzLeave(id)   { document.getElementById(id).classList.remove('over'); }
+function dzDrop(e, type) {
+  e.preventDefault();
+  const id = type === 'train' ? 'dzTrain' : 'dzAnal';
+  document.getElementById(id).classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f, type);
+}
+function dzFile(e, type) {
+  const f = e.target.files[0];
+  if (f) handleFile(f, type);
+}
+
+function handleFile(file, type) {
+  if (!file.name.match(/\.(pcap|pcapng)$/i)) {
+    log(`Invalid file: ${file.name} — must be .pcap or .pcapng`, 'err');
+    return;
+  }
+  if (type === 'train') {
+    S.trainFile = file;
+    document.getElementById('trainName').textContent = file.name;
+    document.getElementById('dzTrain').classList.add('loaded');
+    log(`Training PCAP: ${file.name} (${kb(file.size)})`, 'ok');
+  } else {
+    S.analFile = file;
+    document.getElementById('analName').textContent = file.name;
+    document.getElementById('dzAnal').classList.add('loaded');
+    log(`Analysis PCAP: ${file.name} (${kb(file.size)})`, 'ok');
+    parsePcap(file);
+  }
+}
+
+function kb(b) { return (b/1024).toFixed(1) + ' KB'; }
+
+// ════════════════════════════════════════════════════════════
+//  PARSE PCAP
+// ════════════════════════════════════════════════════════════
+async function parsePcap(file) {
+  setStatus('parsing...', 'busy');
+  log(`Parsing ${file.name}...`, 'info');
+
+  if (!backendOk) {
+    log('No backend — generating demo sessions', 'warn');
+    const sessions = buildDemoSessions(file);
+    onSessionsLoaded(sessions, {sip_packets:49, diameter_packets:60, inap_packets:0, gtp_packets:0});
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r   = await fetch(`${API}/api/parse`, {method:'POST', body:fd});
+    const data = await r.json();
+
+    if (data.error) { log('Parse error: ' + data.error, 'err'); setStatus('error','err'); return; }
+
+    log(`Parsed ${data.total} sessions — SIP:${data.stats.sip_packets} Diameter:${data.stats.diameter_packets} INAP:${data.stats.inap_packets}`, 'ok');
+    S.token = data.token || null;
+    onSessionsLoaded(data.sessions, data.stats);
+
+  } catch(e) {
+    log('Parse failed: ' + e.message, 'err');
+    setStatus('error','err');
+  }
+}
+
+function onSessionsLoaded(sessions, stats) {
+  S.sessions = sessions;
+
+  // Stats bar
+  document.getElementById('parseStats').style.display = 'flex';
+  document.getElementById('stSip').textContent  = stats.sip_packets || 0;
+  document.getElementById('stDia').textContent  = stats.diameter_packets || 0;
+  document.getElementById('stInap').textContent = stats.inap_packets || 0;
+  document.getElementById('stSess').textContent = sessions.length;
+
+  // Populate selector
+  const sel = document.getElementById('callSel');
+  sel.innerHTML = '<option value="">— select call ID —</option>';
+  sessions.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.session_id;
+    const code  = s.final_sip_code || '?';
+    const short = s.session_id.slice(0,30) + '...';
+    o.textContent = `[${code}] ${short}`;
+    sel.appendChild(o);
+  });
+
+  renderSessionCards(sessions);
+  setStatus('ready', 'ok');
+  document.getElementById('btnRun').disabled = false;
+  log(`Ready — ${sessions.length} sessions loaded`, 'ok');
+}
+
+// ════════════════════════════════════════════════════════════
+//  CALL SELECT
+// ════════════════════════════════════════════════════════════
+function onCallSelect(callId) {
+  if (!callId) return;
+  const sess = S.sessions.find(s => s.session_id === callId);
+  if (!sess) return;
+  S.current = sess;
+
+  document.getElementById('callStats').style.display = 'flex';
+  document.getElementById('csSip').textContent = sess.sip_msg_count || 0;
+  document.getElementById('csDia').textContent = sess.dia_msg_count || 0;
+  document.getElementById('csDur').textContent = Math.round(sess.duration_ms || 0);
+
+  log(`Selected: ${callId.slice(0,40)}...`, 'info');
+  log(`  Flow: ${sess.flow}`, 'info');
+  log(`  Final code: ${sess.final_sip_code} | Dia: ${sess.dia_msg_count}`, 'info');
+
+  // Highlight in sessions list
+  document.querySelectorAll('.sess-card').forEach(c =>
+    c.classList.toggle('sel', c.dataset.id === callId));
+}
+
+// ════════════════════════════════════════════════════════════
+//  RUN ANALYSIS
+// ════════════════════════════════════════════════════════════
+async function runAnalysis() {
+  const sess = S.current || S.sessions[0];
+  if (!sess) { log('No session selected', 'err'); return; }
+
+  if (!S.current) {
+    S.current = sess;
+    document.getElementById('callSel').value = sess.session_id;
+    onCallSelect(sess.session_id);
+  }
+
+  setStatus('analyzing...', 'busy');
+  log(`Running RCA for ${S.current.session_id.slice(0,36)}...`, 'head');
+
+  let result;
+
+  if (backendOk) {
+    try {
+      const r = await fetch(`${API}/api/analyze-call`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({call_id: S.current.session_id, token: S.token}),
+      });
+      result = await r.json();
+      if (result.error) throw new Error(result.error);
+    } catch(e) {
+      log('Backend analysis error: ' + e.message, 'err');
+      result = buildDemoAnalysis(S.current);
+    }
+  } else {
+    result = buildDemoAnalysis(S.current);
+  }
+
+  S.analysis = result;
+  log(`RCA: ${result.rca_label} (${result.confidence_pct}%)`, 'ok');
+  (result.evidence || []).forEach(e => log('  › ' + e, 'info'));
+  if (result.dia_correlation) log(`Diameter correlation strategy: ${result.dia_correlation}`, 'dia');
+  if (result.dia_flow && result.dia_flow.has_failure) log(`Diameter failure detected: RC=${result.dia_flow.failure_rc} ${result.dia_flow.failure_name||''}`, 'err');
+
+  renderRcaPanel(result);
+  renderLadder(result);
+  renderDiameterDetail(result);
+  renderFeatures(result.features || S.current.features || {});
+  renderShap(result);
+  setStatus('complete', 'ok');
+  tab('flow');
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: RCA PANEL
+// ════════════════════════════════════════════════════════════
+const RCA_COLORS = {
+  NORMAL_CALL:'var(--ok)', USER_ABORT:'var(--warn)',
+  NO_ANSWER_TIMEOUT:'var(--err)', SERVICE_TIMEOUT:'var(--err)',
+  SUBSCRIBER_UNREACHABLE:'var(--err)', USER_BUSY:'var(--warn)',
+  CODEC_MISMATCH:'var(--err)', CHARGING_FAILURE:'var(--err)',
+  ROUTING_FAILURE:'var(--err)', CALL_FORWARDED:'var(--sip)',
+  ANNOUNCEMENT:'var(--purple)', SERVER_ERROR:'var(--err)', UNKNOWN:'var(--text3)',
+};
+
+function renderRcaPanel(r) {
+  const col = RCA_COLORS[r.rca_label] || 'var(--text2)';
+  document.getElementById('rcaPanel').classList.add('show');
+  document.getElementById('rcaLbl').innerHTML =
+    `<span style="color:${col}">${r.rca_label}</span>`;
+  document.getElementById('rcaMeta').textContent =
+    `Confidence: ${r.confidence_pct}% · ${r.rule_matched || 'ML'}`;
+  document.getElementById('confFill').style.width = r.confidence_pct + '%';
+
+  const evEl = document.getElementById('evList');
+  evEl.innerHTML = (r.evidence || []).map(e =>
+    `<li>${escHtml(e)}</li>`).join('');
+
+  const probEl = document.getElementById('classProbs');
+  probEl.innerHTML = (r.class_probs || []).map(p => {
+    const col2 = p.label === r.rca_label ? 'var(--sip)' : 'var(--border2)';
+    return `<div class="prob-row">
+      <div class="prob-name">${p.label}</div>
+      <div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${p.probability}%;background:${col2}"></div></div>
+      <div class="prob-pct">${p.probability.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: LADDER DIAGRAM
+// ════════════════════════════════════════════════════════════
+function renderLadder(result) {
+  document.getElementById('flowEmpty').style.display = 'none';
+  document.getElementById('flowContent').style.display = 'block';
+
+  const ladder = result.ladder || buildLadderFromSession(S.current);
+  const entities = ladder.entities || ['UE / Caller','P-CSCF','S-CSCF / TAS'];
+  const messages = ladder.messages || [];
+
+  // Header
+  const hdr = document.getElementById('ladderHdr');
+  hdr.innerHTML = entities.map((e,i) => {
+    let cls = 'ent-sip';
+    if (i === 0) cls = 'ent-net';
+    else if (e.includes('OCS') || e.includes('Diameter')) cls = 'ent-dia';
+    else if (e.includes('INAP') || e.includes('SCF')) cls = 'ent-inap';
+    return `<div class="ldr-ent ${cls}">${escHtml(e)}</div>`;
+  }).join('');
+
+  // SVG
+  const svg = document.getElementById('ldr-svg');
+  const W   = svg.getBoundingClientRect().width || 700;
+  const N   = entities.length;
+  const colW = W / N;
+  const colX = entities.map((_,i) => colW * i + colW / 2);
+  const ROW  = 46;
+  const TOP  = 14;
+  const H    = TOP + ROW * Math.max(messages.length, 1) + 30;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.style.height = H + 'px';
+
+  let s = '';
+
+  // Lifelines
+  entities.forEach((_,i) => {
+    const x = colX[i];
+    const isLast = i === N - 1;
+    const isDia  = isLast && N > 3 && !entities[i].includes('INAP');
+    const isInap = isLast && entities[i].includes('INAP');
+    const c = isDia ? '#f97316' : isInap ? '#a78bfa' : '#38bdf8';
+    s += `<line x1="${x}" y1="${TOP}" x2="${x}" y2="${H-16}" stroke="${c}" stroke-width="1" stroke-dasharray="3 4" opacity=".15"/>`;
+  });
+
+  messages.forEach((msg, idx) => {
+    const y  = TOP + ROW * idx + ROW / 2;
+    const yl = y + 4;
+    const fe = Math.min(msg.from_entity, N-1);
+    const te = Math.min(msg.to_entity,   N-1);
+    const fx = colX[fe];
+    const tx = colX[te];
+    const dir = tx > fx ? 1 : -1;
+    const color = msg.color || '#38bdf8';
+    const gap = 10;
+    const x1 = fx + dir * gap;
+    const x2 = tx - dir * gap;
+    const mid = (x1 + x2) / 2;
+
+    // Line (dashed for Diameter/INAP)
+    const dash = msg.dashed ? 'stroke-dasharray="5 3"' : '';
+    s += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${color}" stroke-width="1.5" ${dash} opacity=".88"
+      data-idx="${idx}" class="msg-line"/>`;
+
+    // Arrowhead
+    const ax = x2;
+    s += `<polygon points="${ax},${y} ${ax-dir*9},${y-5} ${ax-dir*9},${y+5}" fill="${color}" opacity=".88"/>`;
+
+    // Label background + text
+    const lw = 78;
+    s += `<rect x="${mid-lw/2}" y="${yl-13}" width="${lw}" height="16" rx="3" fill="#0c0e14" opacity=".88"/>`;
+    s += `<text x="${mid}" y="${yl}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="${color}" font-weight="500">${escSvg(msg.label)}</text>`;
+
+    // Timestamp (left margin)
+    if (msg.timestamp) {
+      const ts = (msg.timestamp % 1000).toFixed(2);
+      s += `<text x="5" y="${yl}" font-family="JetBrains Mono,monospace" font-size="9" fill="#536382">${ts}</text>`;
+    }
+
+    // Right annotation — Q.850, result code, IMSI tail
+    let rAnnot = '';
+    if (msg.q850)        rAnnot = `Q.850:${msg.q850}`;
+    else if (msg.result_code && msg.result_code !== '2001') rAnnot = `RC:${msg.result_code}`;
+    else if (msg.imsi)   rAnnot = `IMSI:${String(msg.imsi).slice(-5)}`;
+    if (rAnnot) {
+      s += `<text x="${W-5}" y="${yl}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#536382">${escSvg(rAnnot)}</text>`;
+    }
+
+    // Failure marker ✕
+    if (msg.is_failure) {
+      const mx = tx - dir * 2;
+      s += `<circle cx="${mx}" cy="${y}" r="6" fill="none" stroke="#f87171" stroke-width="1.5"/>`;
+      s += `<line x1="${mx-4}" y1="${y-4}" x2="${mx+4}" y2="${y+4}" stroke="#f87171" stroke-width="1.5"/>`;
+      s += `<line x1="${mx+4}" y1="${y-4}" x2="${mx-4}" y2="${y+4}" stroke="#f87171" stroke-width="1.5"/>`;
+    }
+
+    // Invisible hit area for tooltip
+    const hx = Math.min(x1,x2)-5;
+    const hw = Math.abs(x2-x1)+10;
+    s += `<rect x="${hx}" y="${y-10}" width="${hw}" height="22" fill="transparent" style="cursor:pointer"
+      onmouseenter="showTip(event,${idx})"
+      onmouseleave="hideTip()"/>`;
+  });
+
+  svg.innerHTML = s;
+  svg._messages = messages;
+}
+
+// ── Tooltip ──────────────────────────────────────────────────
+function showTip(e, idx) {
+  const svg = document.getElementById('ldr-svg');
+  const msg = svg._messages[idx];
+  if (!msg) return;
+  const tt = document.getElementById('tooltip');
+
+  let rows = [];
+  if (msg.proto === 'sip') {
+    rows = [
+      ['Protocol', 'SIP'],
+      ['Label',    msg.label],
+      msg.from_uri  ? ['From', msg.from_uri] : null,
+      msg.to_uri    ? ['To',   msg.to_uri] : null,
+      msg.cseq      ? ['CSeq', msg.cseq] : null,
+      msg.q850      ? ['Q.850', `${msg.q850} — ${Q850_TEXT[msg.q850]||'cause '+msg.q850}`] : null,
+      msg.reason    ? ['Reason', msg.reason] : null,
+      msg.src_ip    ? ['Src IP', msg.src_ip] : null,
+      msg.dst_ip    ? ['Dst IP', msg.dst_ip] : null,
+    ].filter(Boolean);
+  } else if (msg.proto === 'diameter') {
+    rows = [
+      ['Protocol',   'Diameter'],
+      ['Command',    msg.cmd_name || msg.label],
+      ['CC-Type',    msg.cc_type || ''],
+      msg.result_code ? ['Result', `${msg.result_code} ${msg.result_name||''}`] : null,
+      msg.session_id  ? ['Session-Id', msg.session_id.slice(0,30)+'...'] : null,
+      msg.origin_host ? ['Origin', msg.origin_host] : null,
+      msg.dest_host   ? ['Dest',   msg.dest_host] : null,
+      msg.imsi        ? ['IMSI',   msg.imsi] : null,
+      msg.msisdn      ? ['MSISDN', msg.msisdn] : null,
+      msg.is_failure  ? ['Status', 'FAILED'] : ['Status', 'OK'],
+    ].filter(Boolean);
+  } else {
+    rows = [
+      ['Protocol',   'INAP'],
+      ['Operation',  msg.label],
+      msg.service_key ? ['Service Key', msg.service_key] : null,
+      msg.tcap_tid    ? ['TCAP TID',    msg.tcap_tid] : null,
+    ].filter(Boolean);
+  }
+
+  const rHtml = rows.map(([k,v]) =>
+    `<div class="tt-row"><span class="tt-key">${k}</span><span class="tt-val">${escHtml(String(v))}</span></div>`
+  ).join('');
+
+  const protoCol = msg.proto === 'diameter' ? 'var(--dia)' : msg.proto === 'inap' ? 'var(--inap)' : msg.color || 'var(--sip)';
+
+  tt.innerHTML = `
+    <div class="tt-title" style="color:${protoCol}">${msg.proto.toUpperCase()} · ${escHtml(msg.label)}</div>
+    ${rHtml}`;
+  tt.style.display = 'block';
+  tt.style.left = (e.clientX + 14) + 'px';
+  tt.style.top  = (e.clientY - 8) + 'px';
+}
+function hideTip() { document.getElementById('tooltip').style.display = 'none'; }
+
+const Q850_TEXT = {16:'normal clearing',17:'user busy',18:'no user responding',19:'no answer',20:'subscriber absent',21:'call rejected',27:'destination out of order',31:'normal unspecified',34:'no circuit',41:'temporary failure',42:'congestion',102:'timer expiry',88:'incompatible destination'};
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: DIAMETER DETAIL
+// ════════════════════════════════════════════════════════════
+function renderDiameterDetail(result) {
+  const ladder = result.ladder || {};
+  const msgs   = (ladder.messages || []).filter(m => m.proto === 'diameter');
+
+  if (!msgs.length) {
+    document.getElementById('diaEmpty').style.display = 'flex';
+    document.getElementById('diaContent').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('diaEmpty').style.display = 'none';
+  document.getElementById('diaContent').style.display = 'block';
+  const corrBadge = document.getElementById('diaCorrBadge');
+  if (corrBadge) {
+    const corr = result.dia_correlation || '';
+    corrBadge.textContent = corr ? `strategy: ${corr}` : '';
+    corrBadge.style.display = corr ? 'inline-block' : 'none';
+  }
+
+  // Cards for each Diameter message
+  const cardsEl = document.getElementById('diaCards');
+  cardsEl.innerHTML = msgs.map(m => {
+    const isReq  = m.from_entity < m.to_entity;
+    const rcCls  = m.is_failure ? 'rc-err' : 'rc-ok';
+    const rcText = m.result_code
+      ? `${m.result_code} ${m.result_name || ''}`
+      : (isReq ? 'Request' : '—');
+    const ccType = m.cc_type || '';
+
+    return `<div class="dia-card">
+      <div class="dia-card-head">
+        <span class="dia-type" style="color:${m.color}">${m.label}</span>
+        <span class="dia-rc ${rcCls}">${rcText}</span>
+        ${m.is_failure ? '<span style="font-size:11px;color:var(--err)">● FAILURE</span>' : ''}
+      </div>
+      <div class="dia-grid">
+        <div class="dia-field"><span class="dia-k">Direction: </span><span class="dia-v">${isReq ? 'S-CSCF → OCS' : 'OCS → S-CSCF'}</span></div>
+        <div class="dia-field"><span class="dia-k">CC-Type: </span><span class="dia-v">${ccType}</span></div>
+        <div class="dia-field"><span class="dia-k">Origin: </span><span class="dia-v">${m.origin_host || '—'}</span></div>
+        <div class="dia-field"><span class="dia-k">Dest: </span><span class="dia-v">${m.dest_host || '—'}</span></div>
+        <div class="dia-field"><span class="dia-k">IMSI: </span><span class="dia-v">${m.imsi || '—'}</span></div>
+        <div class="dia-field"><span class="dia-k">MSISDN: </span><span class="dia-v">${m.msisdn || '—'}</span></div>
+        ${m.session_id ? `<div class="dia-field" style="grid-column:1/-1"><span class="dia-k">Session-Id: </span><span class="dia-v" style="word-break:break-all">${m.session_id}</span></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Failure analysis
+  const failMsgs = msgs.filter(m => m.is_failure);
+  const diaFlow  = result.dia_flow || {};
+  const analEl   = document.getElementById('diaFailAnalysis');
+
+  // Use dia_flow from backend if available (richer data)
+  const hasDiaFailure = diaFlow.has_failure || failMsgs.length > 0;
+
+  if (hasDiaFailure) {
+    const rc     = diaFlow.failure_rc     || (failMsgs[0] && failMsgs[0].result_code) || '?';
+    const rcName = diaFlow.failure_name   || (failMsgs[0] && failMsgs[0].result_name) || '';
+    const flowComplete = diaFlow.flow_complete ? 'No (terminated early)' : 'Incomplete';
+    const typesSeen = (diaFlow.types_seen || []).join(', ') || 'unknown';
+    analEl.innerHTML =
+      `<span style="color:var(--err)">● Diameter failure detected</span>\n\n` +
+      `Result-Code  : ${rc} ${rcName}\n` +
+      `Types seen   : ${typesSeen}\n` +
+      `Flow complete: ${flowComplete}\n` +
+      `Impact       : ${getDiaImpact(String(rc))}\n\n` +
+      `RCA link     : ${result.rca_label}\n` +
+      `Strategy     : ${result.dia_correlation || 'unknown'}\n\n` +
+      `The Ro (online charging) interface rejected this session.\n` +
+      `The SIP call was blocked before it could be established.`;
+  } else {
+    const flowComplete = diaFlow.flow_complete ? 'Yes (CCR-I + CCR-T)' : 'Partial';
+    const typesSeen = (diaFlow.types_seen || []).join(', ') || 'CCR/CCA';
+    analEl.innerHTML =
+      `<span style="color:var(--ok)">✓ All Diameter transactions successful</span>\n\n` +
+      `Types seen   : ${typesSeen}\n` +
+      `Flow complete: ${flowComplete}\n` +
+      `Strategy     : ${result.dia_correlation || 'unknown'}\n\n` +
+      `Charging layer did not contribute to this call failure.\n` +
+      `Investigate the SIP or network layer for the root cause.`;
+  }
+}
+
+function getDiaImpact(rc) {
+  const m = {
+    '2001':'Success — no impact',
+    '4001':'Authentication failed — subscriber identity rejected',
+    '4012':'Credit limit reached — prepaid balance exhausted',
+    '5003':'Authorization rejected — service not permitted',
+    '3002':'Unable to deliver — charging node unreachable',
+    '5012':'Unable to comply — protocol error at OCS',
+  };
+  return m[rc] || `Result code ${rc} — check OCS logs`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: SESSION CARDS
+// ════════════════════════════════════════════════════════════
+const PILL_CLASS = {
+  NORMAL_CALL:'pill-ok', USER_ABORT:'pill-warn',
+  NO_ANSWER_TIMEOUT:'pill-err', SERVICE_TIMEOUT:'pill-err',
+  SUBSCRIBER_UNREACHABLE:'pill-err', USER_BUSY:'pill-warn',
+  CODEC_MISMATCH:'pill-err', CHARGING_FAILURE:'pill-err',
+  ROUTING_FAILURE:'pill-err', CALL_FORWARDED:'pill-blue',
+  ANNOUNCEMENT:'pill-purple', SERVER_ERROR:'pill-err', UNKNOWN:'pill-gray',
+};
+
+function renderSessionCards(sessions) {
+  document.getElementById('sessEmpty').style.display = 'none';
+  const c = document.getElementById('sessCards');
+  c.innerHTML = sessions.map(s => {
+    const rca   = s.rca || {};
+    const pill  = rca.rca_label ? `<span class="pill ${PILL_CLASS[rca.rca_label]||'pill-gray'}">${rca.rca_label}</span>` : '';
+    const protos = (s.protocols||[]).map(p =>
+      `<span class="proto-tag pt-${p.toLowerCase().replace(/\s.*/,'')}">${p}</span>`
+    ).join(' ');
+    const conf = rca.confidence_pct ? `${rca.confidence_pct}%` : '';
+    return `<div class="sess-card" data-id="${escHtml(s.session_id)}"
+      onclick="onCardClick('${escHtml(s.session_id)}')">
+      <div class="sess-head">
+        <div class="sess-cid">${escHtml(s.session_id.slice(0,40))}...</div>
+        ${pill}
+      </div>
+      <div class="sess-flow">${escHtml((s.flow||'').slice(0,65))}</div>
+      <div class="sess-meta">
+        <span>SIP: ${s.sip_msg_count||0}</span>
+        <span>Dia: ${s.dia_msg_count||0}</span>
+        <span>${Math.round(s.duration_ms||0)}ms</span>
+        <span>${conf}</span>
+        <span>${protos}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function onCardClick(callId) {
+  document.getElementById('callSel').value = callId;
+  onCallSelect(callId);
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: FEATURES TABLE
+// ════════════════════════════════════════════════════════════
+const FEAT_CATS = {
+  sip_code:'SIP Core',is_480:'SIP Core',is_487:'SIP Core',is_488:'SIP Core',
+  is_486:'SIP Core',is_200:'SIP Core',is_408:'SIP Core',is_503:'SIP Core',
+  has_invite:'Flow',has_cancel:'Flow',has_bye:'Flow',has_180:'Flow',
+  has_183:'Flow',has_200_ok:'Flow',early_media:'Flow',
+  invite_count:'Retry',sip_msg_count:'Flow',flow_length:'Flow',
+  missing_cancel:'Absence',missing_200_ok:'Absence',missing_ringing:'Absence',missing_bye:'Absence',
+  duration_ms:'Timing',time_to_failure_ms:'Timing',
+  is_timeout_pattern:'Timing',is_immediate_fail:'Timing',is_fast_fail:'Timing',
+  q850_code:'Q.850',q850_no_answer:'Q.850',q850_user_busy:'Q.850',
+  q850_unreachable:'Q.850',q850_rejected:'Q.850',q850_network_fail:'Q.850',q850_normal:'Q.850',
+  dia_count:'Diameter',dia_failure_count:'Diameter',has_ccr_initial:'Diameter',
+  has_ccr_term:'Diameter',ccr_initial_ok:'Diameter',charging_failed:'Diameter',
+  sub_unreachable_dia:'Diameter',auth_failed_dia:'Diameter',has_diameter:'Diameter',
+  inap_count:'INAP',mrf_invoked:'INAP',inap_routing_fail:'INAP',
+  inap_service_logic:'INAP',inap_release_call:'INAP',has_service_key:'INAP',has_inap:'INAP',
+  has_retransmission:'Retry',
+};
+const CAT_CLS = {
+  'SIP Core':'cat-sip','Flow':'cat-flow','Absence':'cat-absence',
+  'Timing':'cat-timing','Q.850':'cat-q850','Diameter':'cat-dia',
+  'INAP':'cat-inap','Retry':'cat-retry',
+};
+const FEAT_SIGNALS = {
+  missing_cancel:'→ NO_ANSWER_TIMEOUT if is_487+has_180',
+  is_487:'Core failure — combine with absence flags',
+  charging_failed:'→ CHARGING_FAILURE when true',
+  has_cancel:'Separates USER_ABORT from NO_ANSWER',
+  has_180:'Callee was alerted before failure',
+  is_timeout_pattern:'>15s → timer expiry pattern',
+  q850_code:'PSTN-level termination cause',
+  early_media:'IN/MRF active (183 present)',
+  inap_routing_fail:'→ ROUTING_FAILURE',
+  dia_failure_count:'Charging layer failure count',
+};
+
+function renderFeatures(features) {
+  if (!features || !Object.keys(features).length) return;
+  document.getElementById('featEmpty').style.display = 'none';
+  document.getElementById('featContent').style.display = 'block';
+
+  const tbody = document.getElementById('featRows');
+  tbody.innerHTML = Object.entries(features).map(([k,v]) => {
+    const cat   = FEAT_CATS[k] || '—';
+    const catCls = CAT_CLS[cat] || '';
+    const sig   = FEAT_SIGNALS[k] || '';
+    let cls = '';
+    if (v === 1 && (k.includes('fail')||k.includes('missing')||k==='inap_routing_fail')) cls = 'fv-neg';
+    else if (v === 1 && !k.startsWith('is_') && !k.startsWith('has_') && !k.startsWith('missing_')) cls = 'fv-num';
+    else if (v === 1) cls = 'fv-pos';
+    else if (typeof v === 'number' && v > 100) cls = 'fv-num';
+    return `<tr>
+      <td style="font-family:var(--mono)">${k}</td>
+      <td><span class="${cls}">${v}</span></td>
+      <td><span class="cat-badge ${catCls}">${cat}</span></td>
+      <td style="font-size:11px;color:var(--text3)">${sig}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER: SHAP
+// ════════════════════════════════════════════════════════════
+function renderShap(result) {
+  const shap = result.shap_features;
+  if (!shap || !shap.length) return;
+
+  document.getElementById('shapEmpty').style.display = 'none';
+  document.getElementById('shapContent').style.display = 'block';
+  document.getElementById('shapTitle').textContent =
+    `Predicted: ${result.rca_label} (${result.confidence_pct}%) — top feature contributions`;
+
+  const maxAbs = Math.max(...shap.map(s => Math.abs(s.shap_score)));
+  const container = document.getElementById('shapBars');
+  container.innerHTML = shap.map(s => {
+    const pct  = maxAbs > 0 ? Math.round(Math.abs(s.shap_score) / maxAbs * 100) : 0;
+    const pos  = s.direction === 'positive';
+    const col  = pos ? 'var(--ok)' : 'var(--err)';
+    const desc = s.description || s.feature;
+    return `<div class="shap-row">
+      <div class="shap-feat">${s.feature}
+        <span class="shap-val-chip">${s.value}</span>
+      </div>
+      <div class="shap-bar-bg">
+        <div class="shap-bar ${pos?'shap-pos':'shap-neg'}" style="width:${pct}%"></div>
+      </div>
+      <div class="shap-score" style="color:${col}">${pos?'+':''}${s.shap_score.toFixed(3)}</div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);padding:1px 0 5px 0;border-bottom:1px solid var(--border)">${desc}</div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════════════
+function tab(name) {
+  const names = ['flow','diameter','sessions','features','shap','log'];
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('on', names[i] === name));
+  document.querySelectorAll('.panel').forEach(p =>
+    p.classList.remove('on'));
+  document.getElementById('tab-'+name).classList.add('on');
+}
+
+// ════════════════════════════════════════════════════════════
+//  DEMO MODE — realistic sessions when backend not available
+// ════════════════════════════════════════════════════════════
+function buildDemoSessions(file) {
+  const seed = file.size % 256;
+  const rng = mkRng(seed);
+
+  const SCENARIOS = [
+    {rca:'NORMAL_CALL',code:'200',flow:'INVITE → 100 → 180 → 200 → ACK → BYE',
+     sip:7,dia:4,q850:null},
+    {rca:'NO_ANSWER_TIMEOUT',code:'487',flow:'INVITE → 100 → 180 → 487 → ACK',
+     sip:5,dia:2,q850:19},
+    {rca:'USER_ABORT',code:'487',flow:'INVITE → 100 → 180 → CANCEL → 487 → ACK',
+     sip:6,dia:2,q850:16},
+    {rca:'SUBSCRIBER_UNREACHABLE',code:'480',flow:'INVITE → 100 → 480',
+     sip:3,dia:2,q850:20},
+    {rca:'USER_BUSY',code:'486',flow:'INVITE → 100 → 486',
+     sip:3,dia:0,q850:17},
+    {rca:'SERVICE_TIMEOUT',code:'487',flow:'INVITE → 100 → 183 → 487 → ACK',
+     sip:5,dia:2,q850:null},
+    {rca:'CHARGING_FAILURE',code:'403',flow:'INVITE → 100 → 403',
+     sip:3,dia:4,q850:null},
+    {rca:'CODEC_MISMATCH',code:'488',flow:'INVITE → 100 → 488',
+     sip:3,dia:0,q850:88},
+    {rca:'NORMAL_CALL',code:'200',flow:'INVITE → 100 → INVITE → 100 → 180 → 200 → ACK → BYE',
+     sip:9,dia:4,q850:null},
+  ];
+
+  const callers = ['+4915159710403','+4915159714500','+49301234567'];
+  const callees = ['091255791750','030987654','017987654'];
+
+  return SCENARIOS.map((sc, i) => {
+    const callId = mkCallId(i, seed);
+    const dur = sc.code === '200' ? 15000 + Math.floor(rng()*8000) : 3000 + Math.floor(rng()*18000);
+    const rca = simulateRca(sc.rca, sc.code, sc.q850, dur, sc.dia > 0);
+    return {
+      session_id: callId,
+      call_id: callId,
+      calling: callers[i % callers.length],
+      called:  callees[i % callees.length],
+      flow:    sc.flow,
+      final_sip_code: sc.code,
+      duration_ms: dur,
+      start_time: 1757017548 + i * 12,
+      sip_msg_count: sc.sip,
+      dia_msg_count: sc.dia,
+      inap_msg_count: 0,
+      protocols: sc.dia > 0 ? ['SIP','Diameter'] : ['SIP'],
+      has_cancel: sc.flow.includes('CANCEL'),
+      has_180: sc.flow.includes('180'),
+      has_183: sc.flow.includes('183'),
+      has_200: sc.code === '200',
+      q850_cause: sc.q850,
+      rca: rca,
+      features: buildDemoFeatures(sc, dur),
+    };
+  });
+}
+
+function simulateRca(label, code, q850, dur, hasDia) {
+  const EVIDENCE = {
+    NORMAL_CALL:['200 OK received','BYE present — clean call teardown'],
+    NO_ANSWER_TIMEOUT:['487 Request Terminated','180 Ringing — callee was alerted','No CANCEL — timer expired',`Time to failure: ${Math.round(dur)}ms`],
+    USER_ABORT:['487 Request Terminated','CANCEL present — caller ended attempt',q850?`Q.850 ${q850}: normal clearing`:''],
+    SUBSCRIBER_UNREACHABLE:['480 Temporarily Unavailable','Subscriber unregistered or powered off'],
+    USER_BUSY:['486 Busy Here','Callee is on another call'],
+    SERVICE_TIMEOUT:['487 Request Terminated','183 Session Progress — early media','IN service timeout'],
+    CHARGING_FAILURE:['Diameter CCR failure (result 4012)','Online charging rejected session','Call blocked at Ro interface'],
+    CODEC_MISMATCH:['488 Not Acceptable Here','SDP codec negotiation failed'],
+  };
+  const CONF = {NORMAL_CALL:98,NO_ANSWER_TIMEOUT:92,USER_ABORT:95,SUBSCRIBER_UNREACHABLE:90,USER_BUSY:95,SERVICE_TIMEOUT:88,CHARGING_FAILURE:88,CODEC_MISMATCH:90};
+  return {
+    rca_label: label,
+    confidence_pct: CONF[label]||75,
+    confidence: CONF[label]>=90?'HIGH':CONF[label]>=70?'MEDIUM':'LOW',
+    evidence: (EVIDENCE[label]||[label]).filter(Boolean),
+    rule_matched: label==='CHARGING_FAILURE'?'R13':label==='NORMAL_CALL'?'R1':label==='USER_ABORT'?'R3':'RULES',
+  };
+}
+
+function buildDemoFeatures(sc, dur) {
+  return {
+    sip_code: parseInt(sc.code)||0,
+    is_480:sc.code==='480'?1:0, is_487:sc.code==='487'?1:0,
+    is_488:sc.code==='488'?1:0, is_486:sc.code==='486'?1:0, is_200:sc.code==='200'?1:0,
+    has_invite:1, has_cancel:sc.flow.includes('CANCEL')?1:0,
+    has_bye:sc.flow.includes('BYE')?1:0, has_180:sc.flow.includes('180')?1:0,
+    has_183:sc.flow.includes('183')?1:0, has_200_ok:sc.code==='200'?1:0,
+    early_media:sc.flow.includes('183')?1:0,
+    invite_count: sc.flow.split('INVITE').length-1,
+    sip_msg_count: sc.sip, flow_length: sc.flow.split('→').length,
+    missing_cancel: (!sc.flow.includes('CANCEL')&&sc.code==='487')?1:0,
+    missing_200_ok: sc.code!=='200'?1:0,
+    missing_ringing:(!sc.flow.includes('180')&&!sc.flow.includes('183')&&sc.code!=='200')?1:0,
+    duration_ms:Math.round(dur), time_to_failure_ms:sc.code!=='200'?Math.round(dur):0,
+    is_timeout_pattern:dur>15000&&sc.code!=='200'?1:0,
+    is_immediate_fail:dur<500&&sc.code!=='200'?1:0,
+    q850_code:sc.q850||-1, q850_no_answer:sc.q850===19?1:0,
+    q850_user_busy:sc.q850===17?1:0, q850_unreachable:[20,27].includes(sc.q850)?1:0,
+    dia_count:sc.dia, dia_failure_count:sc.rca==='CHARGING_FAILURE'?2:0,
+    has_ccr_initial:sc.dia>0?1:0, has_ccr_term:sc.code==='200'?1:0,
+    ccr_initial_ok:sc.rca!=='CHARGING_FAILURE'&&sc.dia>0?1:0,
+    charging_failed:sc.rca==='CHARGING_FAILURE'?1:0,
+    sub_unreachable_dia:0, auth_failed_dia:0, has_diameter:sc.dia>0?1:0,
+    inap_count:0, mrf_invoked:0, inap_routing_fail:0, inap_service_logic:0,
+    inap_release_call:0, has_service_key:0, has_inap:0, has_retransmission:sc.flow.includes('INVITE → 100 → INVITE')?1:0,
+  };
+}
+
+function buildDemoAnalysis(sess) {
+  const rca = sess.rca || {rca_label:'UNKNOWN',confidence_pct:50,evidence:[],rule_matched:'DEMO'};
+  const features = sess.features || buildDemoFeatures({code:sess.final_sip_code,flow:sess.flow,dia:sess.dia_msg_count,rca:rca.rca_label}, sess.duration_ms);
+  const shap = buildDemoShap(rca.rca_label, features);
+  const ladder = buildLadderFromSession(sess);
+  const probs = buildClassProbs(rca.rca_label, rca.confidence_pct);
+  return {
+    call_id: sess.session_id,
+    calling: sess.calling,
+    called:  sess.called,
+    flow:    sess.flow,
+    duration_ms: sess.duration_ms,
+    protocols: sess.protocols,
+    rca_label: rca.rca_label,
+    confidence: rca.confidence_pct,
+    confidence_pct: rca.confidence_pct,
+    evidence: rca.evidence,
+    rule_matched: rca.rule_matched,
+    shap_features: shap,
+    class_probs: probs,
+    ladder: ladder,
+    features: features,
+  };
+}
+
+function buildLadderFromSession(sess) {
+  const code = sess.final_sip_code;
+  const flow = (sess.flow||'').split('→').map(s=>s.trim());
+  const hasDia = (sess.dia_msg_count||0) > 0;
+  const entities = ['UE / Caller','P-CSCF','S-CSCF / TAS'];
+  if (hasDia) entities.push('OCS (Ro/Diameter)');
+
+  const messages = [];
+  let t = (sess.start_time || 1757017557) + 0.001;
+
+  flow.forEach(step => {
+    t += 0.08 + Math.random() * 0.2;
+    const isReq = isNaN(parseInt(step));
+    const isFail = ['480','487','486','488','403','500'].includes(step);
+    const isOk   = step === '200' || step === '183';
+    const isCx   = step === 'CANCEL';
+    messages.push({
+      proto:'sip',
+      label: step,
+      timestamp: t,
+      from_entity: isReq ? 0 : 2,
+      to_entity:   isReq ? 2 : 0,
+      color: isFail?'#f87171':isOk?'#4ade80':isCx?'#facc15':'#38bdf8',
+      dashed: false,
+      is_failure: isFail,
+      is_ok: isOk,
+      q850: isFail && sess.q850_cause ? sess.q850_cause : null,
+    });
+  });
+
+  if (hasDia) {
+    const diaCol = entities.length - 1;
+    const diaTypes = ['CCR-I [2001]','CCA-I [2001]',
+      code==='200'?'CCR-T [2001]':null,code==='200'?'CCA-T [2001]':null].filter(Boolean);
+    const isFail = sess.rca?.rca_label === 'CHARGING_FAILURE';
+    diaTypes.forEach((lbl, di) => {
+      const isReq = lbl.startsWith('CCR');
+      const rc = lbl.includes('[2001]') && !isFail ? '2001' : isFail ? '4012' : '2001';
+      messages.push({
+        proto:'diameter',
+        label: isFail ? lbl.replace('[2001]','[4012]') : lbl,
+        timestamp: (sess.start_time||0) + 0.005 + di*0.12,
+        from_entity: isReq ? 2 : diaCol,
+        to_entity:   isReq ? diaCol : 2,
+        color: isFail?'#f87171':rc==='2001'?'#4ade80':'#fb923c',
+        dashed: true,
+        is_failure: isFail && isReq,
+        is_ok: !isFail,
+        result_code: isFail ? '4012' : '2001',
+        result_name: isFail ? 'CREDIT_LIMIT_REACHED' : 'SUCCESS',
+        cc_type: lbl.includes('-I')?'INITIAL_REQUEST':lbl.includes('-T')?'TERMINATION_REQUEST':'',
+        origin_host: 'tugwbn11_5_0',
+        dest_host: 'bnstsairc-in',
+        imsi: '262015947008400',
+        msisdn: (sess.calling||'').replace('+','').replace(/^00/,''),
+        session_id: `tugwbn11_5_0;${sess.start_time||1};${di}`,
+        cmd_code: '272',
+        cmd_name: 'CCR/CCA',
+      });
+    });
+  }
+
+  messages.sort((a,b) => (a.timestamp||0)-(b.timestamp||0));
+  return {entities, messages};
+}
+
+function buildDemoShap(label, feats) {
+  const weights = {
+    USER_ABORT:            [['has_cancel',0.88],['is_487',0.72],['missing_cancel',-0.65],['has_180',0.31],['duration_ms',0.18]],
+    NO_ANSWER_TIMEOUT:     [['missing_cancel',0.90],['has_180',0.78],['is_487',0.70],['time_to_failure_ms',0.65],['is_timeout_pattern',0.60],['has_200_ok',-0.44],['q850_no_answer',0.38]],
+    SERVICE_TIMEOUT:       [['has_183',0.86],['early_media',0.80],['is_487',0.68],['missing_cancel',0.62],['inap_count',0.44],['has_200_ok',-0.40]],
+    SUBSCRIBER_UNREACHABLE:[['is_480',0.95],['q850_unreachable',0.82],['missing_ringing',0.75],['is_immediate_fail',0.68],['has_200_ok',-0.55]],
+    USER_BUSY:             [['is_486',0.94],['q850_user_busy',0.82],['has_200_ok',-0.50],['missing_200_ok',0.42]],
+    CODEC_MISMATCH:        [['is_488',0.95],['is_immediate_fail',0.74],['has_200_ok',-0.55],['missing_200_ok',0.44]],
+    CHARGING_FAILURE:      [['charging_failed',0.93],['dia_failure_count',0.85],['ccr_initial_ok',-0.78],['has_ccr_term',-0.62],['has_200_ok',-0.50]],
+    NORMAL_CALL:           [['is_200',0.92],['has_bye',0.86],['has_200_ok',0.83],['has_180',0.56],['ccr_initial_ok',0.48],['is_487',-0.40]],
+  };
+  const FDESC = {
+    missing_cancel:'No CANCEL despite 487 — not user hangup',
+    has_cancel:'CANCEL present — caller hung up',
+    is_487:'SIP 487 Request Terminated',
+    is_480:'SIP 480 Temporarily Unavailable',
+    is_486:'SIP 486 Busy Here',
+    is_488:'SIP 488 Not Acceptable Here',
+    is_200:'SIP 200 OK — call answered',
+    has_180:'180 Ringing — callee was alerted',
+    has_183:'183 Session Progress — early media',
+    has_200_ok:'200 OK present in dialog',
+    has_bye:'BYE present — clean teardown',
+    early_media:'Early media indicates IN/MRF service',
+    time_to_failure_ms:'Time from INVITE to failure',
+    is_timeout_pattern:'Failure >15s — timer expiry',
+    charging_failed:'Diameter CCR rejected — charging failed',
+    dia_failure_count:'Failed Diameter transactions',
+    ccr_initial_ok:'CCR-Initial succeeded',
+    inap_count:'INAP messages present',
+    q850_no_answer:'Q.850: no answer (cause 19)',
+    q850_user_busy:'Q.850: user busy (cause 17)',
+    q850_unreachable:'Q.850: subscriber absent (cause 20)',
+    missing_ringing:'No 180/183 before failure',
+    missing_200_ok:'No 200 OK received',
+    is_immediate_fail:'Failure <500ms — immediate rejection',
+  };
+  return (weights[label]||[['sip_code',0.5]]).map(([f,sc])=>({
+    feature:f, value:feats[f]??0, shap_score:sc,
+    direction:sc>0?'positive':'negative',
+    description:FDESC[f]||f.replace(/_/g,' '),
+  }));
+}
+
+function buildClassProbs(label, conf) {
+  const others = ['NORMAL_CALL','NO_ANSWER_TIMEOUT','USER_ABORT','SUBSCRIBER_UNREACHABLE',
+    'USER_BUSY','CODEC_MISMATCH','CHARGING_FAILURE','SERVICE_TIMEOUT'].filter(l=>l!==label);
+  let rem = 100 - conf;
+  const probs = [{label, probability:conf}];
+  others.slice(0,4).forEach((l,i)=>{
+    const p = i===0?Math.round(rem*0.45):i===1?Math.round(rem*0.30):i===2?Math.round(rem*0.15):rem;
+    rem -= (i<3?p:0);
+    probs.push({label:l,probability:p});
+  });
+  return probs;
+}
+
+function mkRng(seed){ let s=seed; return ()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff}; }
+function mkCallId(i,seed){ const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; let id=''; for(let j=0;j<24;j++) id+=c[(seed*(i+1)*(j+7)*31)%c.length]; return id+'@ims.telekom.de'; }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escSvg(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+checkBackend();
+</script>
+</body>
+</html>

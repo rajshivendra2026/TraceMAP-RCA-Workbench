@@ -1,0 +1,54 @@
+[
+  {
+    "version": "v0.9.0",
+    "date": "2026-04-14",
+    "title": "Learning Control And Platform Visibility",
+    "changes": [
+      "Added one-click learning from a user-specified PCAP folder.",
+      "Added learning status, up-to-date detection, learned PCAP count, and unique pattern count in the UI.",
+      "Added footer version number with clickable improvement history.",
+      "Hardened tshark extraction by filtering unsupported field definitions per environment.",
+      "Added SCTP transport parsing for better control-plane visibility."
+    ]
+  },
+  {
+    "version": "v0.8.0",
+    "date": "2026-04-14",
+    "title": "Self-Learning RCA Intelligence",
+    "changes": [
+      "Added persistent knowledge base, vector search, compaction engine, and skill export.",
+      "Added hybrid RCA scoring using rules, pattern similarity, and anomaly signals.",
+      "Added context-aware learning with validation queue and pattern reinforcement.",
+      "Added lightweight explainability narrative generation for hybrid RCA."
+    ]
+  },
+  {
+    "version": "v0.7.0",
+    "date": "2026-04-14",
+    "title": "Analyst Workbench Overhaul",
+    "changes": [
+      "Reworked UI into an analyst-style RCA workbench.",
+      "Added richer capture analytics, protocol intelligence, endpoint views, and RCA summaries.",
+      "Made call flow and graph views session-aware and protocol-agnostic."
+    ]
+  },
+  {
+    "version": "v0.6.0",
+    "date": "2026-04-14",
+    "title": "Multi-Protocol Correlation Expansion",
+    "changes": [
+      "Expanded protocol coverage across 2G, 3G, LTE/4G, 5G, IMS, MAP, PFCP, HTTP, TCP, and UDP.",
+      "Improved session correlation so ladder and graph group multi-protocol session messages together.",
+      "Added trace details summaries including likely A-party, B-party, and call or transaction type."
+    ]
+  },
+  {
+    "version": "v0.5.0",
+    "date": "2026-04-14",
+    "title": "Production Hardening",
+    "changes": [
+      "Added app factory, config-driven runtime behavior, safer upload handling, and health endpoints.",
+      "Improved model loading, packaging, testing, and operational safety for production use."
+    ]
+  }
+]
