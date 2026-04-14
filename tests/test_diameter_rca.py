@@ -82,6 +82,40 @@ class DiameterRcaTests(unittest.TestCase):
 
         self.assertEqual(result["rca_label"], "SUBSCRIBER_BARRED")
 
+    def test_cancel_location_housekeeping_is_normal_call(self):
+        result = classify_session(
+            {
+                "sip_msgs": [],
+                "dia_msgs": [
+                    {
+                        "command_code": "317",
+                        "command_name": "CLR",
+                        "is_request": True,
+                        "is_failure": False,
+                        "is_auth_failure": False,
+                        "is_auth_reject": False,
+                        "is_roaming_failure": False,
+                        "is_charging_failure": False,
+                        "is_policy_reject": False,
+                    }
+                ],
+                "inap_msgs": [],
+                "gtp_msgs": [],
+                "pfcp_msgs": [],
+                "http_msgs": [],
+                "tcp_msgs": [],
+                "dns_msgs": [],
+                "icmp_msgs": [],
+                "nas_eps_msgs": [],
+                "nas_5gs_msgs": [],
+                "final_sip_code": "",
+                "protocols": ["diameter", "sctp"],
+            }
+        )
+
+        self.assertEqual(result["rca_label"], "NORMAL_CALL")
+        self.assertEqual(result["rule_id"], "R0AA_DIAMETER_HOUSEKEEPING")
+
 
 if __name__ == "__main__":
     unittest.main()

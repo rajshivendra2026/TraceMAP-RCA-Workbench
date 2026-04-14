@@ -255,6 +255,7 @@ def classify_session(session: dict) -> dict:
     )
     policy_failed   = any(m.get("is_policy_reject") for m in dia_msgs)
     diameter_successes = [m for m in dia_msgs if str(m.get("result_code") or "") in DIAMETER_SUCCESS_CODES]
+    diameter_housekeeping = _diameter_housekeeping_profile(session)
     lte_profile = _lte_control_plane_profile(session)
 
     # ========================================================
@@ -310,6 +311,14 @@ def classify_session(session: dict) -> dict:
             68,
             [f"{len(diameter_successes)} successful Diameter answers observed", "No Diameter rejection codes present"],
             "R0A_DIAMETER_SUCCESS",
+        )
+    if diameter_housekeeping["successful_housekeeping"] and not (gtp_failures or nas_failures or icmp_failed):
+        return _result(
+            "NORMAL_CALL",
+            LOW,
+            62,
+            diameter_housekeeping["evidence"],
+            "R0AA_DIAMETER_HOUSEKEEPING",
         )
 
     if lte_profile["successful_mobility"]:
@@ -603,6 +612,33 @@ def _legacy_mobility_profile(session: dict) -> dict:
     return {
         "successful_mobility": successful_mobility,
         "evidence": evidence or ["Legacy mobility signaling observed"],
+    }
+
+
+def _diameter_housekeeping_profile(session: dict) -> dict:
+    dia_msgs = session.get("dia_msgs", [])
+    if not dia_msgs:
+        return {
+            "successful_housekeeping": False,
+            "evidence": ["No Diameter signaling observed"],
+        }
+
+    protocols = {str(protocol).upper() for protocol in session.get("protocols", [])}
+    command_names = {str(msg.get("command_name") or "").upper() for msg in dia_msgs if msg.get("command_name")}
+    explicit_failures = any(msg.get("is_failure") for msg in dia_msgs)
+    has_clr = "CLR" in command_names or "CANCEL-LOCATION" in command_names
+    housekeeping_only = protocols and protocols <= {"DIAMETER", "SCTP"}
+    successful_housekeeping = has_clr and housekeeping_only and not explicit_failures
+
+    evidence = []
+    if has_clr:
+        evidence.append("Diameter Cancel Location housekeeping observed")
+    if housekeeping_only:
+        evidence.append("Session is limited to Diameter/SCTP mobility cleanup traffic")
+
+    return {
+        "successful_housekeeping": successful_housekeeping,
+        "evidence": evidence or ["Diameter signaling observed"],
     }
 
 
