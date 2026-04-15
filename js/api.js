@@ -65,17 +65,30 @@ async function uploadPCAP(file) {
     const data = await res.json();
     console.log("Server response:", data);
 
-    if (typeof window.loadData === "function") {
-      window.loadData(data);
-      if (typeof refreshValidationQueue === "function") {
-        refreshValidationQueue();
-      }
-      alert("✅ PCAP processed successfully");
-    } else {
-      console.error("loadData is not defined after upload completion");
-      window.__TRACE_PENDING_UPLOAD__ = data;
-      alert("✅ Upload successful. Rendering will resume once the UI finishes loading.");
+    if (typeof STATE !== "undefined") {
+      STATE.token = data.token || null;
+      STATE.filename = data.filename || "";
+      STATE.model = data.model || null;
+      STATE.summary = data.summary || null;
+      STATE.sessions = data.sessions || [];
+      STATE.captureGraph = data.graph || null;
+      STATE.graph = STATE.captureGraph;
+      STATE.hydrationPending = true;
     }
+
+    if (typeof window.hydrateFromState === "function") {
+      window.hydrateFromState();
+    } else if (typeof window.loadData === "function") {
+      window.loadData(data);
+    } else {
+      console.error("No render hydrator available after upload completion");
+      window.__TRACE_PENDING_UPLOAD__ = data;
+    }
+
+    if (typeof refreshValidationQueue === "function") {
+      refreshValidationQueue();
+    }
+    alert("✅ PCAP processed successfully");
 
   } catch (err) {
     console.error("uploadPCAP error:", err);

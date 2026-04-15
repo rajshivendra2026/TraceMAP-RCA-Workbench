@@ -1198,6 +1198,7 @@ function loadData(data) {
 }
 
 window.loadData = loadData;
+window.hydrateFromState = hydrateFromState;
 window.renderLearningStatus = renderLearningStatus;
 window.renderValidationQueue = renderValidationQueue;
 window.renderVersionInfo = renderVersionInfo;
