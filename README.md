@@ -27,6 +27,12 @@ It is designed to improve continuously:
 - Autonomous watcher with gated seed refresh and git-backed publishing
 - Analyst UI with validation queue, autonomous reasoning view, and configurable learning path
 
+### Demo Materials
+
+- Detailed presenter script: [`/Users/shivendraraj/Downloads/Tool-2/docs/demo/tracemap_demo_script.md`](/Users/shivendraraj/Downloads/Tool-2/docs/demo/tracemap_demo_script.md)
+- Word-openable handout: [`/Users/shivendraraj/Downloads/Tool-2/docs/demo/TraceMAP_Demo_Script.rtf`](/Users/shivendraraj/Downloads/Tool-2/docs/demo/TraceMAP_Demo_Script.rtf)
+- Gemini diagram prompt pack: [`/Users/shivendraraj/Downloads/Tool-2/docs/demo/gemini_diagram_prompts.md`](/Users/shivendraraj/Downloads/Tool-2/docs/demo/gemini_diagram_prompts.md)
+
 ## Quick Start
 
 macOS or Linux:

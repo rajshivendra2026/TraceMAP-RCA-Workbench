@@ -1,0 +1,94 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\fs24
+\b TraceMAP RCA Workbench Demo Script\b0\par
+\par
+\b Purpose\b0\par
+This document is a detailed presenter script for demonstrating TraceMAP RCA Workbench. It explains the GUI, how RCA is generated, what value the tool adds, and which telecom use cases it supports.\par
+\par
+\b Demo Objective\b0\par
+Show that TraceMAP is not just a packet decoder. It is a telecom-native RCA platform that decodes PCAPs, correlates sessions, applies rule-based and autonomous RCA, persists learned knowledge, and can continuously improve from new traces.\par
+\par
+\b Recommended Demo Duration\b0\par
+- Executive overview: 10 to 12 minutes\par
+- Technical operator demo: 20 to 30 minutes\par
+- Architecture and roadmap session: 35 to 45 minutes\par
+\par
+\b Demo Setup Checklist\b0\par
+- Keep the application running on http://localhost:5050\par
+- Prepare one success trace and one failure trace\par
+- Prepare one mobility or inter-RAT trace if possible\par
+- Prepare one folder of unseen PCAPs for learning demonstration\par
+\par
+\b GUI Walkthrough\b0\par
+\b 1. Header And Upload\b0\par
+Explain that Upload PCAP is the main analyst entry point and that the interface is divided into Analysis and Visualization modes.\par
+\par
+\b 2. Session Explorer\b0\par
+Show the session list, failed versus success filtering, free-text search, and protocol filtering. Emphasize that the tool converts packet-level data into correlated session-level triage.\par
+\par
+\b 3. Trace Overview\b0\par
+Explain that this section summarizes what kind of capture was uploaded and where an analyst should focus first.\par
+\par
+\b 4. Expert Findings\b0\par
+Explain that this panel prioritizes likely investigative starting points and reduces time-to-triage.\par
+\par
+\b 5. Learning Control\b0\par
+Explain the PCAP Learning Path, Save Path, Start Learning, and the KPI cards for patterns, learned PCAP count, pending files, learning state, and validation queue.\par
+\par
+\b 6. Capture Analytics\b0\par
+Explain the KPI layer: sessions, packets, protocols, technologies, normal vs abnormal, average duration, top RCA, top protocol, IMS, 2G/3G, LTE/4G, 5G, and transport indicators.\par
+\par
+\b 7. Protocol And Endpoint Intelligence\b0\par
+Explain protocol mix, technology mix, top endpoints, and RCA distribution.\par
+\par
+\b 8. Session RCA\b0\par
+Select a session and show RCA title, summary, narrative, severity, confidence, evidence, and next checks.\par
+\par
+\b 9. Autonomous Reasoning\b0\par
+Explain agent votes, causal chain, confidence model, and knowledge signals. Position this as a transparent augmentation to rules rather than a black box.\par
+\par
+\b 10. Details And Correlation\b0\par
+Explain that these sections provide drill-down context and reveal how the tool stitched the session across technologies and protocols.\par
+\par
+\b 11. Validation Queue\b0\par
+Explain that uncertain or conflicted cases are queued here so the system can learn safely with analyst oversight.\par
+\par
+\b 12. Visualization Tab\b0\par
+Show Ladder View for chronological signaling, Graph View for topology, and Causal View for RCA explainability.\par
+\par
+\b How RCA Is Generated\b0\par
+1. Decode PCAP with tshark\par
+2. Parse protocol-specific fields\par
+3. Normalize packet events\par
+4. Correlate into sessions\par
+5. Compact fragmented procedures\par
+6. Apply rule-based RCA\par
+7. Run autonomous reasoning and confidence logic\par
+8. Blend hybrid RCA\par
+9. Render analyst-facing output\par
+10. Reinforce or queue learning outcomes\par
+\par
+\b Value Addition\b0\par
+- Faster telecom RCA compared with generic packet viewers\par
+- Cross-protocol telecom procedure understanding\par
+- Explainable RCA rather than only raw decode\par
+- Knowledge retention across traces and machines\par
+- Controlled autonomous learning with gates and git-backed persistence\par
+\par
+\b Example Use Cases\b0\par
+- IMS voice failure triage\par
+- Diameter charging investigation\par
+- Subscriber and registration rejection analysis\par
+- 4G to 5G and 5G to 4G mobility troubleshooting\par
+- Cross-team incident reviews across transport, core, and IMS\par
+- Continuous learning from new corpora of traces\par
+\par
+\b Closing Statement\b0\par
+TraceMAP RCA Workbench turns telecom packet analysis into telecom root-cause analysis. It combines decode, correlation, RCA, autonomous reasoning, and learning into one operator-facing platform that becomes more valuable as more traces are processed.\par
+\par
+\b Additional Files In This Repo\b0\par
+- docs/demo/tracemap_demo_script.md for the full long-form presenter script\par
+- docs/demo/gemini_diagram_prompts.md for Gemini diagram prompts\par
+- docs/assets/tracemap_overview.svg for an overview architecture and flow image\par
+}
