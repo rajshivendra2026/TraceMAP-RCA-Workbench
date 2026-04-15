@@ -50,7 +50,7 @@ def curated_seed_files() -> list[str]:
     return [str(item) for item in configured]
 
 
-def snapshot_seed_state(base_dir: Path | None = None, include_validation: bool = True) -> dict[str, Any]:
+def snapshot_seed_state(base_dir: Path | None = None, include_validation: bool = False) -> dict[str, Any]:
     base = Path(base_dir or knowledge_base_dir())
     files: dict[str, dict[str, Any]] = {}
     pattern_count = 0
@@ -172,7 +172,8 @@ class GitPublisher:
         if not changed:
             return {"committed": False, "pushed": False, "reason": "no_changes"}
 
-        self._run(["git", "add", "--", *changed])
+        rel_changed = [self._to_repo_relative(path) for path in changed]
+        self._run(["git", "add", "--", *rel_changed])
         commit_result = self._run(["git", "commit", "-m", message], check=False)
         if commit_result.returncode != 0:
             return {
@@ -194,7 +195,7 @@ class GitPublisher:
         return {
             "committed": True,
             "pushed": pushed,
-            "paths": changed,
+            "paths": rel_changed,
             "commit_message": message,
             "push_error": push_error,
         }
@@ -202,10 +203,18 @@ class GitPublisher:
     def _changed_paths(self, paths: list[str]) -> list[str]:
         changed: list[str] = []
         for path in paths:
-            result = self._run(["git", "status", "--short", "--", path], check=False)
+            repo_path = self._to_repo_relative(path)
+            result = self._run(["git", "status", "--short", "--", repo_path], check=False)
             if result.stdout.strip():
                 changed.append(path)
         return changed
+
+    def _to_repo_relative(self, path: str) -> str:
+        candidate = Path(path)
+        try:
+            return str(candidate.resolve().relative_to(self.repo_root.resolve()))
+        except ValueError:
+            return str(candidate)
 
     def _run(self, cmd: list[str], check: bool = True) -> subprocess.CompletedProcess:
         return subprocess.run(
@@ -239,6 +248,7 @@ class AutonomousLearningWatcher:
 
     def discover_pending(self) -> list[dict[str, Any]]:
         manifest = self._load_manifest()
+        manifest_updates: dict[str, Any] = {}
         seen = set(manifest)
         pending: list[dict[str, Any]] = []
         for root in self.watch_paths:
@@ -272,6 +282,7 @@ class AutonomousLearningWatcher:
             return report
 
         manifest = self._load_manifest()
+        manifest_updates: dict[str, Any] = {}
         all_sessions: list[dict[str, Any]] = []
         learning_metrics = Counter()
 
@@ -289,7 +300,7 @@ class AutonomousLearningWatcher:
                 }
             )
             all_sessions.extend(sessions)
-            manifest[item["signature"]] = {
+            manifest_updates[item["signature"]] = {
                 "path": item["path"],
                 "name": item["name"],
                 "size": item["size"],
@@ -301,7 +312,6 @@ class AutonomousLearningWatcher:
             for key, value in ((sessions[0].get("learning_metrics") if sessions else {}) or {}).items():
                 learning_metrics[key] += int(value)
 
-        self._save_manifest(manifest)
         report["processed_trace_count"] = len(pending)
         report["session_count"] = len(all_sessions)
         report["label_counts"] = dict(
@@ -336,6 +346,8 @@ class AutonomousLearningWatcher:
                 "reason": "gates_blocked" if not gate["passed"] else "auto_commit_disabled",
             }
 
+        manifest.update(manifest_updates)
+        self._save_manifest(manifest)
         report["finished_at"] = utc_now()
         report["report_path"] = self._write_report(report)
         return report

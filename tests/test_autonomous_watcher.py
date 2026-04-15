@@ -80,6 +80,46 @@ class AutonomousWatcherTests(unittest.TestCase):
             manifest = json.loads((knowledge / "processed_sources.json").read_text(encoding="utf-8"))
             self.assertEqual(len(manifest), 1)
 
+    def test_watcher_does_not_persist_manifest_when_publish_raises(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir)
+            knowledge = base / "knowledge"
+            input_dir = base / "raw"
+            report_dir = knowledge / "run_reports"
+            input_dir.mkdir(parents=True)
+            _write_json(knowledge / "patterns.json", [])
+            _write_json(knowledge / "metrics.json", {"validation_queue_size": 0})
+            _write_json(knowledge / "vectors.json", [])
+            _write_json(knowledge / "validation_queue.json", [])
+            (input_dir / "trace-1.pcap").write_text("pcap", encoding="utf-8")
+
+            def fake_process_pcap(path: str):
+                _write_json(
+                    knowledge / "patterns.json",
+                    [{"pattern_id": "pat-1", "root_cause": "NORMAL_CALL", "embedding_vector": [0.1, 0.2]}],
+                )
+                _write_json(knowledge / "vectors.json", [{"id": "pat-1"}])
+                return [{"session_id": "sess-1", "rca": {"rca_label": "NORMAL_CALL"}}]
+
+            class RaisingPublisher:
+                def publish(self, paths, message, push=False):
+                    raise RuntimeError("git publish failed")
+
+            with patch("src.autonomous.watcher.process_pcap", side_effect=fake_process_pcap), patch(
+                "src.autonomous.watcher.report_dir", return_value=report_dir
+            ), patch("src.autonomous.watcher.cfg", side_effect=lambda key, default=None: True if key == "autonomous.auto_commit" else default):
+                watcher = AutonomousLearningWatcher(
+                    watch_paths=[str(input_dir)],
+                    base_dir=knowledge,
+                    manifest_path=knowledge / "processed_sources.json",
+                    policy=SeedRefreshPolicy(max_unknown_ratio=0.6, max_validation_queue_growth=2, max_pattern_drop=0),
+                    git_publisher=RaisingPublisher(),
+                )
+                with self.assertRaisesRegex(RuntimeError, "git publish failed"):
+                    watcher.run_cycle()
+
+            self.assertFalse((knowledge / "processed_sources.json").exists())
+
     def test_git_publisher_commits_only_changed_paths(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             repo = Path(tmpdir)
@@ -129,6 +169,7 @@ class AutonomousWatcherTests(unittest.TestCase):
             snapshot = snapshot_seed_state(base)
             self.assertEqual(snapshot["pattern_count"], 1)
             self.assertEqual(snapshot["pending_validation"], 1)
+            self.assertNotIn("validation_queue.json", snapshot["files"])
 
 
 if __name__ == "__main__":
