@@ -144,6 +144,9 @@ def session_summary(session: dict) -> dict:
         "confidence": rca.get("confidence_pct", 0),
         "severity": rca.get("severity", ""),
         "rule_id": rca.get("rule_id", ""),
+        "priority_score": rca.get("priority_score", session.get("priority_score", 0)),
+        "priority_band": rca.get("priority_band", session.get("priority_band", "low")),
+        "priority_reason": rca.get("priority_reason", session.get("priority_reason", "baseline inspection")),
         "evidence": rca.get("evidence", []),
         "recommendations": rca.get("recommendations", []),
         "decision_sources": rca.get("decision_sources", {}),
@@ -255,43 +258,122 @@ def _build_endpoint_activity(parsed: dict) -> list:
 
 def _build_expert_findings(protocol_counts: dict, technology_counts: dict, tcp_issues: int, failed_sessions: int, sessions: list) -> list:
     findings = []
+    labels = Counter()
+    abnormal_sessions = []
+    unknown_sessions = []
+
+    for session in sessions:
+        final_rca = session.get("hybrid_rca") or session.get("rca", {})
+        label = final_rca.get("rca_label", "UNKNOWN")
+        labels[label] += 1
+        if label == "UNKNOWN":
+            unknown_sessions.append((session, final_rca))
+        elif label != "NORMAL_CALL":
+            abnormal_sessions.append((session, final_rca))
+
+    total_sessions = len(sessions) or 1
+    abnormal_count = len(abnormal_sessions)
+    unknown_count = len(unknown_sessions)
+    abnormal_ratio = abnormal_count / total_sessions
+    unknown_ratio = unknown_count / total_sessions
+
+    if abnormal_count:
+        top_label, top_count = Counter(
+            final_rca.get("rca_label", "UNKNOWN")
+            for _, final_rca in abnormal_sessions
+        ).most_common(1)[0]
+        severity = "error" if abnormal_ratio >= 0.45 or top_label in {"SUBSCRIBER_BARRED", "NETWORK_REJECTION", "CHARGING_FAILURE", "CORE_NETWORK_FAILURE"} else "warn"
+        findings.append({
+            "severity": severity,
+            "title": f"{top_label.replace('_', ' ').title()} is the dominant abnormal pattern",
+            "body": f"{abnormal_count} of {len(sessions)} correlated sessions are non-normal, and {top_count} of them converge on {top_label.replace('_', ' ').title()}. Start with the highest-confidence abnormal session in the explorer.",
+        })
+
+        lead_session, lead_rca = max(
+            abnormal_sessions,
+            key=lambda item: (
+                float(item[0].get("priority_score", 0) or (item[1] or {}).get("priority_score", 0)),
+                float((item[1] or {}).get("confidence_pct", 0)),
+            )
+        )
+        lead_title = lead_rca.get("rca_title") or lead_rca.get("rca_label", "Unknown")
+        lead_confidence = int(round(float(lead_rca.get("confidence_pct", 0))))
+        lead_evidence = list(lead_rca.get("evidence", []))[:2]
+        lead_hint = "; ".join(str(item) for item in lead_evidence) if lead_evidence else "Review RCA evidence and ladder flow for the first failure marker."
+        findings.append({
+            "severity": "note",
+            "title": f"Lead investigation target: {lead_title}",
+            "body": f"The strongest abnormal session is ranked at priority {int(round(float(lead_session.get('priority_score', lead_rca.get('priority_score', 0)) or 0)))} and classified at {lead_confidence}% confidence. Key evidence: {lead_hint}",
+        })
+
+    if unknown_count:
+        severity = "warn" if unknown_ratio >= 0.3 else "note"
+        findings.append({
+            "severity": severity,
+            "title": "Unknown or weakly stitched sessions remain",
+            "body": f"{unknown_count} session(s) are still classified as UNKNOWN. This usually points to sparse signaling, partial decode coverage, or control-plane fragments that need closer correlation review.",
+        })
+
     if tcp_issues > 50:
         findings.append({
             "severity": "warn",
             "title": "High transport instability",
             "body": f"Observed {tcp_issues} TCP anomalies, which is high for a single capture and may indicate congestion, resets, or packet loss.",
         })
-    if protocol_counts.get("DIAMETER", 0) and any((s.get("hybrid_rca") or s.get("rca", {})).get("rca_label") == "CHARGING_FAILURE" for s in sessions):
+    elif tcp_issues > 0:
+        findings.append({
+            "severity": "note",
+            "title": "Transport noise is present",
+            "body": f"{tcp_issues} TCP anomaly marker(s) were observed. That may affect session quality or explain retransmission-heavy flows without being the primary RCA.",
+        })
+
+    if protocol_counts.get("DIAMETER", 0) and labels.get("CHARGING_FAILURE", 0):
         findings.append({
             "severity": "error",
             "title": "Charging control path is failing",
-            "body": "Diameter charging messages are present and at least one correlated session was classified as a charging failure.",
+            "body": f"Diameter signaling is present and {labels.get('CHARGING_FAILURE', 0)} session(s) were classified as charging failures. Review credit-control and policy exchanges first.",
         })
+
+    if protocol_counts.get("SCTP", 0) and (protocol_counts.get("S1AP", 0) or protocol_counts.get("NGAP", 0)):
+        findings.append({
+            "severity": "note",
+            "title": "Strong control-plane visibility",
+            "body": "SCTP plus access signaling is present, which gives good visibility into telecom procedure progression and makes ladder-view inspection more reliable.",
+        })
+
     if technology_counts.get("5G", 0) and protocol_counts.get("HTTP", 0) == 0 and protocol_counts.get("PFCP", 0) == 0:
         findings.append({
             "severity": "note",
             "title": "Partial 5G visibility",
             "body": "5G access signaling is present, but service-based or user-plane control traffic is limited in this capture.",
         })
-    if protocol_counts.get("SCTP", 0):
-        findings.append({
-            "severity": "note",
-            "title": "SCTP transport observed",
-            "body": "SCTP control-plane traffic is present. This improves visibility for S1AP/NGAP style signaling even when higher-layer field variants differ by trace.",
-        })
-    if failed_sessions and not findings:
-        findings.append({
-            "severity": "note",
-            "title": "Investigate correlated failures",
-            "body": f"{failed_sessions} session(s) were classified as non-normal. Review the RCA panel and flow timeline for the highest-confidence failure first.",
-        })
-    if not findings:
+
+    active_technologies = [tech for tech, count in technology_counts.items() if count > 0]
+    if len(active_technologies) >= 3:
         findings.append({
             "severity": "chat",
-            "title": "No high-severity anomalies surfaced",
-            "body": "The capture looks broadly healthy at summary level. Use the session explorer to inspect individual conversations.",
+            "title": "Multi-domain trace with cross-layer context",
+            "body": f"This capture spans {', '.join(active_technologies[:4])}. Use the protocol intelligence and session RCA panels together because multiple technology domains are contributing context.",
         })
-    return findings
+
+    if not findings:
+        top_protocol = max(protocol_counts.items(), key=lambda item: item[1])[0] if protocol_counts else "UNKNOWN"
+        findings.append({
+            "severity": "chat",
+            "title": "Capture looks broadly healthy",
+            "body": f"No elevated anomalies surfaced at summary level. Start with the dominant {top_protocol} conversations and use the session explorer to inspect a representative normal session.",
+        })
+
+    severity_rank = {"error": 0, "warn": 1, "note": 2, "chat": 3}
+    deduped = []
+    seen_titles = set()
+    for finding in sorted(findings, key=lambda item: (severity_rank.get(item.get("severity", "chat"), 9), item.get("title", ""))):
+        title = finding.get("title", "")
+        if title in seen_titles:
+            continue
+        seen_titles.add(title)
+        deduped.append(finding)
+    return deduped[:4]
 
 
 def build_trace_details_summary(parsed: dict, sessions: list, protocol_counts: dict, technology_counts: dict) -> dict:

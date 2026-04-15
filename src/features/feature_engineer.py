@@ -458,10 +458,21 @@ def detect_session_anomaly(
     )
 
     if IsolationForest is not None:  # pragma: no branch - tiny code path
-        model = IsolationForest(random_state=42, contamination=0.15)
-        baseline = np.vstack([sample, sample * 0.85 + 0.01, sample * 1.15 + 0.02, np.zeros_like(sample)])
-        model.fit(baseline)
-        score = float(-model.score_samples(sample)[0])
+        try:
+            model = IsolationForest(random_state=42, contamination=0.15)
+            baseline = np.vstack([sample, sample * 0.85 + 0.01, sample * 1.15 + 0.02, np.zeros_like(sample)])
+            model.fit(baseline)
+            score = float(-model.score_samples(sample)[0])
+        except Exception:
+            score = min(
+                1.0,
+                (
+                    float(features.get("dia_failure_count", 0)) * 0.18
+                    + float(features.get("timer_anomaly_count", 0)) * 0.22
+                    + float(features.get("has_retransmission", 0)) * 0.2
+                    + float(features.get("sip_4xx", 0) + features.get("sip_5xx", 0)) * 0.2
+                ),
+            )
     else:
         score = min(
             1.0,

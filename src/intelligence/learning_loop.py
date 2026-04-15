@@ -16,6 +16,7 @@ from src.intelligence.compaction_engine import KnowledgeCompactor
 from src.intelligence.knowledge_engine import KnowledgeEngine
 from src.intelligence.llm_explainer import build_llm_explanation
 from src.intelligence.skill_exporter import SkillExporter
+from src.ml.ranking import score_session_priority
 from src.rules.rca_rules import blend_hybrid_rca
 
 
@@ -80,6 +81,17 @@ class LearningLoop:
             session["embedding_vector"] = embedding
             session["autonomous_rca"] = autonomous
             session["hybrid_rca"] = hybrid
+            priority = score_session_priority(
+                session,
+                features=features,
+                intelligence=intelligence,
+                hybrid_rca=hybrid,
+                anomaly_result=anomaly,
+                pattern_match=best_match,
+                confidence_model=autonomous.get("confidence_model"),
+            )
+            session.update(priority)
+            hybrid.update(priority)
 
             confidence_model = autonomous.get("confidence_model", {})
             confidence_score = float(confidence_model.get("confidence_score", 0.0))

@@ -1,5 +1,17 @@
 [
   {
+    "version": "v1.0.0",
+    "date": "2026-04-16",
+    "title": "Production Dashboard And Analyst Triage Upgrade",
+    "changes": [
+      "Unified the header, navigation, and overall SaaS dashboard styling into a cleaner production workbench.",
+      "Moved the validation queue into its own review tab and improved queue status pills and analyst workflow separation.",
+      "Added richer expert findings and session-priority ranking so the highest-value investigation target surfaces first.",
+      "Improved visualization readability with larger ladder, graph, and causal canvases, centered ladder layout, stronger scanability, and better graph legibility.",
+      "Refined typography, panel hierarchy, and interaction behavior to reduce clutter and make the RCA workspace easier to read."
+    ]
+  },
+  {
     "version": "v0.9.0",
     "date": "2026-04-14",
     "title": "Learning Control And Platform Visibility",

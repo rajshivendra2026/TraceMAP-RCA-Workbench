@@ -56,6 +56,11 @@ const FONT_FAMILY    = "'JetBrains Mono', 'Consolas', monospace";
    ════════════════════════════════════════════════════════════════ */
 function setView(mode) {
   STATE.viewMode = mode;
+  const buttons = document.querySelectorAll(".view-toggle button");
+  buttons.forEach(button => {
+    const matches = button.textContent.toLowerCase().includes(mode);
+    button.classList.toggle("active", matches);
+  });
 
   const lv = document.getElementById("ladderView");
   const gv = document.getElementById("graphView");
@@ -103,6 +108,12 @@ function renderSessions() {
     );
   }
 
+  sessions.sort((left, right) => {
+    const priorityDelta = Number(right.priority_score || 0) - Number(left.priority_score || 0);
+    if (priorityDelta !== 0) return priorityDelta;
+    return Number(right.confidence || 0) - Number(left.confidence || 0);
+  });
+
   if (!sessions.length) {
     list.innerHTML = `<div class="empty-state">No sessions found</div>`;
     return;
@@ -119,7 +130,11 @@ function renderSessions() {
     const rca    = s.rca_title || s.rca_label || "Unknown";
     const callId = (s.call_id || "").slice(0, 25);
     const callType = s.details_summary?.call_type || "Generic session";
+    const priority = Math.round(Number(s.priority_score || 0));
+    const priorityBand = String(s.priority_band || "low").toLowerCase();
+    const priorityBadge = `<span class="priority-pill ${priorityBand}">P${priority}</span>`;
     const chips = [
+      priorityBadge,
       ...(s.protocols || []).slice(0, 3).map(p => `<span class="chip">${String(p).toUpperCase()}</span>`),
       ...(s.technologies || []).slice(0, 2).map(t => `<span class="chip">${t}</span>`),
     ].join("");
@@ -132,6 +147,7 @@ function renderSessions() {
       </div>
       <div class="session-line2">${callId}</div>
       <div class="session-line2">${callType}</div>
+      <div class="session-line2">${s.priority_reason || "baseline inspection"}</div>
       <div class="session-meta">${chips}</div>
     `;
 
@@ -168,7 +184,10 @@ function renderOverview() {
   _renderMetricList("technologyMix", summary.technology_counts || {});
   _renderEndpointList("topEndpoints", summary.top_endpoints || []);
   _renderMetricList("rcaDistribution", summary.rca_distribution || {});
-  _renderExpertFindings(summary.expert_findings || []);
+  _renderExpertFindings(summary.expert_findings || [], sessions);
+  _renderTrafficTrendChart(sessions, summary.protocol_counts || {});
+  _renderProtocolShareChart(summary.protocol_counts || {});
+  _renderDurationProfileChart(sessions);
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -180,6 +199,7 @@ function selectSession(s) {
 
   _setText("rcaTitle",      s.rca_title        || s.rca_label || "Unknown");
   _setText("rcaSummary",    s.rca_summary      || "No session summary available.");
+  _setText("rcaPriority",   `Priority P${Math.round(Number(s.priority_score || 0))} · ${String(s.priority_band || "low").toUpperCase()}`);
   _setText("rcaConfidence", `Confidence ${s.confidence || 0}%`);
   _setText("rcaSeverity",   `Severity ${s.severity || "N/A"}`);
   _setText("rcaRule",       s.rule_id || "Rule unavailable");
@@ -318,7 +338,7 @@ function _buildGraphModel(graph) {
       label: _formatGraphNodeLabel(node.label || node.id, type, activity),
       title: `${type}\n${node.label || node.id}\nActivity ${activity}`,
       shape: "dot",
-      size: Math.min(40, 14 + activity * 1.6),
+      size: Math.min(46, 18 + activity * 1.8),
       mass: Math.max(1, activity / 2),
       color: {
         background: style.background,
@@ -335,7 +355,7 @@ function _buildGraphModel(graph) {
       font: {
         color: style.text,
         face: "JetBrains Mono",
-        size: 12,
+        size: 13,
         bold: activity >= 6,
       },
       borderWidth: 2,
@@ -380,7 +400,7 @@ function _buildGraphModel(graph) {
       selectionWidth: 1.5,
       font: {
         color: "#dbeafe",
-        size: 11,
+        size: 12,
         face: "JetBrains Mono",
         strokeWidth: 0,
         background: "rgba(15, 23, 42, 0.75)",
@@ -425,7 +445,7 @@ function _buildCausalGraphModel(graph) {
       label: `${protocol}\n${String(node.message || "Event").slice(0, 28)}\nscore ${Math.round((Number(node.score || 0)) * 100)}%`,
       title: `${node.event || node.id}\n${node.src || "—"} → ${node.dst || "—"}`,
       shape: node.failure ? "diamond" : "box",
-      size: node.failure ? 24 : 18,
+      size: node.failure ? 28 : 22,
       color: {
         background: node.failure ? "rgba(220, 38, 38, 0.92)" : `${style.color}dd`,
         border: node.failure ? "#fecaca" : "#e2e8f0",
@@ -437,7 +457,7 @@ function _buildCausalGraphModel(graph) {
       font: {
         color: "#f8fafc",
         face: "JetBrains Mono",
-        size: 11,
+        size: 12,
       },
       borderWidth: 2,
       margin: 10,
@@ -468,7 +488,7 @@ function _buildCausalGraphModel(graph) {
     dashes: Number(edge.weight || 0) < 0.35,
     font: {
       color: "#dbeafe",
-      size: 10,
+      size: 11,
       face: "JetBrains Mono",
       background: "rgba(15, 23, 42, 0.75)",
       strokeWidth: 0,
@@ -791,14 +811,14 @@ function renderLadder(flow) {
   const nodes = [...nodeSet];
 
   /* Layout constants */
-  const NODE_GAP    = 220;
-  const LEFT_MARGIN = 40;
-  const TOP_HEADER  = 60;
-  const ROW_HEIGHT  = 44;
+  const LEFT_MARGIN = 44;
+  const RIGHT_MARGIN = 44;
+  const TOP_HEADER  = 74;
+  const ROW_HEIGHT  = 52;
   const SELF_RADIUS = 20;
-
-  const svgWidth  = Math.max(900, LEFT_MARGIN + nodes.length * NODE_GAP + 80);
-  const svgHeight = TOP_HEADER + filteredFlow.length * ROW_HEIGHT + 40;
+  const containerWidth = Math.max(760, container.clientWidth || 1200);
+  const svgWidth  = Math.max(760, containerWidth - 24);
+  const svgHeight = TOP_HEADER + filteredFlow.length * ROW_HEIGHT + 56;
 
   const svg = _makeSVGEl("svg");
   svg.setAttribute("width",       svgWidth);
@@ -822,7 +842,13 @@ function renderLadder(flow) {
 
   /* ── Node X positions ── */
   const nodeX = {};
-  nodes.forEach((node, i) => { nodeX[node] = LEFT_MARGIN + 80 + i * NODE_GAP; });
+  const usableWidth = Math.max(220, svgWidth - LEFT_MARGIN - RIGHT_MARGIN);
+  const nodeGap = nodes.length > 1
+    ? Math.max(180, Math.min(320, usableWidth / (nodes.length - 1)))
+    : 0;
+  const nodeSpan = nodeGap * Math.max(0, nodes.length - 1);
+  const startX = LEFT_MARGIN + (usableWidth - nodeSpan) / 2;
+  nodes.forEach((node, i) => { nodeX[node] = startX + i * nodeGap; });
 
   /* ── Node headers + lifelines ── */
   nodes.forEach(node => {
@@ -833,9 +859,9 @@ function renderLadder(flow) {
 
     const typeEl = _makeSVGEl("text");
     typeEl.setAttribute("x",              x);
-    typeEl.setAttribute("y",              18);
+    typeEl.setAttribute("y",              20);
     typeEl.setAttribute("text-anchor",    "middle");
-    typeEl.setAttribute("font-size",      "11");
+    typeEl.setAttribute("font-size",      "12");
     typeEl.setAttribute("font-weight",    "600");
     typeEl.setAttribute("fill",           "#64748b");
     typeEl.setAttribute("letter-spacing", "0.08em");
@@ -844,9 +870,9 @@ function renderLadder(flow) {
 
     const ipEl = _makeSVGEl("text");
     ipEl.setAttribute("x",           x);
-    ipEl.setAttribute("y",           34);
+    ipEl.setAttribute("y",           38);
     ipEl.setAttribute("text-anchor", "middle");
-    ipEl.setAttribute("font-size",   "10");
+    ipEl.setAttribute("font-size",   "11");
     ipEl.setAttribute("fill",        "#94a3b8");
     ipEl.textContent = ip;
     svg.appendChild(ipEl);
@@ -878,6 +904,15 @@ function renderLadder(flow) {
     const safeId = color.replace("#", "mc");
     const markFwd = `url(#${safeId}-fwd)`;
 
+    const band = _makeSVGEl("rect");
+    band.setAttribute("x", LEFT_MARGIN - 4);
+    band.setAttribute("y", y - ROW_HEIGHT / 2 + 6);
+    band.setAttribute("width", svgWidth - LEFT_MARGIN - RIGHT_MARGIN + 8);
+    band.setAttribute("height", ROW_HEIGHT - 10);
+    band.setAttribute("rx", "10");
+    band.setAttribute("fill", i % 2 === 0 ? "rgba(241, 245, 249, 0.55)" : "rgba(255, 255, 255, 0.92)");
+    svg.appendChild(band);
+
     /* Timestamp delta in left margin */
     if (f.time != null) {
       const delta = (parseFloat(f.time) - (parseFloat(filteredFlow[0].time) || 0)).toFixed(3);
@@ -885,7 +920,7 @@ function renderLadder(flow) {
       tsEl.setAttribute("x",           LEFT_MARGIN + 36);
       tsEl.setAttribute("y",           y + 4);
       tsEl.setAttribute("text-anchor", "end");
-      tsEl.setAttribute("font-size",   "9");
+      tsEl.setAttribute("font-size",   "10");
       tsEl.setAttribute("fill",        "#94a3b8");
       tsEl.textContent = `+${delta}s`;
       svg.appendChild(tsEl);
@@ -901,7 +936,7 @@ function renderLadder(flow) {
       );
       arc.setAttribute("fill",          "none");
       arc.setAttribute("stroke",        color);
-      arc.setAttribute("stroke-width",  "1.5");
+      arc.setAttribute("stroke-width",  "2.2");
       arc.setAttribute("marker-end",    markFwd);
       arc.setAttribute("data-flow",     JSON.stringify(f));
       if (isFail) arc.setAttribute("stroke-dasharray", "5,3");
@@ -913,7 +948,7 @@ function renderLadder(flow) {
       arrow.setAttribute("x2",             x2);
       arrow.setAttribute("y2",             y);
       arrow.setAttribute("stroke",         color);
-      arrow.setAttribute("stroke-width",   "1.5");
+      arrow.setAttribute("stroke-width",   "2.2");
       arrow.setAttribute("stroke-linecap", "round");
       /* Always place the arrowhead at the message destination.
          SVG auto orientation handles both left→right and right→left lines. */
@@ -932,9 +967,9 @@ function renderLadder(flow) {
     msgEl.setAttribute("x",           midX);
     msgEl.setAttribute("y",           labelY);
     msgEl.setAttribute("text-anchor", "middle");
-    msgEl.setAttribute("font-size",   "10");
+    msgEl.setAttribute("font-size",   "12");
     msgEl.setAttribute("fill",        isFail ? FAILURE_COLOR : color);
-    msgEl.setAttribute("font-weight", isFail ? "700" : "400");
+    msgEl.setAttribute("font-weight", isFail ? "700" : "500");
     msgEl.textContent = label;
     svg.appendChild(msgEl);
 
@@ -960,7 +995,7 @@ function renderLadder(flow) {
       pEl.setAttribute("x",             px + pillWidth / 2 - 2);
       pEl.setAttribute("y",             y + 13);
       pEl.setAttribute("text-anchor",   "middle");
-      pEl.setAttribute("font-size",     "7.5");
+      pEl.setAttribute("font-size",     "8.5");
       pEl.setAttribute("fill",          color);
       pEl.setAttribute("font-weight",   "600");
       pEl.setAttribute("letter-spacing","0.05em");
@@ -1128,6 +1163,11 @@ function loadData(data) {
   STATE.model    = data.model    || null;
   STATE.summary  = data.summary  || null;
   STATE.sessions = data.sessions || [];
+  STATE.sessions.sort((left, right) => {
+    const priorityDelta = Number(right.priority_score || 0) - Number(left.priority_score || 0);
+    if (priorityDelta !== 0) return priorityDelta;
+    return Number(right.confidence || 0) - Number(left.confidence || 0);
+  });
   STATE.captureGraph = data.graph || null;
   STATE.graph    = STATE.captureGraph;
 
@@ -1335,18 +1375,27 @@ function _renderMetricList(targetId, values) {
   const maxValue = Math.max(...entries.map(([, value]) => Number(value) || 0), 1);
   const list = document.createElement("div");
   list.className = "metric-list";
+  const fillClass = targetId === "protocolMix"
+    ? "protocol"
+    : targetId === "topEndpoints"
+      ? "endpoint"
+      : targetId === "rcaDistribution"
+        ? "rca"
+        : "";
 
   entries.slice(0, 8).forEach(([label, rawValue]) => {
     const value = Number(rawValue) || 0;
     const row = document.createElement("div");
     row.className = "metric-row";
     row.innerHTML = `
-      <span>${label}</span>
-      <strong>${_formatNumber(value)}</strong>
+      <div class="metric-head">
+        <span>${label}</span>
+        <strong>${_formatNumber(value)}</strong>
+      </div>
     `;
     const bar = document.createElement("div");
     bar.className = "metric-bar";
-    bar.innerHTML = `<div class="metric-fill" style="width:${Math.max(8, Math.round((value / maxValue) * 100))}%"></div>`;
+    bar.innerHTML = `<div class="metric-fill ${fillClass}" style="width:${Math.max(8, Math.round((value / maxValue) * 100))}%"></div>`;
     const wrapper = document.createElement("div");
     wrapper.appendChild(row);
     wrapper.appendChild(bar);
@@ -1364,10 +1413,26 @@ function _renderEndpointList(targetId, values) {
   _renderMetricList(targetId, normalized);
 }
 
-function _renderExpertFindings(findings) {
+function _renderExpertFindings(findings, sessions = []) {
   const container = document.getElementById("expertFindings");
   if (!container) return;
   container.innerHTML = "";
+
+  const leadSession = [...(sessions || [])]
+    .sort((left, right) => Number(right.priority_score || 0) - Number(left.priority_score || 0))[0];
+
+  if (leadSession && Number(leadSession.priority_score || 0) > 0) {
+    const lead = document.createElement("div");
+    lead.className = "finding note";
+    lead.innerHTML = `
+      <div class="finding-head">
+        <strong>Top analyst focus: ${leadSession.rca_title || leadSession.rca_label || "Unknown"}</strong>
+        <span class="priority-pill ${String(leadSession.priority_band || "low").toLowerCase()}">P${Math.round(Number(leadSession.priority_score || 0))}</span>
+      </div>
+      <div>${leadSession.priority_reason || "Start with the highest-priority session in the explorer."}</div>
+    `;
+    container.appendChild(lead);
+  }
 
   if (!findings.length) {
     const item = document.createElement("div");
@@ -1380,9 +1445,174 @@ function _renderExpertFindings(findings) {
   findings.forEach(finding => {
     const item = document.createElement("div");
     item.className = `finding ${finding.severity || "note"}`;
-    item.innerHTML = `<strong>${finding.title}</strong><div>${finding.body}</div>`;
+    item.innerHTML = `
+      <div class="finding-head">
+        <strong>${finding.title}</strong>
+        <span class="finding-severity ${finding.severity || "note"}">${String(finding.severity || "note").toUpperCase()}</span>
+      </div>
+      <div>${finding.body}</div>
+    `;
     container.appendChild(item);
   });
+}
+
+function _renderTrafficTrendChart(sessions, protocolCounts) {
+  const container = document.getElementById("trafficTrendChart");
+  if (!container) return;
+
+  const points = _buildTrafficSeries(sessions, protocolCounts);
+  if (!points.length) {
+    container.innerHTML = `<div class="chart-empty">Upload a capture to render message activity.</div>`;
+    return;
+  }
+
+  const width = 360;
+  const height = 136;
+  const padding = { top: 14, right: 14, bottom: 18, left: 14 };
+  const maxValue = Math.max(...points, 1);
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const step = points.length > 1 ? innerWidth / (points.length - 1) : innerWidth;
+
+  const coords = points.map((value, index) => {
+    const x = padding.left + step * index;
+    const y = padding.top + innerHeight - ((value / maxValue) * innerHeight);
+    return [x, y];
+  });
+
+  const linePath = coords.map(([x, y], index) => `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
+  const areaPath = `${linePath} L ${(padding.left + innerWidth).toFixed(2)} ${(padding.top + innerHeight).toFixed(2)} L ${padding.left} ${(padding.top + innerHeight).toFixed(2)} Z`;
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Message activity trend">
+      <defs>
+        <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(47,111,189,0.32)"></stop>
+          <stop offset="100%" stop-color="rgba(47,111,189,0.02)"></stop>
+        </linearGradient>
+      </defs>
+      <line x1="${padding.left}" y1="${padding.top + innerHeight}" x2="${padding.left + innerWidth}" y2="${padding.top + innerHeight}" stroke="#d9dde5" stroke-width="1"/>
+      <path d="${areaPath}" fill="url(#trendFill)"></path>
+      <path d="${linePath}" fill="none" stroke="#2f6fbd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      ${coords.map(([x, y]) => `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="2.6" fill="#ffffff" stroke="#2f6fbd" stroke-width="2"></circle>`).join("")}
+      <text x="${padding.left}" y="12" fill="#6a7481" font-size="11" font-weight="700">Peak ${_formatNumber(maxValue)}</text>
+      <text x="${padding.left + innerWidth}" y="12" text-anchor="end" fill="#6a7481" font-size="11">${_formatNumber(points[points.length - 1])}</text>
+    </svg>
+  `;
+}
+
+function _renderProtocolShareChart(values) {
+  const container = document.getElementById("protocolShareChart");
+  if (!container) return;
+
+  const entries = Object.entries(values || {}).sort((a, b) => (Number(b[1]) || 0) - (Number(a[1]) || 0)).slice(0, 5);
+  if (!entries.length) {
+    container.innerHTML = `<div class="chart-empty">Protocol share appears here once packets are decoded.</div>`;
+    return;
+  }
+
+  const total = entries.reduce((sum, [, value]) => sum + (Number(value) || 0), 0) || 1;
+  const width = 360;
+  const height = 136;
+  const barX = 26;
+  const barY = 24;
+  const barWidth = width - 52;
+  const barHeight = 18;
+  let offset = 0;
+  const segments = entries.map(([label, rawValue]) => {
+    const value = Number(rawValue) || 0;
+    const segmentWidth = (value / total) * barWidth;
+    const color = (PROTOCOL_STYLE[String(label).toUpperCase()] || { color: "#8da6c8" }).color;
+    const segment = `<rect x="${(barX + offset).toFixed(2)}" y="${barY}" width="${Math.max(segmentWidth, 4).toFixed(2)}" height="${barHeight}" rx="8" fill="${color}"></rect>`;
+    offset += segmentWidth;
+    return segment;
+  }).join("");
+
+  const legend = entries.map(([label, rawValue], index) => {
+    const value = Number(rawValue) || 0;
+    const color = (PROTOCOL_STYLE[String(label).toUpperCase()] || { color: "#8da6c8" }).color;
+    const x = index % 2 === 0 ? 26 : 190;
+    const y = 68 + Math.floor(index / 2) * 26;
+    return `
+      <rect x="${x}" y="${y - 10}" width="10" height="10" rx="3" fill="${color}"></rect>
+      <text x="${x + 16}" y="${y}" fill="#334155" font-size="12" font-weight="700">${label}</text>
+      <text x="${x + 128}" y="${y}" text-anchor="end" fill="#64748b" font-size="11">${Math.round((value / total) * 100)}%</text>
+    `;
+  }).join("");
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Protocol share chart">
+      <rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" rx="9" fill="#edf2f8"></rect>
+      ${segments}
+      <text x="${barX}" y="14" fill="#6a7481" font-size="11" font-weight="700">Top protocol mix</text>
+      ${legend}
+    </svg>
+  `;
+}
+
+function _renderDurationProfileChart(sessions) {
+  const container = document.getElementById("durationProfileChart");
+  if (!container) return;
+
+  const bins = _buildDurationBins(sessions);
+  if (!bins.some(Boolean)) {
+    container.innerHTML = `<div class="chart-empty">Session duration profile appears after correlation.</div>`;
+    return;
+  }
+
+  const width = 360;
+  const height = 136;
+  const padding = { top: 18, right: 14, bottom: 24, left: 18 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const maxValue = Math.max(...bins, 1);
+  const barGap = 8;
+  const barWidth = (innerWidth - barGap * (bins.length - 1)) / bins.length;
+  const labels = ["0-1s", "1-5s", "5-15s", "15s+"];
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Session duration profile">
+      <line x1="${padding.left}" y1="${padding.top + innerHeight}" x2="${padding.left + innerWidth}" y2="${padding.top + innerHeight}" stroke="#d9dde5" stroke-width="1"></line>
+      ${bins.map((value, index) => {
+        const x = padding.left + index * (barWidth + barGap);
+        const h = (value / maxValue) * innerHeight;
+        const y = padding.top + innerHeight - h;
+        return `
+          <rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${Math.max(h, 4).toFixed(2)}" rx="8" fill="${index === bins.length - 1 ? "#c48a4c" : "#6d95ca"}"></rect>
+          <text x="${(x + barWidth / 2).toFixed(2)}" y="${height - 8}" text-anchor="middle" fill="#6a7481" font-size="10">${labels[index]}</text>
+          <text x="${(x + barWidth / 2).toFixed(2)}" y="${Math.max(y - 6, 12).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">${value}</text>
+        `;
+      }).join("")}
+    </svg>
+  `;
+}
+
+function _buildTrafficSeries(sessions, protocolCounts) {
+  const values = (sessions || []).map(session => {
+    const flowCount = Array.isArray(session.flow) ? session.flow.length : 0;
+    return Math.max(flowCount, Number(session.packet_count || 0), 1);
+  }).slice(0, 10);
+
+  if (values.length >= 2) return values;
+
+  const fallback = Object.values(protocolCounts || {})
+    .map(value => Number(value) || 0)
+    .filter(Boolean)
+    .slice(0, 10);
+
+  return fallback.length ? fallback : values;
+}
+
+function _buildDurationBins(sessions) {
+  const bins = [0, 0, 0, 0];
+  (sessions || []).forEach(session => {
+    const durationMs = Number(session.duration_ms || session.details_summary?.duration_ms || 0);
+    if (durationMs <= 1000) bins[0] += 1;
+    else if (durationMs <= 5000) bins[1] += 1;
+    else if (durationMs <= 15000) bins[2] += 1;
+    else bins[3] += 1;
+  });
+  return bins;
 }
 
 function _formatNumber(value) {
@@ -1405,6 +1635,8 @@ function renderLearningStatus(payload) {
   _setText("learningPendingCount", _formatNumber(status.new_pcaps ?? 0));
   _setText("learningStateLabel", status.running ? "Running" : "Ready");
   _setText("validationPendingCount", _formatNumber(STATE.validation?.pending_count ?? 0));
+  _setText("validationTabLearningState", status.running ? "Running" : "Ready");
+  _setText("validationTabPath", status.path || knowledge.default_learning_path || payload?.settings?.learn_path || "No path saved");
   _setText("learningStatusMessage", status.message || "System learning status will appear here.");
 
   const pathInput = document.getElementById("learningPathInput");
@@ -1417,6 +1649,7 @@ function renderLearningStatus(payload) {
 function renderValidationQueue(payload) {
   STATE.validation = payload || null;
   _setText("validationPendingCount", _formatNumber(payload?.pending_count ?? 0));
+  _setText("validationTabPendingCount", _formatNumber(payload?.pending_count ?? 0));
   const container = document.getElementById("validationQueue");
   if (!container) return;
   container.innerHTML = "";
@@ -1438,10 +1671,11 @@ function renderValidationQueue(payload) {
   items.forEach(item => {
     const card = document.createElement("div");
     card.className = "validation-item";
+    const status = String(item.validation_status || "pending_review").toLowerCase();
     card.innerHTML = `
       <div class="validation-item-head">
         <strong>${item.hybrid_root_cause || item.rule_root_cause || "UNKNOWN"}</strong>
-        <span class="chip">${item.validation_status || "pending_review"}</span>
+        <span class="status-pill status-${status}">${item.validation_status || "pending_review"}</span>
       </div>
       <div class="validation-item-body">Session ${_truncateMiddle(item.session_id || "—", 64)} · confidence ${Math.round((Number(item.confidence_score || 0)) * 100)}%</div>
       <div class="validation-item-body">${item.agent_conflict ? "Agent conflict detected" : "Awaiting expert confirmation"}</div>

@@ -6,6 +6,7 @@ from pathlib import Path
 from src.intelligence.knowledge_engine import KnowledgeEngine
 from src.intelligence.learning_loop import LearningLoop
 from src.intelligence.skill_exporter import SkillExporter
+from src.ml.ranking import score_session_priority
 from src.rules.rca_rules import blend_hybrid_rca
 
 
@@ -109,6 +110,54 @@ class LearningIntelligenceTests(unittest.TestCase):
             payload = json.loads(Path(target).read_text(encoding="utf-8"))
             self.assertEqual(payload["pattern_count"], 1)
             self.assertEqual(payload["patterns"][0]["root_cause"], "CORE_NETWORK_FAILURE")
+
+    def test_priority_ranking_favors_abnormal_uncertain_sessions(self):
+        abnormal = sample_session()
+        abnormal["autonomous_rca"] = {"agentic_analysis": {"is_conflicted": True}}
+        abnormal["hybrid_rca"] = {
+            **abnormal["rca"],
+            "confidence_model": {"confidence_score": 0.52, "uncertainty": 0.44},
+        }
+        abnormal_features = {
+            "dia_failure_count": 1,
+            "timer_anomaly_count": 2,
+            "has_retransmission": 1,
+            "cross_protocol_hops": 3,
+        }
+        abnormal_score = score_session_priority(
+            abnormal,
+            features=abnormal_features,
+            intelligence={},
+            hybrid_rca=abnormal["hybrid_rca"],
+            anomaly_result={"score": 0.72},
+            confidence_model=abnormal["hybrid_rca"]["confidence_model"],
+        )
+
+        normal = sample_session()
+        normal["rca"] = {
+            **normal["rca"],
+            "rca_label": "NORMAL_CALL",
+            "rca_title": "Normal Session",
+            "severity": "LOW",
+            "confidence_pct": 78,
+            "evidence": ["Normal attach flow"],
+        }
+        normal["hybrid_rca"] = {
+            **normal["rca"],
+            "confidence_model": {"confidence_score": 0.86, "uncertainty": 0.1},
+        }
+        normal_score = score_session_priority(
+            normal,
+            features={"dia_failure_count": 0, "timer_anomaly_count": 0, "has_retransmission": 0, "cross_protocol_hops": 1},
+            intelligence={},
+            hybrid_rca=normal["hybrid_rca"],
+            anomaly_result={"score": 0.08},
+            confidence_model=normal["hybrid_rca"]["confidence_model"],
+        )
+
+        self.assertGreater(abnormal_score["priority_score"], normal_score["priority_score"])
+        self.assertEqual(abnormal_score["priority_band"], "critical")
+        self.assertIn("Charging Failure".split()[0], abnormal_score["priority_reason"])
 
 
 if __name__ == "__main__":

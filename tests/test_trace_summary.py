@@ -79,6 +79,72 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertIn("MAP", summary["details"]["headline"])
         self.assertEqual(summary["details"]["a_party"], "12345")
 
+    def test_expert_findings_prioritize_abnormal_unknown_and_transport_signals(self):
+        parsed = {
+            "diameter": [{"src_ip": "10.0.0.1", "dst_ip": "10.0.0.2"}],
+            "s1ap": [{"src_ip": "10.0.0.3", "dst_ip": "10.0.0.4"}],
+            "sctp": [{"src_ip": "10.0.0.3", "dst_ip": "10.0.0.4"}],
+            "tcp": [{"src_ip": "10.0.0.5", "dst_ip": "10.0.0.6", "is_failure": True} for _ in range(12)],
+            "sip": [],
+            "inap": [],
+            "gtp": [],
+            "ngap": [],
+            "ranap": [],
+            "bssap": [],
+            "map": [],
+            "http": [],
+            "udp": [],
+            "pfcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+        }
+        sessions = [
+            {
+                "duration_ms": 1200,
+                "protocols": ["DIAMETER", "SCTP"],
+                "technologies": ["IMS", "Transport"],
+                "hybrid_rca": {
+                    "rca_label": "SUBSCRIBER_BARRED",
+                    "rca_title": "Subscriber Barred",
+                    "confidence_pct": 94,
+                    "evidence": ["Diameter ULA rejected", "Roaming not allowed"],
+                },
+            },
+            {
+                "duration_ms": 800,
+                "protocols": ["S1AP", "SCTP"],
+                "technologies": ["LTE/4G", "Transport"],
+                "hybrid_rca": {
+                    "rca_label": "UNKNOWN",
+                    "rca_title": "Unknown",
+                    "confidence_pct": 31,
+                    "evidence": ["Sparse control-plane fragment"],
+                },
+            },
+            {
+                "duration_ms": 1500,
+                "protocols": ["S1AP", "SCTP"],
+                "technologies": ["LTE/4G", "Transport"],
+                "hybrid_rca": {
+                    "rca_label": "NORMAL_CALL",
+                    "rca_title": "Normal Session",
+                    "confidence_pct": 72,
+                    "evidence": ["Successful attach markers"],
+                },
+            },
+        ]
+
+        summary = build_capture_summary(parsed, sessions)
+        findings = summary["expert_findings"]
+        titles = [item["title"] for item in findings]
+
+        self.assertGreaterEqual(len(findings), 3)
+        self.assertIn("Subscriber Barred is the dominant abnormal pattern", titles)
+        self.assertIn("Lead investigation target: Subscriber Barred", titles)
+        self.assertIn("Unknown or weakly stitched sessions remain", titles)
+
 
 if __name__ == "__main__":
     unittest.main()
