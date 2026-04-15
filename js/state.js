@@ -21,6 +21,7 @@ const STATE = {
   graphNetwork: null,  // vis.js network instance for graph view
   graphPhysicsEnabled: true,
   viewMode:  "ladder", // "ladder" | "graph" | "causal"
+  hydrationPending: false,
 
   filters: {
     sessionType: "ALL", // "ALL" | "FAILED" | "SUCCESS"
@@ -41,6 +42,15 @@ window.__TRACE_PENDING_UPLOAD__ = window.__TRACE_PENDING_UPLOAD__ || null;
 
 if (typeof window.loadData !== "function") {
   window.loadData = function queuePendingUpload(data) {
-    window.__TRACE_PENDING_UPLOAD__ = data || null;
+    const payload = data || {};
+    STATE.token = payload.token || null;
+    STATE.filename = payload.filename || "";
+    STATE.model = payload.model || null;
+    STATE.summary = payload.summary || null;
+    STATE.sessions = payload.sessions || [];
+    STATE.captureGraph = payload.graph || null;
+    STATE.graph = STATE.captureGraph;
+    STATE.hydrationPending = true;
+    window.__TRACE_PENDING_UPLOAD__ = payload;
   };
 }

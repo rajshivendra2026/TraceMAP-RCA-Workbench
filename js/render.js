@@ -190,6 +190,29 @@ function renderOverview() {
   _renderDurationProfileChart(sessions);
 }
 
+function hydrateFromState() {
+  STATE.sessions = Array.isArray(STATE.sessions) ? STATE.sessions : [];
+  STATE.sessions.sort((left, right) => {
+    const priorityDelta = Number(right.priority_score || 0) - Number(left.priority_score || 0);
+    if (priorityDelta !== 0) return priorityDelta;
+    return Number(right.confidence || 0) - Number(left.confidence || 0);
+  });
+
+  renderOverview();
+  _renderDetails(STATE.summary?.details || null, true);
+  renderSessions();
+
+  if (typeof window.refreshValidationQueue === "function") {
+    window.refreshValidationQueue();
+  }
+
+  if (STATE.sessions.length) {
+    selectSession(STATE.sessions[0]);
+  }
+
+  STATE.hydrationPending = false;
+}
+
 /* ════════════════════════════════════════════════════════════════
    SELECT SESSION
    ════════════════════════════════════════════════════════════════ */
@@ -1170,17 +1193,8 @@ function loadData(data) {
   });
   STATE.captureGraph = data.graph || null;
   STATE.graph    = STATE.captureGraph;
-
-  renderOverview();
-  _renderDetails(STATE.summary?.details || null, true);
-  renderSessions();
-  if (typeof window.refreshValidationQueue === "function") {
-    window.refreshValidationQueue();
-  }
-
-  if (STATE.sessions.length) {
-    selectSession(STATE.sessions[0]);
-  }
+  STATE.hydrationPending = true;
+  hydrateFromState();
 }
 
 window.loadData = loadData;
@@ -1193,6 +1207,8 @@ if (window.__TRACE_PENDING_UPLOAD__) {
   const pendingUpload = window.__TRACE_PENDING_UPLOAD__;
   window.__TRACE_PENDING_UPLOAD__ = null;
   loadData(pendingUpload);
+} else if (STATE.hydrationPending || (Array.isArray(STATE.sessions) && STATE.sessions.length)) {
+  hydrateFromState();
 }
 
 function _renderEvidence(evidence) {
