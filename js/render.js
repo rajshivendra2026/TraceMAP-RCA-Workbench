@@ -1189,6 +1189,12 @@ window.renderValidationQueue = renderValidationQueue;
 window.renderVersionInfo = renderVersionInfo;
 window.toggleVersionHistory = toggleVersionHistory;
 
+if (window.__TRACE_PENDING_UPLOAD__) {
+  const pendingUpload = window.__TRACE_PENDING_UPLOAD__;
+  window.__TRACE_PENDING_UPLOAD__ = null;
+  loadData(pendingUpload);
+}
+
 function _renderEvidence(evidence) {
   const list = document.getElementById("whyList");
   if (!list) return;

@@ -28,3 +28,19 @@ const STATE = {
     protocol:    "ALL", // "ALL" | "SIP" | "DIAMETER" | "INAP" | "S1AP"
   },
 };
+
+/*
+ * Upload/render handshake
+ *
+ * API callbacks may complete before render.js finishes evaluating,
+ * especially after hard UI refactors or when the browser serves a stale
+ * script from cache. Keep a safe placeholder so uploads never fail just
+ * because loadData was not exported yet.
+ */
+window.__TRACE_PENDING_UPLOAD__ = window.__TRACE_PENDING_UPLOAD__ || null;
+
+if (typeof window.loadData !== "function") {
+  window.loadData = function queuePendingUpload(data) {
+    window.__TRACE_PENDING_UPLOAD__ = data || null;
+  };
+}

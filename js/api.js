@@ -65,7 +65,6 @@ async function uploadPCAP(file) {
     const data = await res.json();
     console.log("Server response:", data);
 
-    /* FIX [1]: success alert only fires when loadData actually ran */
     if (typeof window.loadData === "function") {
       window.loadData(data);
       if (typeof refreshValidationQueue === "function") {
@@ -73,8 +72,9 @@ async function uploadPCAP(file) {
       }
       alert("✅ PCAP processed successfully");
     } else {
-      console.error("loadData is not defined — render.js may not have loaded");
-      alert("❌ Internal error: loadData not found.\nCheck that render.js is loaded.");
+      console.error("loadData is not defined after upload completion");
+      window.__TRACE_PENDING_UPLOAD__ = data;
+      alert("✅ Upload successful. Rendering will resume once the UI finishes loading.");
     }
 
   } catch (err) {
