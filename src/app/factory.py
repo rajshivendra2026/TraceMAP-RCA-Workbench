@@ -16,6 +16,7 @@ from src.correlation.session_builder import build_sessions
 from src.features.feature_engineer import extract_features
 from src.intelligence.knowledge_engine import KnowledgeEngine
 from src.intelligence.learning_loop import run_learning_cycle
+from src.ml.retrain import retrain_from_feedback
 from src.ml.predict import predict_session
 from src.parser.pcap_loader import load_pcap
 from src.parser.tshark_runner import TSharkRunner
@@ -180,11 +181,18 @@ def create_app() -> Flask:
             result = knowledge.resolve_validation(validation_id, action, reviewer=reviewer, note=note)
             if not result:
                 return jsonify({"error": "Validation item not found"}), 404
+            retraining = None
+            if bool(cfg("learning.feedback_retrain_enabled", True)):
+                retraining = retrain_from_feedback(
+                    dataset_path=str((knowledge.base_dir / "feedback_dataset.jsonl").resolve()),
+                    min_samples=int(cfg("learning.feedback_min_samples", 3)),
+                )
             return jsonify(
                 {
                     "updated": result,
                     "queue": load_validation_queue(),
                     "knowledge": load_learning_metrics(),
+                    "retraining": retraining,
                 }
             )
         except ValueError as exc:

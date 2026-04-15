@@ -100,6 +100,14 @@ class LearningLoop:
             confidence_model = autonomous.get("confidence_model", {})
             confidence_score = float(confidence_model.get("confidence_score", 0.0))
             is_conflicted = bool((autonomous.get("agentic_analysis") or {}).get("is_conflicted"))
+            snapshot = _validation_snapshot(
+                session,
+                hybrid=hybrid,
+                features=features,
+                intelligence=intelligence,
+                anomaly=anomaly,
+                best_match=best_match,
+            )
             if confidence_score < float(cfg("autonomous.validation_confidence_threshold", 0.58)) or is_conflicted:
                 self.knowledge.queue_validation(
                     {
@@ -110,6 +118,7 @@ class LearningLoop:
                         "uncertainty": confidence_model.get("uncertainty"),
                         "agent_conflict": is_conflicted,
                         "context": context,
+                        "session_snapshot": snapshot,
                     }
                 )
                 metrics["queued_uncertain"] += 1
@@ -128,6 +137,7 @@ class LearningLoop:
                             "knowledge_root_cause": best_match.get("root_cause"),
                             "similarity": best_match.get("similarity"),
                             "context": context,
+                            "session_snapshot": snapshot,
                         }
                     )
                     metrics["queued_conflicts"] += 1
@@ -170,4 +180,67 @@ def run_learning_cycle(
     return {
         "sessions": sessions,
         "metrics": metrics,
+    }
+
+
+def _validation_snapshot(
+    session: dict,
+    *,
+    hybrid: dict,
+    features: dict,
+    intelligence: dict,
+    anomaly: dict,
+    best_match: dict | None,
+) -> dict:
+    feature_keys = (
+        "duration_ms",
+        "time_to_failure_ms",
+        "dia_failure_count",
+        "charging_failed",
+        "auth_failed_dia",
+        "cross_protocol_hops",
+        "timer_anomaly_count",
+        "has_retransmission",
+        "sip_4xx",
+        "sip_5xx",
+        "q850_network_fail",
+        "protocol_count",
+        "technology_count",
+    )
+    compact_features = {key: features.get(key, 0) for key in feature_keys}
+    return {
+        "session_id": session.get("session_id") or session.get("call_id"),
+        "protocols": list(session.get("protocols", [])),
+        "technologies": list(session.get("technologies", [])),
+        "duration_ms": session.get("duration_ms", 0),
+        "rca_label": hybrid.get("rca_label"),
+        "confidence_pct": hybrid.get("confidence_pct", 0),
+        "raw_confidence_pct": hybrid.get("raw_confidence_pct", hybrid.get("confidence_pct", 0)),
+        "priority_score": hybrid.get("priority_score", session.get("priority_score", 0)),
+        "priority_band": hybrid.get("priority_band", session.get("priority_band", "low")),
+        "priority_reason": hybrid.get("priority_reason", session.get("priority_reason", "baseline inspection")),
+        "pattern_match": {
+            "root_cause": (best_match or {}).get("root_cause"),
+            "similarity": (best_match or {}).get("similarity"),
+            "historical_success": (best_match or {}).get("historical_success"),
+        },
+        "anomaly": {
+            "score": anomaly.get("score", 0),
+            "is_anomalous": anomaly.get("is_anomalous", False),
+            "suggested_root_cause": anomaly.get("suggested_root_cause"),
+            "dominant_signal": anomaly.get("dominant_signal"),
+            "component_scores": anomaly.get("component_scores", {}),
+        },
+        "confidence_model": {
+            "confidence_score": (hybrid.get("confidence_model") or {}).get("confidence_score"),
+            "uncertainty": (hybrid.get("confidence_model") or {}).get("uncertainty"),
+            "consensus": (hybrid.get("confidence_model") or {}).get("consensus"),
+        },
+        "features": compact_features,
+        "trace_intelligence": {
+            "sequence_length": intelligence.get("sequence_length", 0),
+            "timer_anomaly_count": intelligence.get("timer_anomaly_count", 0),
+            "cross_protocol_hops": intelligence.get("cross_protocol_hops", 0),
+            "failure_signature": intelligence.get("failure_signature", ""),
+        },
     }

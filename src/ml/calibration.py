@@ -119,7 +119,7 @@ def train_confidence_calibrator(sessions: list[dict[str, Any]]) -> dict[str, Any
         scores = [0.12, *scores, 0.96]
         labels = [0, *labels, 1]
 
-    if len(scores) < 4 or len(set(labels)) < 2:
+    if len(scores) < 3 or len(set(labels)) < 2:
         return {
             "trained": False,
             "reason": "insufficient_label_diversity",

@@ -168,6 +168,9 @@ learning:
   compact_on_batch: true
   export_skill_on_upload: false
   export_skill_on_batch: false
+  feedback_retrain_enabled: true
+  feedback_min_samples: 3
+  feedback_dataset_path: "data/knowledge_base/feedback_dataset.jsonl"
 
 
 # ============================================================

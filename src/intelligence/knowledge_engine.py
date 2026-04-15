@@ -10,6 +10,7 @@ from typing import Any
 from uuid import uuid4
 
 from src.config import cfg_path
+from src.eval.feedback_dataset import append_feedback_record
 from src.intelligence.vector_store import VectorStore
 
 
@@ -153,6 +154,12 @@ class KnowledgeEngine:
         item["reviewer"] = reviewer
         if note:
             item["review_note"] = note
+        item["review_action"] = action
+        item["resolved_root_cause"] = (
+            item.get("hybrid_root_cause")
+            if action == "approve"
+            else item.get("knowledge_root_cause") or item.get("rule_root_cause") or item.get("hybrid_root_cause")
+        )
 
         pattern_id = item.get("pattern_id")
         if action == "approve":
@@ -175,6 +182,29 @@ class KnowledgeEngine:
 
         self.metrics["validation_queue_size"] = len(
             [row for row in self.validation_queue if row.get("validation_status") == "pending_review"]
+        )
+        append_feedback_record(
+            {
+                "validation_id": item.get("validation_id"),
+                "session_id": item.get("session_id"),
+                "pattern_id": item.get("pattern_id"),
+                "review_action": action,
+                "validation_status": item.get("validation_status"),
+                "reviewer": reviewer,
+                "review_note": note,
+                "reviewed_at": item.get("reviewed_at"),
+                "rule_root_cause": item.get("rule_root_cause"),
+                "hybrid_root_cause": item.get("hybrid_root_cause"),
+                "knowledge_root_cause": item.get("knowledge_root_cause"),
+                "resolved_root_cause": item.get("resolved_root_cause"),
+                "similarity": item.get("similarity"),
+                "confidence_score": item.get("confidence_score"),
+                "uncertainty": item.get("uncertainty"),
+                "agent_conflict": item.get("agent_conflict"),
+                "context": item.get("context"),
+                "session_snapshot": item.get("session_snapshot"),
+            },
+            base_dir=self.base_dir,
         )
         self.save()
         return deepcopy(item)
