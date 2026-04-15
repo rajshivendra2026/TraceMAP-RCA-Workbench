@@ -254,7 +254,10 @@ def load_ranker(model_path: str | Path | None = None) -> dict[str, Any] | None:
     if _MODEL_CACHE["path"] == cache_key:
         return _MODEL_CACHE["payload"]
 
-    payload = joblib.load(target)
+    try:
+        payload = joblib.load(target)
+    except Exception:
+        return None
     if not isinstance(payload, dict) or "model" not in payload:
         return None
 

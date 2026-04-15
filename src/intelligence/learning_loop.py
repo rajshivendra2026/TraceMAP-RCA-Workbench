@@ -16,6 +16,7 @@ from src.intelligence.compaction_engine import KnowledgeCompactor
 from src.intelligence.knowledge_engine import KnowledgeEngine
 from src.intelligence.llm_explainer import build_llm_explanation
 from src.intelligence.skill_exporter import SkillExporter
+from src.ml.calibration import apply_confidence_calibration
 from src.ml.ranking import score_session_priority
 from src.rules.rca_rules import blend_hybrid_rca
 
@@ -75,6 +76,8 @@ class LearningLoop:
             hybrid["knowledge_graph_summary"] = autonomous.get("knowledge_graph_summary")
             hybrid["timeseries_summary"] = autonomous.get("timeseries_summary")
             hybrid["llm_explanation"] = build_llm_explanation(session, hybrid, intelligence)
+            hybrid["raw_confidence_pct"] = hybrid.get("confidence_pct", 0)
+            hybrid = apply_confidence_calibration(hybrid, use_model=True)
 
             session["features"] = features
             session["trace_intelligence"] = intelligence

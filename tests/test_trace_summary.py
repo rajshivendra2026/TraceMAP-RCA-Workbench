@@ -18,6 +18,24 @@ class _FakeFlaskApp:
         return decorator
 
 
+class _FakePandasDataFrame:
+    pass
+
+
+class _FakePandasSeries:
+    pass
+
+try:
+    import pandas as _real_pandas
+except Exception:  # pragma: no cover - fallback for minimal envs
+    _real_pandas = None
+
+try:
+    import numpy as _real_numpy
+except Exception:  # pragma: no cover - fallback for minimal envs
+    _real_numpy = None
+
+
 sys.modules["loguru"] = types.SimpleNamespace(
     logger=types.SimpleNamespace(
         info=lambda *a, **k: None,
@@ -40,10 +58,11 @@ sys.modules["flask"] = types.SimpleNamespace(
 sys.modules["flask_cors"] = types.SimpleNamespace(CORS=lambda *a, **k: None)
 sys.modules["werkzeug.exceptions"] = types.SimpleNamespace(RequestEntityTooLarge=Exception)
 sys.modules["werkzeug.utils"] = types.SimpleNamespace(secure_filename=lambda x: x)
-sys.modules["pandas"] = types.SimpleNamespace(DataFrame=object, read_csv=lambda *a, **k: None)
-sys.modules["numpy"] = types.SimpleNamespace(array=lambda data, dtype=float: data)
+sys.modules["pandas"] = _real_pandas or types.SimpleNamespace(DataFrame=_FakePandasDataFrame, Series=_FakePandasSeries, read_csv=lambda *a, **k: None)
+sys.modules["numpy"] = _real_numpy or types.SimpleNamespace(array=lambda data, dtype=float: data, dtype=object, __version__="1.0.0")
 
 from main import build_capture_summary
+from src.app.summary import session_summary
 
 
 class TraceSummaryTests(unittest.TestCase):
@@ -109,6 +128,9 @@ class TraceSummaryTests(unittest.TestCase):
                     "rca_label": "SUBSCRIBER_BARRED",
                     "rca_title": "Subscriber Barred",
                     "confidence_pct": 94,
+                    "raw_confidence_pct": 88,
+                    "confidence_band": "high",
+                    "calibration_source": "isotonic",
                     "evidence": ["Diameter ULA rejected", "Roaming not allowed"],
                 },
             },
@@ -139,11 +161,14 @@ class TraceSummaryTests(unittest.TestCase):
         summary = build_capture_summary(parsed, sessions)
         findings = summary["expert_findings"]
         titles = [item["title"] for item in findings]
-
         self.assertGreaterEqual(len(findings), 3)
         self.assertIn("Subscriber Barred is the dominant abnormal pattern", titles)
         self.assertIn("Lead investigation target: Subscriber Barred", titles)
         self.assertIn("Unknown or weakly stitched sessions remain", titles)
+        session_payload = session_summary(sessions[0])
+        self.assertEqual(session_payload["raw_confidence"], 88)
+        self.assertEqual(session_payload["confidence_band"], "high")
+        self.assertEqual(session_payload["calibration_source"], "isotonic")
 
 
 if __name__ == "__main__":
