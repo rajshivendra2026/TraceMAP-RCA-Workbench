@@ -166,6 +166,21 @@ autonomous:
   validation_confidence_threshold: 0.58
   streaming_batch_size: 500
   timeseries_enabled: true
+  watch_paths:
+    - "data/raw_pcaps"
+  poll_interval_sec: 60
+  auto_commit: false
+  auto_push: false
+  max_unknown_ratio: 0.35
+  max_validation_queue_growth: 25
+  max_pattern_drop: 0
+  run_reports_dir: "data/knowledge_base/run_reports"
+  curated_seed_files:
+    - "knowledge_graph.json"
+    - "metrics.json"
+    - "patterns.json"
+    - "timeseries_intelligence.json"
+    - "vectors.json"
 
 
 # ============================================================

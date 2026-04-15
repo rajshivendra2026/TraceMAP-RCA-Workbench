@@ -111,6 +111,9 @@ def process_pcap(
             autonomous_engine=autonomous,
         )
         sessions = learning["sessions"]
+        learning_metrics = learning.get("metrics", {})
+        for s in sessions:
+            s["learning_metrics"] = dict(learning_metrics)
 
         # Log per-PCAP label distribution
         from collections import Counter
