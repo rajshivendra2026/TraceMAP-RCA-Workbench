@@ -169,8 +169,8 @@ autonomous:
   watch_paths:
     - "data/raw_pcaps"
   poll_interval_sec: 60
-  auto_commit: false
-  auto_push: false
+  auto_commit: true
+  auto_push: true
   max_unknown_ratio: 0.35
   max_validation_queue_growth: 25
   max_pattern_drop: 0
