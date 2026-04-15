@@ -334,5 +334,29 @@
     "size": 1216,
     "mtime": 1758675972,
     "learned_at": 1776173810.311054
+  },
+  "68f06d05c404ea5bb9780458ff3fb8e2845a1c46": {
+    "path": "/private/var/folders/qh/4glg3xjn58j2tjnywwkrlbpr0000gn/T/tmpv2ods0zo/raw/trace-1.pcap",
+    "name": "trace-1.pcap",
+    "size": 4,
+    "mtime": 1776231055,
+    "learned_at": 1776231055.279776,
+    "autonomous_cycle_id": "20260415T053055Z"
+  },
+  "548f526b9d0b8d5be230108a63d790830f1b3cee": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/Simless_sos-57ff4a8c.pcapng",
+    "name": "Simless_sos-57ff4a8c.pcapng",
+    "size": 86616,
+    "mtime": 1776204287,
+    "learned_at": 1776231629.8941739,
+    "autonomous_cycle_id": "20260415T054025Z"
+  },
+  "76848a7c5dd21e27f63178d85519e68217bcdab2": {
+    "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/isa-Hung_Bearer_AF-Audio-e13db8f2.pcap",
+    "name": "isa-Hung_Bearer_AF-Audio-e13db8f2.pcap",
+    "size": 176130,
+    "mtime": 1776205034,
+    "learned_at": 1776231634.583358,
+    "autonomous_cycle_id": "20260415T054025Z"
   }
 }

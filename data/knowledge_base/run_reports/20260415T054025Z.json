@@ -1,0 +1,82 @@
+{
+  "cycle_id": "20260415T054025Z",
+  "started_at": "2026-04-15T05:40:25.815200+00:00",
+  "watch_paths": [
+    "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps"
+  ],
+  "pending_trace_count": 2,
+  "processed_trace_count": 2,
+  "processed_files": [
+    {
+      "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/Simless_sos-57ff4a8c.pcapng",
+      "name": "Simless_sos-57ff4a8c.pcapng",
+      "signature": "548f526b9d0b8d5be230108a63d790830f1b3cee",
+      "session_count": 1,
+      "label_counts": {
+        "NORMAL_CALL": 1
+      }
+    },
+    {
+      "path": "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps/isa-Hung_Bearer_AF-Audio-e13db8f2.pcap",
+      "name": "isa-Hung_Bearer_AF-Audio-e13db8f2.pcap",
+      "signature": "76848a7c5dd21e27f63178d85519e68217bcdab2",
+      "session_count": 11,
+      "label_counts": {
+        "UNKNOWN": 2,
+        "NORMAL_CALL": 9
+      }
+    }
+  ],
+  "session_count": 12,
+  "label_counts": {
+    "NORMAL_CALL": 10,
+    "UNKNOWN": 2
+  },
+  "learning_metrics": {
+    "queued_uncertain": 5,
+    "queued_conflicts": 2,
+    "compacted_removed": 0,
+    "reinforced_patterns": 10
+  },
+  "gate": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "seed_files_changed",
+        "passed": true,
+        "detail": "Changed: knowledge_graph.json, metrics.json, patterns.json, timeseries_intelligence.json, validation_queue.json, vectors.json"
+      },
+      {
+        "name": "unknown_ratio_within_limit",
+        "passed": true,
+        "detail": "UNKNOWN ratio 0.167 within limit."
+      },
+      {
+        "name": "validation_queue_growth_within_limit",
+        "passed": true,
+        "detail": "Pending validation delta 7."
+      },
+      {
+        "name": "pattern_drop_within_limit",
+        "passed": true,
+        "detail": "Pattern delta 0."
+      }
+    ],
+    "changed_files": [
+      "knowledge_graph.json",
+      "metrics.json",
+      "patterns.json",
+      "timeseries_intelligence.json",
+      "validation_queue.json",
+      "vectors.json"
+    ],
+    "unknown_ratio": 0.1667,
+    "validation_queue_growth": 7,
+    "pattern_delta": 0
+  },
+  "git": {
+    "committed": false,
+    "pushed": false
+  },
+  "status": "accepted"
+}

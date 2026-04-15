@@ -31226,5 +31226,283 @@
     "validation_id": "val-85c284545de5",
     "queued_at": "2026-04-14T20:49:09.275280+00:00",
     "validation_status": "pending_review"
+  },
+  {
+    "session_id": "124433268",
+    "rule_root_cause": "UNKNOWN",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.3604,
+    "uncertainty": 0.6979,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "S1AP"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "LTE control-plane procedure"
+    },
+    "validation_id": "val-245594f4afa1",
+    "queued_at": "2026-04-14T22:17:17.964020+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:4223:c710:0:2:5767:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.5316,
+    "uncertainty": 0.3925,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-bc8a2b8d79c8",
+    "queued_at": "2026-04-14T22:17:18.089051+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "DIAMETER:pcsf-prim.imsgroup0-001.so0ca07pcf.so1ca.uvp.els-an.att.net;428398;1;5.745003665.2",
+    "pattern_id": "pat-0e00cef24ba8",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "knowledge_root_cause": "UNKNOWN",
+    "similarity": 0.9625,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-ef02f30053ea",
+    "queued_at": "2026-04-14T22:17:18.148343+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:4224:31:0:2:5749:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.5316,
+    "uncertainty": 0.3925,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-a389068fb2a3",
+    "queued_at": "2026-04-14T22:17:18.201170+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:425a:c301:0:1:2424:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "UNKNOWN",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.4256,
+    "uncertainty": 0.5427,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-d631952a7a6f",
+    "queued_at": "2026-04-14T22:17:18.259127+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "0",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.4756,
+    "uncertainty": 0.5825,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "GTP",
+        "SCTP",
+        "SIP",
+        "TCP",
+        "UDP"
+      ],
+      "technology_family": [
+        "IMS",
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "IMS voice session"
+    },
+    "validation_id": "val-0a878446b719",
+    "queued_at": "2026-04-15T05:40:29.050047+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "0",
+    "pattern_id": "pat-eb88ec8fb5b3",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "knowledge_root_cause": "CHARGING_FAILURE",
+    "similarity": 0.9795,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "GTP",
+        "SCTP",
+        "SIP",
+        "TCP",
+        "UDP"
+      ],
+      "technology_family": [
+        "IMS",
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "IMS voice session"
+    },
+    "validation_id": "val-3374f16d07b8",
+    "queued_at": "2026-04-15T05:40:29.053413+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "124433268",
+    "rule_root_cause": "UNKNOWN",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.3604,
+    "uncertainty": 0.6979,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "S1AP"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "LTE control-plane procedure"
+    },
+    "validation_id": "val-03758dda98eb",
+    "queued_at": "2026-04-15T05:40:33.154273+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:4223:c710:0:2:5767:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.5316,
+    "uncertainty": 0.3925,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-2cc10c948461",
+    "queued_at": "2026-04-15T05:40:33.285046+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "DIAMETER:pcsf-prim.imsgroup0-001.so0ca07pcf.so1ca.uvp.els-an.att.net;428398;1;5.745003665.2",
+    "pattern_id": "pat-0e00cef24ba8",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "knowledge_root_cause": "UNKNOWN",
+    "similarity": 0.9625,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-f32b04de6fe1",
+    "queued_at": "2026-04-15T05:40:33.346446+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:4224:31:0:2:5749:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "NORMAL_CALL",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.5316,
+    "uncertainty": 0.3925,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-e6b01d0621cc",
+    "queued_at": "2026-04-15T05:40:33.401951+00:00",
+    "validation_status": "pending_review"
+  },
+  {
+    "session_id": "2001:506:425a:c301:0:1:2424:2:-->2600:300:3005:2::2:-",
+    "rule_root_cause": "UNKNOWN",
+    "hybrid_root_cause": "NORMAL_CALL",
+    "confidence_score": 0.4256,
+    "uncertainty": 0.5427,
+    "agent_conflict": false,
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS"
+      ],
+      "technology_family": [
+        "LTE/4G"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "validation_id": "val-7052de6e2b66",
+    "queued_at": "2026-04-15T05:40:33.462970+00:00",
+    "validation_status": "pending_review"
   }
 ]

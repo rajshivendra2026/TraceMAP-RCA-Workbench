@@ -5,18 +5,18 @@
       "type": "protocol",
       "name": "DIAMETER",
       "attributes": {},
-      "weight": 182.0,
-      "occurrence_count": 182,
-      "last_seen": "2026-04-15T05:31:21.331358+00:00"
+      "weight": 187.0,
+      "occurrence_count": 187,
+      "last_seen": "2026-04-15T05:40:33.747573+00:00"
     },
     "protocol:sctp": {
       "id": "protocol:sctp",
       "type": "protocol",
       "name": "SCTP",
       "attributes": {},
-      "weight": 1010.0,
-      "occurrence_count": 1010,
-      "last_seen": "2026-04-15T05:31:21.331366+00:00"
+      "weight": 1013.0,
+      "occurrence_count": 1013,
+      "last_seen": "2026-04-15T05:40:33.747580+00:00"
     },
     "protocol:nas-5gs": {
       "id": "protocol:nas-5gs",
@@ -32,9 +32,9 @@
       "type": "technology",
       "name": "IMS",
       "attributes": {},
-      "weight": 259.0,
-      "occurrence_count": 259,
-      "last_seen": "2026-04-15T05:31:21.331371+00:00"
+      "weight": 264.0,
+      "occurrence_count": 264,
+      "last_seen": "2026-04-15T05:40:33.747583+00:00"
     },
     "technology:5g": {
       "id": "technology:5g",
@@ -50,9 +50,9 @@
       "type": "technology",
       "name": "Transport",
       "attributes": {},
-      "weight": 1282.0,
-      "occurrence_count": 1282,
-      "last_seen": "2026-04-15T05:31:21.331376+00:00"
+      "weight": 1288.0,
+      "occurrence_count": 1288,
+      "last_seen": "2026-04-15T05:40:33.747586+00:00"
     },
     "scenario:subscriber-barred": {
       "id": "scenario:subscriber-barred",
@@ -81,12 +81,12 @@
       "attributes": {
         "protocol": "SCTP",
         "message": "DATA",
-        "src": "AMF",
-        "dst": "UDM"
+        "src": "IMS\n172.29.65.45",
+        "dst": "EXT\n107.79.12.133"
       },
-      "weight": 31180.0,
-      "occurrence_count": 31180,
-      "last_seen": "2026-04-15T05:31:21.331461+00:00"
+      "weight": 31200.0,
+      "occurrence_count": 31200,
+      "last_seen": "2026-04-15T05:40:33.747661+00:00"
     },
     "event:diameter-saa-5003": {
       "id": "event:diameter-saa-5003",
@@ -139,36 +139,36 @@
       "type": "hypothesis",
       "name": "TRANSPORT:NORMAL_CALL",
       "attributes": {},
-      "weight": 1292.0,
-      "occurrence_count": 1292,
-      "last_seen": "2026-04-15T05:31:21.331443+00:00"
+      "weight": 1298.0,
+      "occurrence_count": 1298,
+      "last_seen": "2026-04-15T05:40:33.747646+00:00"
     },
     "protocol:sip": {
       "id": "protocol:sip",
       "type": "protocol",
       "name": "SIP",
       "attributes": {},
-      "weight": 22.0,
-      "occurrence_count": 22,
-      "last_seen": "2026-04-15T05:31:21.291520+00:00"
+      "weight": 23.0,
+      "occurrence_count": 23,
+      "last_seen": "2026-04-15T05:40:29.040956+00:00"
     },
     "protocol:tcp": {
       "id": "protocol:tcp",
       "type": "protocol",
       "name": "TCP",
       "attributes": {},
-      "weight": 79.0,
-      "occurrence_count": 79,
-      "last_seen": "2026-04-15T05:31:21.291532+00:00"
+      "weight": 81.0,
+      "occurrence_count": 81,
+      "last_seen": "2026-04-15T05:40:33.214579+00:00"
     },
     "technology:lte-4g": {
       "id": "technology:lte-4g",
       "type": "technology",
       "name": "LTE/4G",
       "attributes": {},
-      "weight": 550.0,
-      "occurrence_count": 550,
-      "last_seen": "2026-04-15T05:31:21.291538+00:00"
+      "weight": 559.0,
+      "occurrence_count": 559,
+      "last_seen": "2026-04-15T05:40:33.631965+00:00"
     },
     "scenario:charging-failure": {
       "id": "scenario:charging-failure",
@@ -197,12 +197,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "INVITE",
-        "src": "UE\n10.0.0.1",
-        "dst": "IMS\n10.0.0.2"
+        "src": "CORE\n10.58.7.210",
+        "dst": "EXT\n109.39.146.135"
       },
-      "weight": 63.0,
-      "occurrence_count": 63,
-      "last_seen": "2026-04-15T05:31:21.291611+00:00"
+      "weight": 64.0,
+      "occurrence_count": 64,
+      "last_seen": "2026-04-15T05:40:29.041061+00:00"
     },
     "event:diameter-272": {
       "id": "event:diameter-272",
@@ -255,9 +255,9 @@
       "type": "protocol",
       "name": "GTP",
       "attributes": {},
-      "weight": 221.0,
-      "occurrence_count": 221,
-      "last_seen": "2026-04-14T22:17:18.421496+00:00"
+      "weight": 225.0,
+      "occurrence_count": 225,
+      "last_seen": "2026-04-15T05:40:33.631955+00:00"
     },
     "scenario:core-network-failure": {
       "id": "scenario:core-network-failure",
@@ -298,27 +298,27 @@
       "type": "hypothesis",
       "name": "GTP:NORMAL_CALL",
       "attributes": {},
-      "weight": 208.0,
-      "occurrence_count": 208,
-      "last_seen": "2026-04-14T22:17:18.421569+00:00"
+      "weight": 212.0,
+      "occurrence_count": 212,
+      "last_seen": "2026-04-15T05:40:33.632041+00:00"
     },
     "protocol:nas-eps": {
       "id": "protocol:nas-eps",
       "type": "protocol",
       "name": "NAS_EPS",
       "attributes": {},
-      "weight": 335.0,
-      "occurrence_count": 335,
-      "last_seen": "2026-04-14T22:17:18.365810+00:00"
+      "weight": 339.0,
+      "occurrence_count": 339,
+      "last_seen": "2026-04-15T05:40:33.574135+00:00"
     },
     "protocol:s1ap": {
       "id": "protocol:s1ap",
       "type": "protocol",
       "name": "S1AP",
       "attributes": {},
-      "weight": 212.0,
-      "occurrence_count": 212,
-      "last_seen": "2026-04-14T22:17:17.955833+00:00"
+      "weight": 213.0,
+      "occurrence_count": 213,
+      "last_seen": "2026-04-15T05:40:33.145720+00:00"
     },
     "scenario:unknown-or-incomplete-session": {
       "id": "scenario:unknown-or-incomplete-session",
@@ -364,9 +364,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 1396.0,
-      "occurrence_count": 1396,
-      "last_seen": "2026-04-14T22:17:18.365931+00:00"
+      "weight": 1412.0,
+      "occurrence_count": 1412,
+      "last_seen": "2026-04-15T05:40:33.574261+00:00"
     },
     "event:s1ap-11": {
       "id": "event:s1ap-11",
@@ -457,9 +457,9 @@
       "type": "hypothesis",
       "name": "NAS:NORMAL_CALL",
       "attributes": {},
-      "weight": 329.0,
-      "occurrence_count": 329,
-      "last_seen": "2026-04-14T22:17:18.365938+00:00"
+      "weight": 334.0,
+      "occurrence_count": 334,
+      "last_seen": "2026-04-15T05:40:33.574269+00:00"
     },
     "scenario:nas-registration-rejection": {
       "id": "scenario:nas-registration-rejection",
@@ -570,18 +570,18 @@
       "type": "hypothesis",
       "name": "DIAMETER:NORMAL_CALL",
       "attributes": {},
-      "weight": 124.0,
-      "occurrence_count": 124,
-      "last_seen": "2026-04-14T22:17:18.531629+00:00"
+      "weight": 128.0,
+      "occurrence_count": 128,
+      "last_seen": "2026-04-15T05:40:33.747638+00:00"
     },
     "protocol:udp": {
       "id": "protocol:udp",
       "type": "protocol",
       "name": "UDP",
       "attributes": {},
-      "weight": 271.0,
-      "occurrence_count": 271,
-      "last_seen": "2026-04-14T22:17:18.421499+00:00"
+      "weight": 275.0,
+      "occurrence_count": 275,
+      "last_seen": "2026-04-15T05:40:33.631962+00:00"
     },
     "event:udp-udp": {
       "id": "event:udp-udp",
@@ -593,9 +593,9 @@
         "src": "IMS\n172.29.65.154",
         "dst": "EXT\n107.77.17.54"
       },
-      "weight": 28695.0,
-      "occurrence_count": 28695,
-      "last_seen": "2026-04-14T22:17:18.421600+00:00"
+      "weight": 28932.0,
+      "occurrence_count": 28932,
+      "last_seen": "2026-04-15T05:40:33.632073+00:00"
     },
     "protocol:icmp": {
       "id": "protocol:icmp",
@@ -645,9 +645,9 @@
         "src": "EXT\n166.216.164.148",
         "dst": "EXT\n166.170.13.52"
       },
-      "weight": 39364.0,
-      "occurrence_count": 39364,
-      "last_seen": "2026-04-14T22:17:18.023137+00:00"
+      "weight": 39582.0,
+      "occurrence_count": 39582,
+      "last_seen": "2026-04-15T05:40:33.218520+00:00"
     },
     "event:icmp-icmp-type-3-code-3": {
       "id": "event:icmp-icmp-type-3-code-3",
@@ -698,18 +698,18 @@
       "attributes": {
         "session_id": "107.79.12.133:3868->172.29.65.45:3868"
       },
-      "weight": 624.0,
-      "occurrence_count": 624,
-      "last_seen": "2026-04-14T22:17:18.531588+00:00"
+      "weight": 636.0,
+      "occurrence_count": 636,
+      "last_seen": "2026-04-15T05:40:33.747590+00:00"
     },
     "error:normal-call": {
       "id": "error:normal-call",
       "type": "error",
       "name": "NORMAL_CALL",
       "attributes": {},
-      "weight": 624.0,
-      "occurrence_count": 624,
-      "last_seen": "2026-04-14T22:17:18.531591+00:00"
+      "weight": 636.0,
+      "occurrence_count": 636,
+      "last_seen": "2026-04-15T05:40:33.747593+00:00"
     },
     "event:sctp-init-ack": {
       "id": "event:sctp-init-ack",
@@ -1012,12 +1012,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "200",
-        "src": "CORE\n10.58.26.74",
-        "dst": "CORE\n10.58.24.7"
+        "src": "CORE\n10.58.26.78",
+        "dst": "CORE\n10.58.10.195"
       },
-      "weight": 304.0,
-      "occurrence_count": 304,
-      "last_seen": "2026-04-14T17:51:14.968286+00:00"
+      "weight": 324.0,
+      "occurrence_count": 324,
+      "last_seen": "2026-04-15T05:40:29.042007+00:00"
     },
     "event:diameter-319r": {
       "id": "event:diameter-319r",
@@ -1082,12 +1082,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "100",
-        "src": "CORE\n10.58.25.7",
-        "dst": "CORE\n10.58.26.77"
+        "src": "CORE\n10.36.163.179",
+        "dst": "CORE\n10.255.240.116"
       },
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T17:51:14.966790+00:00"
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:29.041132+00:00"
     },
     "event:sip-183": {
       "id": "event:sip-183",
@@ -1096,12 +1096,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "183",
-        "src": "CORE\n10.58.26.74",
-        "dst": "CORE\n10.58.24.7"
+        "src": "CORE\n10.36.163.179",
+        "dst": "CORE\n10.255.240.116"
       },
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967752+00:00"
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041269+00:00"
     },
     "event:diameter-265r": {
       "id": "event:diameter-265r",
@@ -1113,9 +1113,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 43.0,
-      "occurrence_count": 43,
-      "last_seen": "2026-04-14T22:17:18.141620+00:00"
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.339409+00:00"
     },
     "event:diameter-rar": {
       "id": "event:diameter-rar",
@@ -1127,9 +1127,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 87.0,
-      "occurrence_count": 87,
-      "last_seen": "2026-04-14T22:17:18.141611+00:00"
+      "weight": 112.0,
+      "occurrence_count": 112,
+      "last_seen": "2026-04-15T05:40:33.339401+00:00"
     },
     "event:diameter-raa-2001": {
       "id": "event:diameter-raa-2001",
@@ -1141,9 +1141,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 93.0,
-      "occurrence_count": 93,
-      "last_seen": "2026-04-14T22:17:18.141615+00:00"
+      "weight": 120.0,
+      "occurrence_count": 120,
+      "last_seen": "2026-04-15T05:40:33.339405+00:00"
     },
     "event:diameter-265a-2001": {
       "id": "event:diameter-265a-2001",
@@ -1155,9 +1155,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 43.0,
-      "occurrence_count": 43,
-      "last_seen": "2026-04-14T22:17:18.141624+00:00"
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.339414+00:00"
     },
     "event:sip-prack": {
       "id": "event:sip-prack",
@@ -1166,12 +1166,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "PRACK",
-        "src": "CORE\n10.36.163.178",
-        "dst": "CORE\n10.255.250.150"
+        "src": "CORE\n10.58.26.78",
+        "dst": "CORE\n10.58.10.195"
       },
-      "weight": 66.0,
-      "occurrence_count": 66,
-      "last_seen": "2026-04-14T17:51:14.967074+00:00"
+      "weight": 72.0,
+      "occurrence_count": 72,
+      "last_seen": "2026-04-15T05:40:29.041606+00:00"
     },
     "event:sip-180": {
       "id": "event:sip-180",
@@ -1180,12 +1180,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "180",
-        "src": "CORE\n10.58.26.74",
-        "dst": "CORE\n10.58.24.7"
+        "src": "CORE\n10.36.163.179",
+        "dst": "CORE\n10.255.240.116"
       },
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T17:51:14.967798+00:00"
+      "weight": 48.0,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:29.041535+00:00"
     },
     "event:sip-ack": {
       "id": "event:sip-ack",
@@ -1194,12 +1194,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "ACK",
-        "src": "CORE\n10.36.163.178",
-        "dst": "CORE\n10.255.250.150"
+        "src": "CORE\n10.58.26.78",
+        "dst": "CORE\n10.58.10.195"
       },
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T17:51:14.967642+00:00"
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:29.041780+00:00"
     },
     "event:sip-bye": {
       "id": "event:sip-bye",
@@ -1208,12 +1208,12 @@
       "attributes": {
         "protocol": "SIP",
         "message": "BYE",
-        "src": "CORE\n10.36.163.178",
-        "dst": "CORE\n10.255.250.150"
+        "src": "EXT\n109.39.146.135",
+        "dst": "CORE\n10.58.7.210"
       },
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T17:51:14.968106+00:00"
+      "weight": 76.0,
+      "occurrence_count": 76,
+      "last_seen": "2026-04-15T05:40:29.041868+00:00"
     },
     "event:diameter-275r": {
       "id": "event:diameter-275r",
@@ -1225,9 +1225,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 29.0,
-      "occurrence_count": 29,
-      "last_seen": "2026-04-14T22:17:18.141587+00:00"
+      "weight": 34.0,
+      "occurrence_count": 34,
+      "last_seen": "2026-04-15T05:40:33.339377+00:00"
     },
     "event:diameter-275a-2001": {
       "id": "event:diameter-275a-2001",
@@ -1239,27 +1239,27 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 28.0,
-      "occurrence_count": 28,
-      "last_seen": "2026-04-14T22:17:18.141593+00:00"
+      "weight": 33.0,
+      "occurrence_count": 33,
+      "last_seen": "2026-04-15T05:40:33.339383+00:00"
     },
     "hypothesis:diameter-policy-failure": {
       "id": "hypothesis:diameter-policy-failure",
       "type": "hypothesis",
       "name": "DIAMETER:POLICY_FAILURE",
       "attributes": {},
-      "weight": 27.0,
-      "occurrence_count": 27,
-      "last_seen": "2026-04-14T17:51:14.968368+00:00"
+      "weight": 28.0,
+      "occurrence_count": 28,
+      "last_seen": "2026-04-15T05:40:29.042151+00:00"
     },
     "hypothesis:sip-normal-call": {
       "id": "hypothesis:sip-normal-call",
       "type": "hypothesis",
       "name": "SIP:NORMAL_CALL",
       "attributes": {},
-      "weight": 8.0,
-      "occurrence_count": 8,
-      "last_seen": "2026-04-14T17:51:14.968375+00:00"
+      "weight": 9.0,
+      "occurrence_count": 9,
+      "last_seen": "2026-04-15T05:40:29.042158+00:00"
     },
     "scenario:transport-congestion": {
       "id": "scenario:transport-congestion",
@@ -1291,9 +1291,9 @@
         "src": "EXT\n166.170.13.52",
         "dst": "EXT\n166.216.164.148"
       },
-      "weight": 205.0,
-      "occurrence_count": 205,
-      "last_seen": "2026-04-14T22:17:18.022760+00:00"
+      "weight": 221.0,
+      "occurrence_count": 221,
+      "last_seen": "2026-04-15T05:40:33.218147+00:00"
     },
     "event:diameter-cca-2001": {
       "id": "event:diameter-cca-2001",
@@ -1305,9 +1305,9 @@
         "src": "EXT\n166.216.164.148",
         "dst": "EXT\n166.170.13.52"
       },
-      "weight": 216.0,
-      "occurrence_count": 216,
-      "last_seen": "2026-04-14T22:17:18.022813+00:00"
+      "weight": 232.0,
+      "occurrence_count": 232,
+      "last_seen": "2026-04-15T05:40:33.218200+00:00"
     },
     "event:diameter-318r": {
       "id": "event:diameter-318r",
@@ -1823,9 +1823,9 @@
         "src": "IMS\n172.29.65.157",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 5336.0,
-      "occurrence_count": 5336,
-      "last_seen": "2026-04-14T22:17:18.023037+00:00"
+      "weight": 5390.0,
+      "occurrence_count": 5390,
+      "last_seen": "2026-04-15T05:40:33.218414+00:00"
     },
     "event:gtp-modify-bearer-response--request-accepted": {
       "id": "event:gtp-modify-bearer-response--request-accepted",
@@ -1837,9 +1837,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.65.157"
       },
-      "weight": 5295.0,
-      "occurrence_count": 5295,
-      "last_seen": "2026-04-14T22:17:18.023063+00:00"
+      "weight": 5349.0,
+      "occurrence_count": 5349,
+      "last_seen": "2026-04-15T05:40:33.218440+00:00"
     },
     "event:gtp-delete-session-request": {
       "id": "event:gtp-delete-session-request",
@@ -1907,9 +1907,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.65.157"
       },
-      "weight": 335.0,
-      "occurrence_count": 335,
-      "last_seen": "2026-04-14T22:17:18.023000+00:00"
+      "weight": 345.0,
+      "occurrence_count": 345,
+      "last_seen": "2026-04-15T05:40:33.218379+00:00"
     },
     "event:gtp-gtpv2-177--request-accepted": {
       "id": "event:gtp-gtpv2-177--request-accepted",
@@ -1921,9 +1921,9 @@
         "src": "IMS\n172.29.65.157",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 331.0,
-      "occurrence_count": 331,
-      "last_seen": "2026-04-14T22:17:18.023013+00:00"
+      "weight": 341.0,
+      "occurrence_count": 341,
+      "last_seen": "2026-04-15T05:40:33.218391+00:00"
     },
     "event:s1ap-handover-resource-allocation": {
       "id": "event:s1ap-handover-resource-allocation",
@@ -1977,9 +1977,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 1381.0,
-      "occurrence_count": 1381,
-      "last_seen": "2026-04-14T22:17:17.956894+00:00"
+      "weight": 1404.0,
+      "occurrence_count": 1404,
+      "last_seen": "2026-04-15T05:40:33.146732+00:00"
     },
     "event:nas-eps-nas-eps-tracking-area-update-request": {
       "id": "event:nas-eps-nas-eps-tracking-area-update-request",
@@ -1991,9 +1991,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 489.0,
-      "occurrence_count": 489,
-      "last_seen": "2026-04-14T22:17:18.365833+00:00"
+      "weight": 490.0,
+      "occurrence_count": 490,
+      "last_seen": "2026-04-15T05:40:33.574165+00:00"
     },
     "event:s1ap-downlink-nas-transport": {
       "id": "event:s1ap-downlink-nas-transport",
@@ -2005,9 +2005,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 1024.0,
-      "occurrence_count": 1024,
-      "last_seen": "2026-04-14T22:17:17.956881+00:00"
+      "weight": 1031.0,
+      "occurrence_count": 1031,
+      "last_seen": "2026-04-15T05:40:33.146720+00:00"
     },
     "event:nas-eps-nas-eps-tracking-area-update-accept": {
       "id": "event:nas-eps-nas-eps-tracking-area-update-accept",
@@ -2019,9 +2019,9 @@
         "src": "EXT\n2600:300:3005:2::",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 223.0,
-      "occurrence_count": 223,
-      "last_seen": "2026-04-14T22:17:18.365967+00:00"
+      "weight": 225.0,
+      "occurrence_count": 225,
+      "last_seen": "2026-04-15T05:40:33.574298+00:00"
     },
     "event:nas-eps-nas-eps-tracking-area-update-complete": {
       "id": "event:nas-eps-nas-eps-tracking-area-update-complete",
@@ -2033,9 +2033,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 174.0,
-      "occurrence_count": 174,
-      "last_seen": "2026-04-14T22:17:18.365886+00:00"
+      "weight": 175.0,
+      "occurrence_count": 175,
+      "last_seen": "2026-04-15T05:40:33.574217+00:00"
     },
     "event:s1ap-ue-context-release": {
       "id": "event:s1ap-ue-context-release",
@@ -2047,9 +2047,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 56.0,
-      "occurrence_count": 56,
-      "last_seen": "2026-04-14T22:17:17.956874+00:00"
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:33.146713+00:00"
     },
     "event:nas-eps-nas-eps-0x61": {
       "id": "event:nas-eps-nas-eps-0x61",
@@ -2061,9 +2061,9 @@
         "src": "EXT\n2600:300:3005:2::",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 106.0,
-      "occurrence_count": 106,
-      "last_seen": "2026-04-14T22:17:18.365893+00:00"
+      "weight": 107.0,
+      "occurrence_count": 107,
+      "last_seen": "2026-04-15T05:40:33.574224+00:00"
     },
     "event:s1ap-e-rab-release": {
       "id": "event:s1ap-e-rab-release",
@@ -2075,9 +2075,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 194.0,
-      "occurrence_count": 194,
-      "last_seen": "2026-04-14T22:17:17.956704+00:00"
+      "weight": 202.0,
+      "occurrence_count": 202,
+      "last_seen": "2026-04-15T05:40:33.146555+00:00"
     },
     "event:nas-eps-nas-eps-bearer-resource-command-cause-36": {
       "id": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
@@ -2089,9 +2089,9 @@
         "src": "EXT\n2600:300:3005:2::2",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 162.0,
-      "occurrence_count": 162,
-      "last_seen": "2026-04-14T22:17:18.252653+00:00"
+      "weight": 169.0,
+      "occurrence_count": 169,
+      "last_seen": "2026-04-15T05:40:33.456165+00:00"
     },
     "event:nas-eps-nas-eps-bearer-resource-failure-indication": {
       "id": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
@@ -2103,9 +2103,9 @@
         "src": "EXT\n2001:506:425a:c321:0:10:1411:2",
         "dst": "EXT\n2600:300:3005:2::2"
       },
-      "weight": 160.0,
-      "occurrence_count": 160,
-      "last_seen": "2026-04-14T22:17:18.194773+00:00"
+      "weight": 166.0,
+      "occurrence_count": 166,
+      "last_seen": "2026-04-15T05:40:33.394977+00:00"
     },
     "event:nas-eps-nas-eps-bearer-resource-modification-reject": {
       "id": "event:nas-eps-nas-eps-bearer-resource-modification-reject",
@@ -2131,9 +2131,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 217.0,
-      "occurrence_count": 217,
-      "last_seen": "2026-04-14T22:17:17.956366+00:00"
+      "weight": 225.0,
+      "occurrence_count": 225,
+      "last_seen": "2026-04-15T05:40:33.146231+00:00"
     },
     "event:nas-eps-nas-eps-activate-default-eps-bearer-context-request": {
       "id": "event:nas-eps-nas-eps-activate-default-eps-bearer-context-request",
@@ -2173,9 +2173,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 601.0,
-      "occurrence_count": 601,
-      "last_seen": "2026-04-14T22:17:17.956941+00:00"
+      "weight": 613.0,
+      "occurrence_count": 613,
+      "last_seen": "2026-04-15T05:40:33.146777+00:00"
     },
     "event:s1ap-mme-status-transfer": {
       "id": "event:s1ap-mme-status-transfer",
@@ -2187,9 +2187,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 1604.0,
-      "occurrence_count": 1604,
-      "last_seen": "2026-04-14T22:17:17.956974+00:00"
+      "weight": 1630.0,
+      "occurrence_count": 1630,
+      "last_seen": "2026-04-15T05:40:33.146808+00:00"
     },
     "event:s1ap-paging": {
       "id": "event:s1ap-paging",
@@ -2215,9 +2215,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 905.0,
-      "occurrence_count": 905,
-      "last_seen": "2026-04-14T22:17:17.956978+00:00"
+      "weight": 917.0,
+      "occurrence_count": 917,
+      "last_seen": "2026-04-15T05:40:33.146813+00:00"
     },
     "event:s1ap-initial-context-setup": {
       "id": "event:s1ap-initial-context-setup",
@@ -2229,9 +2229,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 1340.0,
-      "occurrence_count": 1340,
-      "last_seen": "2026-04-14T22:17:17.956988+00:00"
+      "weight": 1364.0,
+      "occurrence_count": 1364,
+      "last_seen": "2026-04-15T05:40:33.146822+00:00"
     },
     "event:s1ap-enb-status-transfer": {
       "id": "event:s1ap-enb-status-transfer",
@@ -2243,9 +2243,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 177.0,
-      "occurrence_count": 177,
-      "last_seen": "2026-04-14T22:17:17.956818+00:00"
+      "weight": 178.0,
+      "occurrence_count": 178,
+      "last_seen": "2026-04-15T05:40:33.146661+00:00"
     },
     "event:s1ap-s1ap-procedure-3": {
       "id": "event:s1ap-s1ap-procedure-3",
@@ -2257,9 +2257,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 1346.0,
-      "occurrence_count": 1346,
-      "last_seen": "2026-04-14T22:17:17.956651+00:00"
+      "weight": 1374.0,
+      "occurrence_count": 1374,
+      "last_seen": "2026-04-15T05:40:33.146504+00:00"
     },
     "event:nas-eps-nas-eps-0xd2": {
       "id": "event:nas-eps-nas-eps-0xd2",
@@ -2327,9 +2327,9 @@
         "src": "EXT\n2600:300:3005:2::",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 250.0,
-      "occurrence_count": 250,
-      "last_seen": "2026-04-14T22:17:18.365956+00:00"
+      "weight": 252.0,
+      "occurrence_count": 252,
+      "last_seen": "2026-04-15T05:40:33.574288+00:00"
     },
     "event:nas-eps-nas-eps-0x5e": {
       "id": "event:nas-eps-nas-eps-0x5e",
@@ -2341,9 +2341,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 229.0,
-      "occurrence_count": 229,
-      "last_seen": "2026-04-14T22:17:18.365961+00:00"
+      "weight": 231.0,
+      "occurrence_count": 231,
+      "last_seen": "2026-04-15T05:40:33.574292+00:00"
     },
     "event:nas-eps-nas-eps-0xd9": {
       "id": "event:nas-eps-nas-eps-0xd9",
@@ -2523,9 +2523,9 @@
         "src": "IMS\n172.29.65.154",
         "dst": "EXT\n107.77.17.54"
       },
-      "weight": 222.0,
-      "occurrence_count": 222,
-      "last_seen": "2026-04-14T22:17:18.421529+00:00"
+      "weight": 224.0,
+      "occurrence_count": 224,
+      "last_seen": "2026-04-15T05:40:33.631991+00:00"
     },
     "event:gtp-gtpv2-131--request-accepted": {
       "id": "event:gtp-gtpv2-131--request-accepted",
@@ -2537,9 +2537,9 @@
         "src": "EXT\n107.77.17.54",
         "dst": "IMS\n172.29.65.154"
       },
-      "weight": 252.0,
-      "occurrence_count": 252,
-      "last_seen": "2026-04-14T22:17:18.421583+00:00"
+      "weight": 256.0,
+      "occurrence_count": 256,
+      "last_seen": "2026-04-15T05:40:33.632055+00:00"
     },
     "event:gtp-gtpv2-132--request-accepted": {
       "id": "event:gtp-gtpv2-132--request-accepted",
@@ -2551,9 +2551,9 @@
         "src": "IMS\n172.29.65.154",
         "dst": "EXT\n107.77.17.54"
       },
-      "weight": 204.0,
-      "occurrence_count": 204,
-      "last_seen": "2026-04-14T22:17:18.421589+00:00"
+      "weight": 208.0,
+      "occurrence_count": 208,
+      "last_seen": "2026-04-15T05:40:33.632061+00:00"
     },
     "event:gtp-gtp": {
       "id": "event:gtp-gtp",
@@ -2562,12 +2562,12 @@
       "attributes": {
         "protocol": "GTP",
         "message": "GTP",
-        "src": "EXT\n213.181.60.45",
-        "dst": "EXT\n213.181.62.84"
+        "src": "EXT\n62.140.129.140",
+        "dst": "EXT\n62.140.129.113"
       },
-      "weight": 2723.0,
-      "occurrence_count": 2723,
-      "last_seen": "2026-04-14T21:41:23.320658+00:00"
+      "weight": 2737.0,
+      "occurrence_count": 2737,
+      "last_seen": "2026-04-15T05:40:29.041905+00:00"
     },
     "protocol:map": {
       "id": "protocol:map",
@@ -2682,9 +2682,9 @@
         "src": "IMS\n172.29.65.146",
         "dst": "EXT\n107.79.102.133"
       },
-      "weight": 1148.0,
-      "occurrence_count": 1148,
-      "last_seen": "2026-04-14T22:17:18.477121+00:00"
+      "weight": 1149.0,
+      "occurrence_count": 1149,
+      "last_seen": "2026-04-15T05:40:33.689815+00:00"
     },
     "event:diameter-aia-2001": {
       "id": "event:diameter-aia-2001",
@@ -2696,9 +2696,9 @@
         "src": "EXT\n107.79.102.133",
         "dst": "IMS\n172.29.65.146"
       },
-      "weight": 1161.0,
-      "occurrence_count": 1161,
-      "last_seen": "2026-04-14T22:17:18.477188+00:00"
+      "weight": 1163.0,
+      "occurrence_count": 1163,
+      "last_seen": "2026-04-15T05:40:33.689882+00:00"
     },
     "event:diameter-ulr": {
       "id": "event:diameter-ulr",
@@ -2710,9 +2710,9 @@
         "src": "IMS\n172.29.65.146",
         "dst": "EXT\n107.79.102.133"
       },
-      "weight": 1064.0,
-      "occurrence_count": 1064,
-      "last_seen": "2026-04-14T22:17:18.477192+00:00"
+      "weight": 1066.0,
+      "occurrence_count": 1066,
+      "last_seen": "2026-04-15T05:40:33.689886+00:00"
     },
     "event:diameter-ula-5004": {
       "id": "event:diameter-ula-5004",
@@ -2752,9 +2752,9 @@
         "src": "IMS\n172.29.65.157",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 523.0,
-      "occurrence_count": 523,
-      "last_seen": "2026-04-14T22:17:18.023076+00:00"
+      "weight": 535.0,
+      "occurrence_count": 535,
+      "last_seen": "2026-04-15T05:40:33.218453+00:00"
     },
     "event:gtp-release-access-bearers-response--request-accepted": {
       "id": "event:gtp-release-access-bearers-response--request-accepted",
@@ -2766,9 +2766,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.65.157"
       },
-      "weight": 460.0,
-      "occurrence_count": 460,
-      "last_seen": "2026-04-14T22:17:18.023090+00:00"
+      "weight": 472.0,
+      "occurrence_count": 472,
+      "last_seen": "2026-04-15T05:40:33.218470+00:00"
     },
     "event:gtp-gtpv2-97": {
       "id": "event:gtp-gtpv2-97",
@@ -2831,9 +2831,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.66.205"
       },
-      "weight": 52.0,
-      "occurrence_count": 52,
-      "last_seen": "2026-04-14T22:17:18.020968+00:00"
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.216306+00:00"
     },
     "event:gtp-create-bearer-response--ue-not-responding": {
       "id": "event:gtp-create-bearer-response--ue-not-responding",
@@ -2873,9 +2873,9 @@
         "src": "EXT\n2600:300:3005:2::",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 214.0,
-      "occurrence_count": 214,
-      "last_seen": "2026-04-14T22:17:18.365951+00:00"
+      "weight": 216.0,
+      "occurrence_count": 216,
+      "last_seen": "2026-04-15T05:40:33.574283+00:00"
     },
     "event:nas-eps-nas-eps-authentication-failure": {
       "id": "event:nas-eps-nas-eps-authentication-failure",
@@ -2887,9 +2887,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 235.0,
-      "occurrence_count": 235,
-      "last_seen": "2026-04-14T22:17:18.365945+00:00"
+      "weight": 237.0,
+      "occurrence_count": 237,
+      "last_seen": "2026-04-15T05:40:33.574277+00:00"
     },
     "event:nas-eps-nas-eps-attach-accept": {
       "id": "event:nas-eps-nas-eps-attach-accept",
@@ -2915,9 +2915,9 @@
         "src": "EXT\n2600:300:3005:2::2",
         "dst": "EXT\n2001:506:425a:c321:0:10:1411:2"
       },
-      "weight": 108.0,
-      "occurrence_count": 108,
-      "last_seen": "2026-04-14T22:17:18.194784+00:00"
+      "weight": 116.0,
+      "occurrence_count": 116,
+      "last_seen": "2026-04-15T05:40:33.394987+00:00"
     },
     "event:s1ap-s1ap-procedure-50": {
       "id": "event:s1ap-s1ap-procedure-50",
@@ -2943,9 +2943,9 @@
         "src": "IMS\n172.29.66.205",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 55.0,
-      "occurrence_count": 55,
-      "last_seen": "2026-04-14T22:17:18.020981+00:00"
+      "weight": 59.0,
+      "occurrence_count": 59,
+      "last_seen": "2026-04-15T05:40:33.216319+00:00"
     },
     "event:nas-eps-nas-eps-0xc6": {
       "id": "event:nas-eps-nas-eps-0xc6",
@@ -2957,9 +2957,9 @@
         "src": "EXT\n2001:506:425a:c321:0:10:1411:2",
         "dst": "EXT\n2600:300:3005:2::2"
       },
-      "weight": 84.0,
-      "occurrence_count": 84,
-      "last_seen": "2026-04-14T22:17:18.194639+00:00"
+      "weight": 89.0,
+      "occurrence_count": 89,
+      "last_seen": "2026-04-15T05:40:33.394838+00:00"
     },
     "protocol:ngap": {
       "id": "protocol:ngap",
@@ -3316,9 +3316,9 @@
         "src": "EXT\n107.79.102.133",
         "dst": "IMS\n172.29.65.146"
       },
-      "weight": 1043.0,
-      "occurrence_count": 1043,
-      "last_seen": "2026-04-14T22:17:18.477196+00:00"
+      "weight": 1045.0,
+      "occurrence_count": 1045,
+      "last_seen": "2026-04-15T05:40:33.689891+00:00"
     },
     "event:diameter-321r": {
       "id": "event:diameter-321r",
@@ -3638,9 +3638,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.65.157"
       },
-      "weight": 79.0,
-      "occurrence_count": 79,
-      "last_seen": "2026-04-14T22:17:18.022929+00:00"
+      "weight": 93.0,
+      "occurrence_count": 93,
+      "last_seen": "2026-04-15T05:40:33.218312+00:00"
     },
     "event:gtp-update-bearer-response--request-accepted": {
       "id": "event:gtp-update-bearer-response--request-accepted",
@@ -3652,9 +3652,9 @@
         "src": "IMS\n172.29.65.157",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 71.0,
-      "occurrence_count": 71,
-      "last_seen": "2026-04-14T22:17:18.022962+00:00"
+      "weight": 85.0,
+      "occurrence_count": 85,
+      "last_seen": "2026-04-15T05:40:33.218342+00:00"
     },
     "protocol:http": {
       "id": "protocol:http",
@@ -4090,9 +4090,9 @@
         "src": "EXT\n2600:300:3005:2::",
         "dst": "EXT\n2001:506:425a:c301:0:1:2424:2"
       },
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T22:17:18.365910+00:00"
+      "weight": 79.0,
+      "occurrence_count": 79,
+      "last_seen": "2026-04-15T05:40:33.574241+00:00"
     },
     "event:nas-eps-nas-eps-0xca": {
       "id": "event:nas-eps-nas-eps-0xca",
@@ -4104,9 +4104,9 @@
         "src": "EXT\n2001:506:425a:c301:0:1:2424:2",
         "dst": "EXT\n2600:300:3005:2::"
       },
-      "weight": 73.0,
-      "occurrence_count": 73,
-      "last_seen": "2026-04-14T22:17:18.365924+00:00"
+      "weight": 85.0,
+      "occurrence_count": 85,
+      "last_seen": "2026-04-15T05:40:33.574255+00:00"
     },
     "event:s1ap-s1ap-procedure-0": {
       "id": "event:s1ap-s1ap-procedure-0",
@@ -4174,9 +4174,9 @@
         "src": "UNKNOWN",
         "dst": "UNKNOWN"
       },
-      "weight": 68.0,
-      "occurrence_count": 68,
-      "last_seen": "2026-04-14T22:17:17.956632+00:00"
+      "weight": 84.0,
+      "occurrence_count": 84,
+      "last_seen": "2026-04-15T05:40:33.146486+00:00"
     },
     "event:diameter-clr": {
       "id": "event:diameter-clr",
@@ -4188,9 +4188,9 @@
         "src": "EXT\n107.79.12.133",
         "dst": "IMS\n172.29.65.45"
       },
-      "weight": 344.0,
-      "occurrence_count": 344,
-      "last_seen": "2026-04-14T22:17:18.531654+00:00"
+      "weight": 346.0,
+      "occurrence_count": 346,
+      "last_seen": "2026-04-15T05:40:33.747665+00:00"
     },
     "event:gtp-create-session-response--new-pdn-type-due-to-network-preference": {
       "id": "event:gtp-create-session-response--new-pdn-type-due-to-network-preference",
@@ -4216,9 +4216,9 @@
         "src": "EXT\n166.170.13.21",
         "dst": "IMS\n172.29.66.205"
       },
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.022300+00:00"
+      "weight": 52.0,
+      "occurrence_count": 52,
+      "last_seen": "2026-04-15T05:40:33.217665+00:00"
     },
     "event:gtp-gtpv2-100--request-accepted": {
       "id": "event:gtp-gtpv2-100--request-accepted",
@@ -4230,9 +4230,9 @@
         "src": "IMS\n172.29.66.205",
         "dst": "EXT\n166.170.13.21"
       },
-      "weight": 51.0,
-      "occurrence_count": 51,
-      "last_seen": "2026-04-14T22:17:18.022313+00:00"
+      "weight": 55.0,
+      "occurrence_count": 55,
+      "last_seen": "2026-04-15T05:40:33.217681+00:00"
     },
     "event:dns-dns-sos-apn-epc-mnc004-mcc204-3gppnetwork-org": {
       "id": "event:dns-dns-sos-apn-epc-mnc004-mcc204-3gppnetwork-org",
@@ -4482,9 +4482,9 @@
         "src": "IMS\n172.29.65.45",
         "dst": "EXT\n107.79.12.133"
       },
-      "weight": 310.0,
-      "occurrence_count": 310,
-      "last_seen": "2026-04-14T22:17:18.531642+00:00"
+      "weight": 312.0,
+      "occurrence_count": 312,
+      "last_seen": "2026-04-15T05:40:33.747653+00:00"
     },
     "event:diameter-265a-5065": {
       "id": "event:diameter-265a-5065",
@@ -4496,9 +4496,9 @@
         "src": "CORE\n10.56.236.135",
         "dst": "CORE\n10.56.128.34"
       },
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T17:51:03.112000+00:00"
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.042173+00:00"
     },
     "event:map-map-insertsubscriberdata": {
       "id": "event:map-map-insertsubscriberdata",
@@ -9295,9 +9295,9 @@
       "source": "event:sctp-data",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 6050.0,
-      "occurrence_count": 6050,
-      "last_seen": "2026-04-14T21:41:27.280469+00:00",
+      "weight": 6055.0,
+      "occurrence_count": 6055,
+      "last_seen": "2026-04-15T05:40:29.042088+00:00",
       "attributes": {}
     },
     "scenario:unknown-or-incomplete-session|contains|event:s1ap-22": {
@@ -9925,9 +9925,9 @@
       "source": "event:udp-udp",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 5993.0,
-      "occurrence_count": 5993,
-      "last_seen": "2026-04-14T22:17:18.022944+00:00",
+      "weight": 5999.0,
+      "occurrence_count": 5999,
+      "last_seen": "2026-04-15T05:40:33.218325+00:00",
       "attributes": {}
     },
     "event:udp-udp|causes|error:unknown": {
@@ -10025,9 +10025,9 @@
       "source": "event:tcp-tcp",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 36319.0,
-      "occurrence_count": 36319,
-      "last_seen": "2026-04-14T22:17:18.022829+00:00",
+      "weight": 36399.0,
+      "occurrence_count": 36399,
+      "last_seen": "2026-04-15T05:40:33.218215+00:00",
       "attributes": {}
     },
     "scenario:icmp-network-failure|contains|event:udp-udp": {
@@ -10045,9 +10045,9 @@
       "source": "event:tcp-tcp",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 754.0,
-      "occurrence_count": 754,
-      "last_seen": "2026-04-14T21:41:23.320592+00:00",
+      "weight": 764.0,
+      "occurrence_count": 764,
+      "last_seen": "2026-04-15T05:40:29.041761+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:tcp-tcp": {
@@ -10055,9 +10055,9 @@
       "source": "event:udp-udp",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 541.0,
-      "occurrence_count": 541,
-      "last_seen": "2026-04-14T22:17:18.022127+00:00",
+      "weight": 563.0,
+      "occurrence_count": 563,
+      "last_seen": "2026-04-15T05:40:33.217468+00:00",
       "attributes": {}
     },
     "scenario:icmp-network-failure|contains|event:icmp-icmp-type-3-code-3": {
@@ -10195,9 +10195,9 @@
       "source": "scenario:normal-session",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 1355.32,
-      "occurrence_count": 624,
-      "last_seen": "2026-04-14T22:17:18.531594+00:00",
+      "weight": 1383.88,
+      "occurrence_count": 636,
+      "last_seen": "2026-04-15T05:40:33.747597+00:00",
       "attributes": {}
     },
     "protocol:tcp|participates_in|scenario:normal-session": {
@@ -10205,9 +10205,9 @@
       "source": "protocol:tcp",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.019220+00:00",
+      "weight": 50.0,
+      "occurrence_count": 50,
+      "last_seen": "2026-04-15T05:40:33.214608+00:00",
       "attributes": {}
     },
     "technology:transport|depends_on|scenario:normal-session": {
@@ -10215,9 +10215,9 @@
       "source": "technology:transport",
       "target": "scenario:normal-session",
       "relation": "depends_on",
-      "weight": 350.7,
-      "occurrence_count": 501,
-      "last_seen": "2026-04-14T22:17:18.531601+00:00",
+      "weight": 354.9,
+      "occurrence_count": 507,
+      "last_seen": "2026-04-15T05:40:33.747605+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:tcp-tcp": {
@@ -10225,9 +10225,9 @@
       "source": "scenario:normal-session",
       "target": "event:tcp-tcp",
       "relation": "contains",
-      "weight": 15388.0,
-      "occurrence_count": 15388,
-      "last_seen": "2026-04-14T22:17:18.022828+00:00",
+      "weight": 15597.0,
+      "occurrence_count": 15597,
+      "last_seen": "2026-04-15T05:40:33.218214+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|correlates_with|error:normal-call": {
@@ -10235,9 +10235,9 @@
       "source": "event:tcp-tcp",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 18465.6,
-      "occurrence_count": 15388,
-      "last_seen": "2026-04-14T22:17:18.022831+00:00",
+      "weight": 18716.4,
+      "occurrence_count": 15597,
+      "last_seen": "2026-04-15T05:40:33.218217+00:00",
       "attributes": {}
     },
     "hypothesis:transport-normal-call|correlates_with|error:normal-call": {
@@ -10245,9 +10245,9 @@
       "source": "hypothesis:transport-normal-call",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 178.44,
-      "occurrence_count": 504,
-      "last_seen": "2026-04-14T22:17:18.531638+00:00",
+      "weight": 180.54,
+      "occurrence_count": 510,
+      "last_seen": "2026-04-15T05:40:33.747648+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:transport-normal-call": {
@@ -10255,9 +10255,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:transport-normal-call",
       "relation": "depends_on",
-      "weight": 403.2,
-      "occurrence_count": 504,
-      "last_seen": "2026-04-14T22:17:18.531639+00:00",
+      "weight": 408.0,
+      "occurrence_count": 510,
+      "last_seen": "2026-04-15T05:40:33.747650+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|causes|error:normal-call": {
@@ -10265,9 +10265,9 @@
       "source": "event:tcp-tcp",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 132.1266,
-      "occurrence_count": 147,
-      "last_seen": "2026-04-14T22:17:18.023139+00:00",
+      "weight": 140.2266,
+      "occurrence_count": 156,
+      "last_seen": "2026-04-15T05:40:33.218522+00:00",
       "attributes": {}
     },
     "protocol:nas-eps|participates_in|scenario:normal-session": {
@@ -10275,9 +10275,9 @@
       "source": "protocol:nas-eps",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 280.0,
-      "occurrence_count": 280,
-      "last_seen": "2026-04-14T22:17:18.365826+00:00",
+      "weight": 284.0,
+      "occurrence_count": 284,
+      "last_seen": "2026-04-15T05:40:33.574156+00:00",
       "attributes": {}
     },
     "protocol:s1ap|participates_in|scenario:normal-session": {
@@ -10285,9 +10285,9 @@
       "source": "protocol:s1ap",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 154.0,
-      "occurrence_count": 154,
-      "last_seen": "2026-04-14T22:17:17.955864+00:00",
+      "weight": 155.0,
+      "occurrence_count": 155,
+      "last_seen": "2026-04-15T05:40:33.145747+00:00",
       "attributes": {}
     },
     "protocol:sctp|participates_in|scenario:normal-session": {
@@ -10295,9 +10295,9 @@
       "source": "protocol:sctp",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 312.0,
-      "occurrence_count": 312,
-      "last_seen": "2026-04-14T22:17:18.531597+00:00",
+      "weight": 315.0,
+      "occurrence_count": 315,
+      "last_seen": "2026-04-15T05:40:33.747601+00:00",
       "attributes": {}
     },
     "technology:lte-4g|depends_on|scenario:normal-session": {
@@ -10305,9 +10305,9 @@
       "source": "technology:lte-4g",
       "target": "scenario:normal-session",
       "relation": "depends_on",
-      "weight": 311.5,
-      "occurrence_count": 445,
-      "last_seen": "2026-04-14T22:17:18.421519+00:00",
+      "weight": 317.8,
+      "occurrence_count": 454,
+      "last_seen": "2026-04-15T05:40:33.631985+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sctp-init": {
@@ -10385,9 +10385,9 @@
       "source": "scenario:normal-session",
       "target": "event:sctp-data",
       "relation": "contains",
-      "weight": 16569.0,
-      "occurrence_count": 16569,
-      "last_seen": "2026-04-14T22:17:18.531625+00:00",
+      "weight": 16585.0,
+      "occurrence_count": 16585,
+      "last_seen": "2026-04-15T05:40:33.747632+00:00",
       "attributes": {}
     },
     "event:sctp-cookie-ack|precedes|event:sctp-data": {
@@ -10505,9 +10505,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps",
       "relation": "contains",
-      "weight": 517.0,
-      "occurrence_count": 517,
-      "last_seen": "2026-04-14T22:17:18.365933+00:00",
+      "weight": 530.0,
+      "occurrence_count": 530,
+      "last_seen": "2026-04-15T05:40:33.574264+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps|precedes|event:sctp-sack": {
@@ -10835,9 +10835,9 @@
       "source": "hypothesis:nas-normal-call",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 150.34,
-      "occurrence_count": 294,
-      "last_seen": "2026-04-14T22:17:18.365940+00:00",
+      "weight": 152.72,
+      "occurrence_count": 299,
+      "last_seen": "2026-04-15T05:40:33.574272+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:nas-normal-call": {
@@ -10845,9 +10845,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:nas-normal-call",
       "relation": "depends_on",
-      "weight": 235.2,
-      "occurrence_count": 294,
-      "last_seen": "2026-04-14T22:17:18.365941+00:00",
+      "weight": 239.2,
+      "occurrence_count": 299,
+      "last_seen": "2026-04-15T05:40:33.574273+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps|causes|error:normal-call": {
@@ -10855,9 +10855,9 @@
       "source": "event:nas-eps-nas-eps",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 72.71,
-      "occurrence_count": 173,
-      "last_seen": "2026-04-14T22:17:18.252668+00:00",
+      "weight": 73.88,
+      "occurrence_count": 176,
+      "last_seen": "2026-04-15T05:40:33.456180+00:00",
       "attributes": {}
     },
     "scenario:nas-registration-rejection|contains|event:s1ap-12": {
@@ -10995,9 +10995,9 @@
       "source": "protocol:diameter",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 103.0,
-      "occurrence_count": 103,
-      "last_seen": "2026-04-14T22:17:18.531595+00:00",
+      "weight": 108.0,
+      "occurrence_count": 108,
+      "last_seen": "2026-04-15T05:40:33.747599+00:00",
       "attributes": {}
     },
     "protocol:sip|participates_in|scenario:normal-session": {
@@ -11005,9 +11005,9 @@
       "source": "protocol:sip",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.965244+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.040992+00:00",
       "attributes": {}
     },
     "protocol:udp|participates_in|scenario:normal-session": {
@@ -11015,9 +11015,9 @@
       "source": "protocol:udp",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 201.0,
-      "occurrence_count": 201,
-      "last_seen": "2026-04-14T22:17:18.421517+00:00",
+      "weight": 205.0,
+      "occurrence_count": 205,
+      "last_seen": "2026-04-15T05:40:33.631983+00:00",
       "attributes": {}
     },
     "technology:ims|depends_on|scenario:normal-session": {
@@ -11025,9 +11025,9 @@
       "source": "technology:ims",
       "target": "scenario:normal-session",
       "relation": "depends_on",
-      "weight": 91.7,
-      "occurrence_count": 131,
-      "last_seen": "2026-04-14T22:17:18.531599+00:00",
+      "weight": 95.2,
+      "occurrence_count": 136,
+      "last_seen": "2026-04-15T05:40:33.747603+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:udp-udp": {
@@ -11035,9 +11035,9 @@
       "source": "scenario:normal-session",
       "target": "event:udp-udp",
       "relation": "contains",
-      "weight": 20436.0,
-      "occurrence_count": 20436,
-      "last_seen": "2026-04-14T22:17:18.421564+00:00",
+      "weight": 20667.0,
+      "occurrence_count": 20667,
+      "last_seen": "2026-04-15T05:40:33.632035+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-401": {
@@ -11325,9 +11325,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-200",
       "relation": "contains",
-      "weight": 304.0,
-      "occurrence_count": 304,
-      "last_seen": "2026-04-14T17:51:14.968288+00:00",
+      "weight": 324.0,
+      "occurrence_count": 324,
+      "last_seen": "2026-04-15T05:40:29.042009+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-200": {
@@ -11335,9 +11335,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-200",
       "relation": "precedes",
-      "weight": 257.0,
-      "occurrence_count": 257,
-      "last_seen": "2026-04-14T17:51:14.968289+00:00",
+      "weight": 264.0,
+      "occurrence_count": 264,
+      "last_seen": "2026-04-15T05:40:29.041940+00:00",
       "attributes": {}
     },
     "event:sip-200|precedes|event:tcp-tcp": {
@@ -11345,9 +11345,9 @@
       "source": "event:sip-200",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 263.0,
-      "occurrence_count": 263,
-      "last_seen": "2026-04-14T17:51:14.968294+00:00",
+      "weight": 272.0,
+      "occurrence_count": 272,
+      "last_seen": "2026-04-15T05:40:29.041933+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-319r": {
@@ -11435,9 +11435,9 @@
       "source": "event:sctp-data",
       "target": "event:sip-200",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.965747+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041715+00:00",
       "attributes": {}
     },
     "event:sip-200|precedes|event:udp-udp": {
@@ -11445,9 +11445,9 @@
       "source": "event:sip-200",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967338+00:00",
+      "weight": 44.0,
+      "occurrence_count": 44,
+      "last_seen": "2026-04-15T05:40:29.042016+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sip-register": {
@@ -11575,9 +11575,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-100",
       "relation": "contains",
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T17:51:14.966792+00:00",
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:29.041133+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-100": {
@@ -11585,9 +11585,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-100",
       "relation": "precedes",
-      "weight": 54.0,
-      "occurrence_count": 54,
-      "last_seen": "2026-04-14T17:51:14.966793+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:29.041135+00:00",
       "attributes": {}
     },
     "event:sip-100|precedes|event:tcp-tcp": {
@@ -11595,9 +11595,9 @@
       "source": "event:sip-100",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T17:51:14.966799+00:00",
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:29.041140+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-invite": {
@@ -11605,9 +11605,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-invite",
       "relation": "contains",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967656+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041063+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-invite": {
@@ -11615,9 +11615,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-invite",
       "relation": "precedes",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967657+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041065+00:00",
       "attributes": {}
     },
     "event:sip-invite|precedes|event:tcp-tcp": {
@@ -11635,9 +11635,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-183",
       "relation": "contains",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967754+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041271+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-183": {
@@ -11645,9 +11645,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-183",
       "relation": "precedes",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967755+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041272+00:00",
       "attributes": {}
     },
     "event:sip-183|precedes|event:tcp-tcp": {
@@ -11655,9 +11655,9 @@
       "source": "event:sip-183",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 35.0,
-      "occurrence_count": 35,
-      "last_seen": "2026-04-14T17:51:14.967761+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:29.041277+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-265r": {
@@ -11665,9 +11665,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-265r",
       "relation": "contains",
-      "weight": 40.0,
-      "occurrence_count": 40,
-      "last_seen": "2026-04-14T22:17:18.141577+00:00",
+      "weight": 52.0,
+      "occurrence_count": 52,
+      "last_seen": "2026-04-15T05:40:33.339367+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-265r": {
@@ -11675,9 +11675,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-265r",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.966781+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041214+00:00",
       "attributes": {}
     },
     "event:diameter-265r|precedes|event:tcp-tcp": {
@@ -11685,9 +11685,9 @@
       "source": "event:diameter-265r",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 10.0,
-      "occurrence_count": 10,
-      "last_seen": "2026-04-14T17:51:14.966786+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:29.041219+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-rar": {
@@ -11695,9 +11695,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-rar",
       "relation": "contains",
-      "weight": 82.0,
-      "occurrence_count": 82,
-      "last_seen": "2026-04-14T22:17:18.141565+00:00",
+      "weight": 106.0,
+      "occurrence_count": 106,
+      "last_seen": "2026-04-15T05:40:33.339356+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-rar": {
@@ -11705,9 +11705,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-rar",
       "relation": "precedes",
-      "weight": 62.0,
-      "occurrence_count": 62,
-      "last_seen": "2026-04-14T22:17:18.022394+00:00",
+      "weight": 80.0,
+      "occurrence_count": 80,
+      "last_seen": "2026-04-15T05:40:33.217764+00:00",
       "attributes": {}
     },
     "event:diameter-rar|precedes|event:tcp-tcp": {
@@ -11715,9 +11715,9 @@
       "source": "event:diameter-rar",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 65.0,
-      "occurrence_count": 65,
-      "last_seen": "2026-04-14T22:17:18.022399+00:00",
+      "weight": 84.0,
+      "occurrence_count": 84,
+      "last_seen": "2026-04-15T05:40:33.217770+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-raa-2001": {
@@ -11725,9 +11725,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-raa-2001",
       "relation": "contains",
-      "weight": 88.0,
-      "occurrence_count": 88,
-      "last_seen": "2026-04-14T22:17:18.141571+00:00",
+      "weight": 114.0,
+      "occurrence_count": 114,
+      "last_seen": "2026-04-15T05:40:33.339362+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-raa-2001": {
@@ -11735,9 +11735,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-raa-2001",
       "relation": "precedes",
-      "weight": 68.0,
-      "occurrence_count": 68,
-      "last_seen": "2026-04-14T22:17:18.022414+00:00",
+      "weight": 88.0,
+      "occurrence_count": 88,
+      "last_seen": "2026-04-15T05:40:33.217789+00:00",
       "attributes": {}
     },
     "event:diameter-raa-2001|precedes|event:tcp-tcp": {
@@ -11745,9 +11745,9 @@
       "source": "event:diameter-raa-2001",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 71.0,
-      "occurrence_count": 71,
-      "last_seen": "2026-04-14T22:17:18.022419+00:00",
+      "weight": 92.0,
+      "occurrence_count": 92,
+      "last_seen": "2026-04-15T05:40:33.217796+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-265a-2001": {
@@ -11755,9 +11755,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-265a-2001",
       "relation": "contains",
-      "weight": 37.0,
-      "occurrence_count": 37,
-      "last_seen": "2026-04-14T22:17:18.141583+00:00",
+      "weight": 48.0,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:33.339373+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-265a-2001": {
@@ -11765,9 +11765,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-265a-2001",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.966835+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041252+00:00",
       "attributes": {}
     },
     "event:diameter-265a-2001|precedes|event:tcp-tcp": {
@@ -11775,9 +11775,9 @@
       "source": "event:diameter-265a-2001",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.966841+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041258+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-prack": {
@@ -11785,9 +11785,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-prack",
       "relation": "contains",
-      "weight": 66.0,
-      "occurrence_count": 66,
-      "last_seen": "2026-04-14T17:51:14.967075+00:00",
+      "weight": 72.0,
+      "occurrence_count": 72,
+      "last_seen": "2026-04-15T05:40:29.041608+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-prack": {
@@ -11795,9 +11795,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-prack",
       "relation": "precedes",
-      "weight": 53.0,
-      "occurrence_count": 53,
-      "last_seen": "2026-04-14T17:51:14.967077+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:29.041609+00:00",
       "attributes": {}
     },
     "event:sip-prack|precedes|event:udp-udp": {
@@ -11805,9 +11805,9 @@
       "source": "event:sip-prack",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.966934+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041337+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sip-prack": {
@@ -11815,9 +11815,9 @@
       "source": "event:udp-udp",
       "target": "event:sip-prack",
       "relation": "precedes",
-      "weight": 13.0,
-      "occurrence_count": 13,
-      "last_seen": "2026-04-14T17:51:14.966939+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:29.041568+00:00",
       "attributes": {}
     },
     "event:sip-prack|precedes|event:tcp-tcp": {
@@ -11825,9 +11825,9 @@
       "source": "event:sip-prack",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 53.0,
-      "occurrence_count": 53,
-      "last_seen": "2026-04-14T17:51:14.967082+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:29.041614+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-180": {
@@ -11835,9 +11835,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-180",
       "relation": "contains",
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T17:51:14.967800+00:00",
+      "weight": 48.0,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:29.041537+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-180": {
@@ -11845,9 +11845,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-180",
       "relation": "precedes",
-      "weight": 42.0,
-      "occurrence_count": 42,
-      "last_seen": "2026-04-14T17:51:14.967801+00:00",
+      "weight": 44.0,
+      "occurrence_count": 44,
+      "last_seen": "2026-04-15T05:40:29.041514+00:00",
       "attributes": {}
     },
     "event:sip-180|precedes|event:tcp-tcp": {
@@ -11855,9 +11855,9 @@
       "source": "event:sip-180",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T17:51:14.967807+00:00",
+      "weight": 48.0,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:29.041544+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sip-200": {
@@ -11865,9 +11865,9 @@
       "source": "event:udp-udp",
       "target": "event:sip-200",
       "relation": "precedes",
-      "weight": 40.0,
-      "occurrence_count": 40,
-      "last_seen": "2026-04-14T17:51:14.967343+00:00",
+      "weight": 52.0,
+      "occurrence_count": 52,
+      "last_seen": "2026-04-15T05:40:29.042010+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-ack": {
@@ -11875,9 +11875,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-ack",
       "relation": "contains",
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T17:51:14.967644+00:00",
+      "weight": 60.0,
+      "occurrence_count": 60,
+      "last_seen": "2026-04-15T05:40:29.041782+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-ack": {
@@ -11885,9 +11885,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-ack",
       "relation": "precedes",
-      "weight": 43.0,
-      "occurrence_count": 43,
-      "last_seen": "2026-04-14T17:51:14.967645+00:00",
+      "weight": 44.0,
+      "occurrence_count": 44,
+      "last_seen": "2026-04-15T05:40:29.041772+00:00",
       "attributes": {}
     },
     "event:sip-ack|precedes|event:udp-udp": {
@@ -11895,9 +11895,9 @@
       "source": "event:sip-ack",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 11.0,
-      "occurrence_count": 11,
-      "last_seen": "2026-04-14T17:51:14.967579+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:29.041778+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sip-ack": {
@@ -11905,9 +11905,9 @@
       "source": "event:udp-udp",
       "target": "event:sip-ack",
       "relation": "precedes",
-      "weight": 14.0,
-      "occurrence_count": 14,
-      "last_seen": "2026-04-14T17:51:14.967584+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:29.041783+00:00",
       "attributes": {}
     },
     "event:sip-ack|precedes|event:tcp-tcp": {
@@ -11915,9 +11915,9 @@
       "source": "event:sip-ack",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 43.0,
-      "occurrence_count": 43,
-      "last_seen": "2026-04-14T17:51:14.967650+00:00",
+      "weight": 44.0,
+      "occurrence_count": 44,
+      "last_seen": "2026-04-15T05:40:29.041788+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:sip-bye": {
@@ -11925,9 +11925,9 @@
       "source": "scenario:normal-session",
       "target": "event:sip-bye",
       "relation": "contains",
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T17:51:14.968107+00:00",
+      "weight": 76.0,
+      "occurrence_count": 76,
+      "last_seen": "2026-04-15T05:40:29.041869+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:sip-bye": {
@@ -11935,9 +11935,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sip-bye",
       "relation": "precedes",
-      "weight": 54.0,
-      "occurrence_count": 54,
-      "last_seen": "2026-04-14T17:51:14.968109+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:29.041845+00:00",
       "attributes": {}
     },
     "event:sip-bye|precedes|event:tcp-tcp": {
@@ -11945,9 +11945,9 @@
       "source": "event:sip-bye",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 51.0,
-      "occurrence_count": 51,
-      "last_seen": "2026-04-14T17:51:14.968114+00:00",
+      "weight": 52.0,
+      "occurrence_count": 52,
+      "last_seen": "2026-04-15T05:40:29.041838+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-275r": {
@@ -11955,9 +11955,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-275r",
       "relation": "contains",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:18.141588+00:00",
+      "weight": 29.0,
+      "occurrence_count": 29,
+      "last_seen": "2026-04-15T05:40:33.339379+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-275r": {
@@ -11985,9 +11985,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-275a-2001",
       "relation": "contains",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:18.141595+00:00",
+      "weight": 29.0,
+      "occurrence_count": 29,
+      "last_seen": "2026-04-15T05:40:33.339385+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-275a-2001": {
@@ -12015,9 +12015,9 @@
       "source": "hypothesis:diameter-policy-failure",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 5.04,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.968370+00:00",
+      "weight": 5.76,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.042153+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:diameter-policy-failure": {
@@ -12025,9 +12025,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:diameter-policy-failure",
       "relation": "depends_on",
-      "weight": 5.6,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.968372+00:00",
+      "weight": 6.4,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.042155+00:00",
       "attributes": {}
     },
     "hypothesis:sip-normal-call|correlates_with|error:normal-call": {
@@ -12035,9 +12035,9 @@
       "source": "hypothesis:sip-normal-call",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 3.15,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.968377+00:00",
+      "weight": 3.6,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.042160+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:sip-normal-call": {
@@ -12045,9 +12045,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:sip-normal-call",
       "relation": "depends_on",
-      "weight": 5.6,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T17:51:14.968378+00:00",
+      "weight": 6.4,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.042161+00:00",
       "attributes": {}
     },
     "event:sip-401|causes|error:normal-call": {
@@ -12235,9 +12235,9 @@
       "source": "event:diameter-rar",
       "target": "event:diameter-raa-2001",
       "relation": "precedes",
-      "weight": 19.0,
-      "occurrence_count": 19,
-      "last_seen": "2026-04-14T22:17:18.141572+00:00",
+      "weight": 24.0,
+      "occurrence_count": 24,
+      "last_seen": "2026-04-15T05:40:33.339363+00:00",
       "attributes": {}
     },
     "event:diameter-raa-2001|precedes|event:diameter-ccr": {
@@ -12435,9 +12435,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-ccr",
       "relation": "contains",
-      "weight": 162.0,
-      "occurrence_count": 162,
-      "last_seen": "2026-04-14T22:17:18.022762+00:00",
+      "weight": 178.0,
+      "occurrence_count": 178,
+      "last_seen": "2026-04-15T05:40:33.218149+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:diameter-ccr": {
@@ -12445,9 +12445,9 @@
       "source": "event:udp-udp",
       "target": "event:diameter-ccr",
       "relation": "precedes",
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.022743+00:00",
+      "weight": 57.0,
+      "occurrence_count": 57,
+      "last_seen": "2026-04-15T05:40:33.218129+00:00",
       "attributes": {}
     },
     "event:diameter-ccr|precedes|event:tcp-tcp": {
@@ -12455,9 +12455,9 @@
       "source": "event:diameter-ccr",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 118.0,
-      "occurrence_count": 118,
-      "last_seen": "2026-04-14T22:17:18.022769+00:00",
+      "weight": 134.0,
+      "occurrence_count": 134,
+      "last_seen": "2026-04-15T05:40:33.218155+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-ccr": {
@@ -12465,9 +12465,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-ccr",
       "relation": "precedes",
-      "weight": 44.0,
-      "occurrence_count": 44,
-      "last_seen": "2026-04-14T22:17:18.022763+00:00",
+      "weight": 49.0,
+      "occurrence_count": 49,
+      "last_seen": "2026-04-15T05:40:33.218150+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-8388635r": {
@@ -12535,9 +12535,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-cca-2001",
       "relation": "contains",
-      "weight": 162.0,
-      "occurrence_count": 162,
-      "last_seen": "2026-04-14T22:17:18.022815+00:00",
+      "weight": 178.0,
+      "occurrence_count": 178,
+      "last_seen": "2026-04-15T05:40:33.218201+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-cca-2001": {
@@ -12545,9 +12545,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-cca-2001",
       "relation": "precedes",
-      "weight": 143.0,
-      "occurrence_count": 143,
-      "last_seen": "2026-04-14T22:17:18.022783+00:00",
+      "weight": 157.0,
+      "occurrence_count": 157,
+      "last_seen": "2026-04-15T05:40:33.218170+00:00",
       "attributes": {}
     },
     "event:diameter-cca-2001|precedes|event:tcp-tcp": {
@@ -12555,9 +12555,9 @@
       "source": "event:diameter-cca-2001",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 117.0,
-      "occurrence_count": 117,
-      "last_seen": "2026-04-14T22:17:18.022822+00:00",
+      "weight": 133.0,
+      "occurrence_count": 133,
+      "last_seen": "2026-04-15T05:40:33.218208+00:00",
       "attributes": {}
     },
     "event:diameter-cca-2001|precedes|event:udp-udp": {
@@ -12575,9 +12575,9 @@
       "source": "hypothesis:diameter-normal-call",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 43.2,
-      "occurrence_count": 96,
-      "last_seen": "2026-04-14T22:17:18.531631+00:00",
+      "weight": 45.0,
+      "occurrence_count": 100,
+      "last_seen": "2026-04-15T05:40:33.747640+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:diameter-normal-call": {
@@ -12585,9 +12585,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:diameter-normal-call",
       "relation": "depends_on",
-      "weight": 76.8,
-      "occurrence_count": 96,
-      "last_seen": "2026-04-14T22:17:18.531633+00:00",
+      "weight": 80.0,
+      "occurrence_count": 100,
+      "last_seen": "2026-04-15T05:40:33.747642+00:00",
       "attributes": {}
     },
     "protocol:pfcp|participates_in|scenario:unknown-or-incomplete-session": {
@@ -13915,9 +13915,9 @@
       "source": "event:udp-udp",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 36.22,
-      "occurrence_count": 81,
-      "last_seen": "2026-04-14T22:17:18.421602+00:00",
+      "weight": 38.92,
+      "occurrence_count": 87,
+      "last_seen": "2026-04-15T05:40:33.632075+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap|causes|error:normal-call": {
@@ -14105,9 +14105,9 @@
       "source": "protocol:gtp",
       "target": "scenario:normal-session",
       "relation": "participates_in",
-      "weight": 188.0,
-      "occurrence_count": 188,
-      "last_seen": "2026-04-14T22:17:18.421516+00:00",
+      "weight": 192.0,
+      "occurrence_count": 192,
+      "last_seen": "2026-04-15T05:40:33.631981+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-forward-relocation-request": {
@@ -14235,9 +14235,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-modify-bearer-request",
       "relation": "contains",
-      "weight": 5087.0,
-      "occurrence_count": 5087,
-      "last_seen": "2026-04-14T22:17:18.023038+00:00",
+      "weight": 5141.0,
+      "occurrence_count": 5141,
+      "last_seen": "2026-04-15T05:40:33.218416+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-modify-bearer-request": {
@@ -14245,9 +14245,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-modify-bearer-request",
       "relation": "precedes",
-      "weight": 5106.0,
-      "occurrence_count": 5106,
-      "last_seen": "2026-04-14T22:17:18.023040+00:00",
+      "weight": 5159.0,
+      "occurrence_count": 5159,
+      "last_seen": "2026-04-15T05:40:33.218417+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-request|precedes|event:udp-udp": {
@@ -14255,9 +14255,9 @@
       "source": "event:gtp-modify-bearer-request",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 5152.0,
-      "occurrence_count": 5152,
-      "last_seen": "2026-04-14T22:17:18.023045+00:00",
+      "weight": 5206.0,
+      "occurrence_count": 5206,
+      "last_seen": "2026-04-15T05:40:33.218422+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-modify-bearer-response--request-accepted": {
@@ -14265,9 +14265,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-modify-bearer-response--request-accepted",
       "relation": "contains",
-      "weight": 5024.0,
-      "occurrence_count": 5024,
-      "last_seen": "2026-04-14T22:17:18.023065+00:00",
+      "weight": 5078.0,
+      "occurrence_count": 5078,
+      "last_seen": "2026-04-15T05:40:33.218441+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-modify-bearer-response--request-accepted": {
@@ -14275,9 +14275,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-modify-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 5083.0,
-      "occurrence_count": 5083,
-      "last_seen": "2026-04-14T22:17:18.023066+00:00",
+      "weight": 5130.0,
+      "occurrence_count": 5130,
+      "last_seen": "2026-04-15T05:40:33.218443+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-response--request-accepted|precedes|event:udp-udp": {
@@ -14285,9 +14285,9 @@
       "source": "event:gtp-modify-bearer-response--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 5101.0,
-      "occurrence_count": 5101,
-      "last_seen": "2026-04-14T22:17:18.023072+00:00",
+      "weight": 5150.0,
+      "occurrence_count": 5150,
+      "last_seen": "2026-04-15T05:40:33.218448+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-delete-session-request": {
@@ -14415,9 +14415,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-176",
       "relation": "contains",
-      "weight": 284.0,
-      "occurrence_count": 284,
-      "last_seen": "2026-04-14T22:17:18.023002+00:00",
+      "weight": 294.0,
+      "occurrence_count": 294,
+      "last_seen": "2026-04-15T05:40:33.218381+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-176": {
@@ -14425,9 +14425,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-176",
       "relation": "precedes",
-      "weight": 292.0,
-      "occurrence_count": 292,
-      "last_seen": "2026-04-14T22:17:18.023003+00:00",
+      "weight": 300.0,
+      "occurrence_count": 300,
+      "last_seen": "2026-04-15T05:40:33.218382+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-176|precedes|event:udp-udp": {
@@ -14435,9 +14435,9 @@
       "source": "event:gtp-gtpv2-176",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 323.0,
-      "occurrence_count": 323,
-      "last_seen": "2026-04-14T22:17:18.023009+00:00",
+      "weight": 333.0,
+      "occurrence_count": 333,
+      "last_seen": "2026-04-15T05:40:33.218387+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-gtpv2-177--request-accepted": {
@@ -14445,9 +14445,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-177--request-accepted",
       "relation": "contains",
-      "weight": 292.0,
-      "occurrence_count": 292,
-      "last_seen": "2026-04-14T22:17:18.023014+00:00",
+      "weight": 302.0,
+      "occurrence_count": 302,
+      "last_seen": "2026-04-15T05:40:33.218393+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-177--request-accepted": {
@@ -14455,9 +14455,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-177--request-accepted",
       "relation": "precedes",
-      "weight": 294.0,
-      "occurrence_count": 294,
-      "last_seen": "2026-04-14T22:17:18.023016+00:00",
+      "weight": 304.0,
+      "occurrence_count": 304,
+      "last_seen": "2026-04-15T05:40:33.218394+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-177--request-accepted|precedes|event:udp-udp": {
@@ -14465,9 +14465,9 @@
       "source": "event:gtp-gtpv2-177--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 284.0,
-      "occurrence_count": 284,
-      "last_seen": "2026-04-14T22:17:18.023021+00:00",
+      "weight": 294.0,
+      "occurrence_count": 294,
+      "last_seen": "2026-04-15T05:40:33.218399+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-response--request-accepted|precedes|event:gtp-modify-bearer-response--request-accepted": {
@@ -14475,9 +14475,9 @@
       "source": "event:gtp-modify-bearer-response--request-accepted",
       "target": "event:gtp-modify-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 80.0,
-      "occurrence_count": 80,
-      "last_seen": "2026-04-14T22:17:18.022908+00:00",
+      "weight": 83.0,
+      "occurrence_count": 83,
+      "last_seen": "2026-04-15T05:40:33.218291+00:00",
       "attributes": {}
     },
     "hypothesis:gtp-normal-call|correlates_with|error:normal-call": {
@@ -14485,9 +14485,9 @@
       "source": "hypothesis:gtp-normal-call",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 130.54,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421571+00:00",
+      "weight": 133.16,
+      "occurrence_count": 202,
+      "last_seen": "2026-04-15T05:40:33.632043+00:00",
       "attributes": {}
     },
     "scenario:normal-session|depends_on|hypothesis:gtp-normal-call": {
@@ -14495,9 +14495,9 @@
       "source": "scenario:normal-session",
       "target": "hypothesis:gtp-normal-call",
       "relation": "depends_on",
-      "weight": 158.4,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421572+00:00",
+      "weight": 161.6,
+      "occurrence_count": 202,
+      "last_seen": "2026-04-15T05:40:33.632044+00:00",
       "attributes": {}
     },
     "event:gtp-forward-relocation-request|causes|error:normal-call": {
@@ -14765,9 +14765,9 @@
       "source": "event:s1ap-downlink-nas-transport",
       "target": "event:s1ap-ue-context-release",
       "relation": "precedes",
-      "weight": 20.0,
-      "occurrence_count": 20,
-      "last_seen": "2026-04-14T22:17:17.956877+00:00",
+      "weight": 22.0,
+      "occurrence_count": 22,
+      "last_seen": "2026-04-15T05:40:33.146716+00:00",
       "attributes": {}
     },
     "event:s1ap-ue-context-release|precedes|event:sctp-data": {
@@ -15235,9 +15235,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-s1ap-procedure-3",
       "relation": "precedes",
-      "weight": 38.0,
-      "occurrence_count": 38,
-      "last_seen": "2026-04-14T22:17:17.956312+00:00",
+      "weight": 39.0,
+      "occurrence_count": 39,
+      "last_seen": "2026-04-15T05:40:33.146180+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-3|precedes|event:sctp-data": {
@@ -15265,9 +15265,9 @@
       "source": "event:s1ap-s1ap-procedure-3",
       "target": "event:s1ap-s1ap-procedure-3",
       "relation": "precedes",
-      "weight": 199.0,
-      "occurrence_count": 199,
-      "last_seen": "2026-04-14T22:17:17.956654+00:00",
+      "weight": 220.0,
+      "occurrence_count": 220,
+      "last_seen": "2026-04-15T05:40:33.146507+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:nas-eps-nas-eps-tracking-area-update-request": {
@@ -15385,9 +15385,9 @@
       "source": "event:s1ap-ue-context-release-request",
       "target": "event:s1ap-mme-status-transfer",
       "relation": "precedes",
-      "weight": 133.0,
-      "occurrence_count": 133,
-      "last_seen": "2026-04-14T22:17:17.956951+00:00",
+      "weight": 144.0,
+      "occurrence_count": 144,
+      "last_seen": "2026-04-15T05:40:33.146786+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:s1ap-initial-ue-message": {
@@ -15465,9 +15465,9 @@
       "source": "event:s1ap-mme-status-transfer",
       "target": "event:s1ap-initial-ue-message",
       "relation": "precedes",
-      "weight": 73.0,
-      "occurrence_count": 73,
-      "last_seen": "2026-04-14T22:17:17.956924+00:00",
+      "weight": 84.0,
+      "occurrence_count": 84,
+      "last_seen": "2026-04-15T05:40:33.146760+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-ue-message|precedes|event:nas-eps-nas-eps-tracking-area-update-request": {
@@ -15485,9 +15485,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-downlink-nas-transport",
       "relation": "precedes",
-      "weight": 101.0,
-      "occurrence_count": 101,
-      "last_seen": "2026-04-14T22:17:17.956801+00:00",
+      "weight": 104.0,
+      "occurrence_count": 104,
+      "last_seen": "2026-04-15T05:40:33.146646+00:00",
       "attributes": {}
     },
     "event:s1ap-downlink-nas-transport|precedes|event:s1ap-mme-status-transfer": {
@@ -16375,9 +16375,9 @@
       "source": "event:sctp-data",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 199.5745,
-      "occurrence_count": 451,
-      "last_seen": "2026-04-14T22:17:18.531652+00:00",
+      "weight": 201.3745,
+      "occurrence_count": 455,
+      "last_seen": "2026-04-15T05:40:33.747663+00:00",
       "attributes": {}
     },
     "event:inap-unknown|causes|error:normal-call": {
@@ -16425,9 +16425,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-130",
       "relation": "contains",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421532+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.631994+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-130|precedes|event:s1ap-s1ap": {
@@ -16445,9 +16445,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-tracking-area-update-request",
       "relation": "contains",
-      "weight": 271.0,
-      "occurrence_count": 271,
-      "last_seen": "2026-04-14T22:17:18.365836+00:00",
+      "weight": 272.0,
+      "occurrence_count": 272,
+      "last_seen": "2026-04-15T05:40:33.574167+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap|precedes|event:nas-eps-nas-eps-tracking-area-update-request": {
@@ -16485,9 +16485,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-131--request-accepted",
       "relation": "contains",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421545+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632017+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-131--request-accepted": {
@@ -16495,9 +16495,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-131--request-accepted",
       "relation": "precedes",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421546+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632018+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-131--request-accepted|precedes|event:udp-udp": {
@@ -16505,9 +16505,9 @@
       "source": "event:gtp-gtpv2-131--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421552+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632024+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-gtpv2-132--request-accepted": {
@@ -16515,9 +16515,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-132--request-accepted",
       "relation": "contains",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421558+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632030+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-132--request-accepted": {
@@ -16525,9 +16525,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-132--request-accepted",
       "relation": "precedes",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421560+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632031+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-132--request-accepted|precedes|event:udp-udp": {
@@ -16535,9 +16535,9 @@
       "source": "event:gtp-gtpv2-132--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 198.0,
-      "occurrence_count": 198,
-      "last_seen": "2026-04-14T22:17:18.421565+00:00",
+      "weight": 200.0,
+      "occurrence_count": 200,
+      "last_seen": "2026-04-15T05:40:33.632037+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-tracking-area-update-request|causes|error:normal-call": {
@@ -16565,9 +16565,9 @@
       "source": "event:gtp-gtpv2-131--request-accepted",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 29.7,
-      "occurrence_count": 54,
-      "last_seen": "2026-04-14T22:17:18.421585+00:00",
+      "weight": 30.8,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.632057+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-request|precedes|event:gtp-modify-bearer-request": {
@@ -16695,9 +16695,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtp",
       "relation": "contains",
-      "weight": 961.0,
-      "occurrence_count": 961,
-      "last_seen": "2026-04-14T21:41:23.320579+00:00",
+      "weight": 975.0,
+      "occurrence_count": 975,
+      "last_seen": "2026-04-15T05:40:29.041906+00:00",
       "attributes": {}
     },
     "event:gtp-gtp|precedes|event:udp-udp": {
@@ -16705,9 +16705,9 @@
       "source": "event:gtp-gtp",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 2044.0,
-      "occurrence_count": 2044,
-      "last_seen": "2026-04-14T21:41:23.320558+00:00",
+      "weight": 2048.0,
+      "occurrence_count": 2048,
+      "last_seen": "2026-04-15T05:40:29.041913+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtp": {
@@ -16865,9 +16865,9 @@
       "source": "event:nas-eps-nas-eps",
       "target": "event:nas-eps-nas-eps",
       "relation": "precedes",
-      "weight": 20.0,
-      "occurrence_count": 20,
-      "last_seen": "2026-04-14T22:17:18.252641+00:00",
+      "weight": 26.0,
+      "occurrence_count": 26,
+      "last_seen": "2026-04-15T05:40:33.456153+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:s1ap-22": {
@@ -17025,9 +17025,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-ue-context-release-request",
       "relation": "precedes",
-      "weight": 141.0,
-      "occurrence_count": 141,
-      "last_seen": "2026-04-14T22:17:17.956944+00:00",
+      "weight": 148.0,
+      "occurrence_count": 148,
+      "last_seen": "2026-04-15T05:40:33.146780+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:s1ap-initial-context-setup": {
@@ -17035,9 +17035,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-initial-context-setup",
       "relation": "precedes",
-      "weight": 134.0,
-      "occurrence_count": 134,
-      "last_seen": "2026-04-14T22:17:17.956937+00:00",
+      "weight": 144.0,
+      "occurrence_count": 144,
+      "last_seen": "2026-04-15T05:40:33.146773+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-3|precedes|event:s1ap-uplink-nas-transport": {
@@ -17085,9 +17085,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-e-rab-release",
       "relation": "precedes",
-      "weight": 11.0,
-      "occurrence_count": 11,
-      "last_seen": "2026-04-14T22:17:17.956344+00:00",
+      "weight": 13.0,
+      "occurrence_count": 13,
+      "last_seen": "2026-04-15T05:40:33.146210+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-release|precedes|event:s1ap-uplink-nas-transport": {
@@ -17095,9 +17095,9 @@
       "source": "event:s1ap-e-rab-release",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:17.956357+00:00",
+      "weight": 15.0,
+      "occurrence_count": 15,
+      "last_seen": "2026-04-15T05:40:33.146223+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:s1ap-ue-context-release-request": {
@@ -17105,9 +17105,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-ue-context-release-request",
       "relation": "precedes",
-      "weight": 17.0,
-      "occurrence_count": 17,
-      "last_seen": "2026-04-14T22:17:17.956905+00:00",
+      "weight": 19.0,
+      "occurrence_count": 19,
+      "last_seen": "2026-04-15T05:40:33.146742+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-ue-message|precedes|event:s1ap-initial-context-setup": {
@@ -17115,9 +17115,9 @@
       "source": "event:s1ap-initial-ue-message",
       "target": "event:s1ap-initial-context-setup",
       "relation": "precedes",
-      "weight": 17.0,
-      "occurrence_count": 17,
-      "last_seen": "2026-04-14T22:17:17.956931+00:00",
+      "weight": 27.0,
+      "occurrence_count": 27,
+      "last_seen": "2026-04-15T05:40:33.146767+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:s1ap-enb-status-transfer": {
@@ -17125,9 +17125,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-enb-status-transfer",
       "relation": "precedes",
-      "weight": 13.0,
-      "occurrence_count": 13,
-      "last_seen": "2026-04-14T22:17:17.956822+00:00",
+      "weight": 14.0,
+      "occurrence_count": 14,
+      "last_seen": "2026-04-15T05:40:33.146665+00:00",
       "attributes": {}
     },
     "event:s1ap-enb-status-transfer|precedes|event:s1ap-initial-context-setup": {
@@ -17145,9 +17145,9 @@
       "source": "event:s1ap-downlink-nas-transport",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 25.0,
-      "occurrence_count": 25,
-      "last_seen": "2026-04-14T22:17:17.956891+00:00",
+      "weight": 30.0,
+      "occurrence_count": 30,
+      "last_seen": "2026-04-15T05:40:33.146729+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:nas-eps-nas-eps-0x53": {
@@ -17245,9 +17245,9 @@
       "source": "event:s1ap-mme-status-transfer",
       "target": "event:s1ap-mme-status-transfer",
       "relation": "precedes",
-      "weight": 52.0,
-      "occurrence_count": 52,
-      "last_seen": "2026-04-14T22:17:17.956957+00:00",
+      "weight": 64.0,
+      "occurrence_count": 64,
+      "last_seen": "2026-04-15T05:40:33.146792+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-modification-reject|precedes|event:s1ap-uplink-nas-transport": {
@@ -17555,9 +17555,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-tracking-area-update-complete",
       "relation": "contains",
-      "weight": 49.0,
-      "occurrence_count": 49,
-      "last_seen": "2026-04-14T22:17:18.365888+00:00",
+      "weight": 50.0,
+      "occurrence_count": 50,
+      "last_seen": "2026-04-15T05:40:33.574219+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-tracking-area-update-complete|causes|error:normal-call": {
@@ -17785,9 +17785,9 @@
       "source": "event:diameter-air",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 1065.0,
-      "occurrence_count": 1065,
-      "last_seen": "2026-04-14T22:17:18.477131+00:00",
+      "weight": 1066.0,
+      "occurrence_count": 1066,
+      "last_seen": "2026-04-15T05:40:33.689826+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-air": {
@@ -17815,9 +17815,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-aia-2001",
       "relation": "precedes",
-      "weight": 1030.0,
-      "occurrence_count": 1030,
-      "last_seen": "2026-04-14T22:17:18.477138+00:00",
+      "weight": 1031.0,
+      "occurrence_count": 1031,
+      "last_seen": "2026-04-15T05:40:33.689832+00:00",
       "attributes": {}
     },
     "event:diameter-aia-2001|precedes|event:sctp-data": {
@@ -17825,9 +17825,9 @@
       "source": "event:diameter-aia-2001",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 1034.0,
-      "occurrence_count": 1034,
-      "last_seen": "2026-04-14T22:17:18.477144+00:00",
+      "weight": 1035.0,
+      "occurrence_count": 1035,
+      "last_seen": "2026-04-15T05:40:33.689839+00:00",
       "attributes": {}
     },
     "scenario:subscriber-barred|contains|event:diameter-ulr": {
@@ -17845,9 +17845,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-ulr",
       "relation": "precedes",
-      "weight": 957.0,
-      "occurrence_count": 957,
-      "last_seen": "2026-04-14T22:17:18.477151+00:00",
+      "weight": 958.0,
+      "occurrence_count": 958,
+      "last_seen": "2026-04-15T05:40:33.689845+00:00",
       "attributes": {}
     },
     "event:diameter-ulr|precedes|event:sctp-data": {
@@ -17855,9 +17855,9 @@
       "source": "event:diameter-ulr",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 973.0,
-      "occurrence_count": 973,
-      "last_seen": "2026-04-14T22:17:18.477157+00:00",
+      "weight": 974.0,
+      "occurrence_count": 974,
+      "last_seen": "2026-04-15T05:40:33.689850+00:00",
       "attributes": {}
     },
     "scenario:subscriber-barred|contains|event:diameter-ula-5004": {
@@ -18055,9 +18055,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-release-access-bearers-request",
       "relation": "precedes",
-      "weight": 372.0,
-      "occurrence_count": 372,
-      "last_seen": "2026-04-14T22:17:18.023079+00:00",
+      "weight": 383.0,
+      "occurrence_count": 383,
+      "last_seen": "2026-04-15T05:40:33.218457+00:00",
       "attributes": {}
     },
     "event:gtp-release-access-bearers-request|precedes|event:gtp-release-access-bearers-request": {
@@ -18075,9 +18075,9 @@
       "source": "event:gtp-release-access-bearers-request",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 442.0,
-      "occurrence_count": 442,
-      "last_seen": "2026-04-14T22:17:18.023085+00:00",
+      "weight": 454.0,
+      "occurrence_count": 454,
+      "last_seen": "2026-04-15T05:40:33.218464+00:00",
       "attributes": {}
     },
     "scenario:core-network-failure|contains|event:gtp-release-access-bearers-response--request-accepted": {
@@ -18095,9 +18095,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-release-access-bearers-response--request-accepted",
       "relation": "precedes",
-      "weight": 391.0,
-      "occurrence_count": 391,
-      "last_seen": "2026-04-14T22:17:18.023093+00:00",
+      "weight": 403.0,
+      "occurrence_count": 403,
+      "last_seen": "2026-04-15T05:40:33.218474+00:00",
       "attributes": {}
     },
     "event:gtp-release-access-bearers-response--request-accepted|precedes|event:gtp-release-access-bearers-response--request-accepted": {
@@ -18115,9 +18115,9 @@
       "source": "event:gtp-release-access-bearers-response--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 391.0,
-      "occurrence_count": 391,
-      "last_seen": "2026-04-14T22:17:18.023099+00:00",
+      "weight": 403.0,
+      "occurrence_count": 403,
+      "last_seen": "2026-04-15T05:40:33.218481+00:00",
       "attributes": {}
     },
     "scenario:core-network-failure|contains|event:gtp-gtpv2-97": {
@@ -18495,9 +18495,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-create-bearer-request",
       "relation": "precedes",
-      "weight": 42.0,
-      "occurrence_count": 42,
-      "last_seen": "2026-04-14T22:17:18.020971+00:00",
+      "weight": 43.0,
+      "occurrence_count": 43,
+      "last_seen": "2026-04-15T05:40:33.216309+00:00",
       "attributes": {}
     },
     "event:gtp-create-bearer-request|precedes|event:udp-udp": {
@@ -18505,9 +18505,9 @@
       "source": "event:gtp-create-bearer-request",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 52.0,
-      "occurrence_count": 52,
-      "last_seen": "2026-04-14T22:17:18.020976+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.216315+00:00",
       "attributes": {}
     },
     "scenario:icmp-network-failure|contains|event:gtp-create-bearer-response--ue-not-responding": {
@@ -18675,9 +18675,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-initial-ue-message",
       "relation": "contains",
-      "weight": 215.0,
-      "occurrence_count": 215,
-      "last_seen": "2026-04-14T22:17:17.956923+00:00",
+      "weight": 226.0,
+      "occurrence_count": 226,
+      "last_seen": "2026-04-15T05:40:33.146759+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-attach-request": {
@@ -18705,9 +18705,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-authentication-response",
       "relation": "contains",
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.365844+00:00",
+      "weight": 49.0,
+      "occurrence_count": 49,
+      "last_seen": "2026-04-15T05:40:33.574176+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:nas-eps-nas-eps-authentication-response": {
@@ -18725,9 +18725,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-downlink-nas-transport",
       "relation": "contains",
-      "weight": 348.0,
-      "occurrence_count": 348,
-      "last_seen": "2026-04-14T22:17:17.956883+00:00",
+      "weight": 355.0,
+      "occurrence_count": 355,
+      "last_seen": "2026-04-15T05:40:33.146721+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-authentication-response|precedes|event:s1ap-downlink-nas-transport": {
@@ -18755,9 +18755,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-authentication-failure",
       "relation": "contains",
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.365853+00:00",
+      "weight": 49.0,
+      "occurrence_count": 49,
+      "last_seen": "2026-04-15T05:40:33.574184+00:00",
       "attributes": {}
     },
     "event:sctp-sack|precedes|event:nas-eps-nas-eps-authentication-failure": {
@@ -18775,9 +18775,9 @@
       "source": "event:nas-eps-nas-eps-authentication-failure",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 57.6,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.365856+00:00",
+      "weight": 58.8,
+      "occurrence_count": 49,
+      "last_seen": "2026-04-15T05:40:33.574188+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:s1ap-uplink-nas-transport": {
@@ -18785,9 +18785,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "contains",
-      "weight": 570.0,
-      "occurrence_count": 570,
-      "last_seen": "2026-04-14T22:17:17.956896+00:00",
+      "weight": 593.0,
+      "occurrence_count": 593,
+      "last_seen": "2026-04-15T05:40:33.146733+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-authentication-failure|precedes|event:s1ap-uplink-nas-transport": {
@@ -18815,9 +18815,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-0x5d",
       "relation": "contains",
-      "weight": 79.0,
-      "occurrence_count": 79,
-      "last_seen": "2026-04-14T22:17:18.365862+00:00",
+      "weight": 80.0,
+      "occurrence_count": 80,
+      "last_seen": "2026-04-15T05:40:33.574195+00:00",
       "attributes": {}
     },
     "event:sctp-sack|precedes|event:nas-eps-nas-eps-0x5d": {
@@ -18835,9 +18835,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-0x5e",
       "relation": "contains",
-      "weight": 73.0,
-      "occurrence_count": 73,
-      "last_seen": "2026-04-14T22:17:18.365869+00:00",
+      "weight": 74.0,
+      "occurrence_count": 74,
+      "last_seen": "2026-04-15T05:40:33.574202+00:00",
       "attributes": {}
     },
     "event:sctp-sack|precedes|event:nas-eps-nas-eps-0x5e": {
@@ -18875,9 +18875,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-initial-context-setup",
       "relation": "contains",
-      "weight": 430.0,
-      "occurrence_count": 430,
-      "last_seen": "2026-04-14T22:17:17.956936+00:00",
+      "weight": 452.0,
+      "occurrence_count": 452,
+      "last_seen": "2026-04-15T05:40:33.146772+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-attach-accept|precedes|event:s1ap-initial-context-setup": {
@@ -18965,9 +18965,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-e-rab-setup",
       "relation": "contains",
-      "weight": 163.0,
-      "occurrence_count": 163,
-      "last_seen": "2026-04-14T22:17:17.956368+00:00",
+      "weight": 171.0,
+      "occurrence_count": 171,
+      "last_seen": "2026-04-15T05:40:33.146233+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-setup|precedes|event:sctp-sack": {
@@ -19005,9 +19005,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "relation": "contains",
-      "weight": 23.0,
-      "occurrence_count": 23,
-      "last_seen": "2026-04-14T22:17:18.194633+00:00",
+      "weight": 27.0,
+      "occurrence_count": 27,
+      "last_seen": "2026-04-15T05:40:33.394832+00:00",
       "attributes": {}
     },
     "event:sctp-sack|precedes|event:nas-eps-nas-eps-pdn-connectivity-reject": {
@@ -19025,9 +19025,9 @@
       "source": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 27.6,
-      "occurrence_count": 23,
-      "last_seen": "2026-04-14T22:17:18.194636+00:00",
+      "weight": 32.4,
+      "occurrence_count": 27,
+      "last_seen": "2026-04-15T05:40:33.394835+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-pdn-connectivity-reject|precedes|event:s1ap-e-rab-setup": {
@@ -19095,9 +19095,9 @@
       "source": "event:nas-eps-nas-eps-authentication-failure",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 46.53,
-      "occurrence_count": 47,
-      "last_seen": "2026-04-14T22:17:18.365947+00:00",
+      "weight": 47.52,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:33.574279+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-modification-reject|causes|error:normal-call": {
@@ -19115,9 +19115,9 @@
       "source": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 21.501,
-      "occurrence_count": 23,
-      "last_seen": "2026-04-14T22:17:18.194786+00:00",
+      "weight": 25.038,
+      "occurrence_count": 27,
+      "last_seen": "2026-04-15T05:40:33.394989+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-attach-request|causes|error:normal-call": {
@@ -19135,9 +19135,9 @@
       "source": "event:nas-eps-nas-eps-authentication-response",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 15.95,
-      "occurrence_count": 29,
-      "last_seen": "2026-04-14T22:17:18.365953+00:00",
+      "weight": 16.5,
+      "occurrence_count": 30,
+      "last_seen": "2026-04-15T05:40:33.574285+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-modify-bearer-request": {
@@ -19145,9 +19145,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-modify-bearer-request",
       "relation": "precedes",
-      "weight": 25.0,
-      "occurrence_count": 25,
-      "last_seen": "2026-04-14T22:17:18.021184+00:00",
+      "weight": 26.0,
+      "occurrence_count": 26,
+      "last_seen": "2026-04-15T05:40:33.216511+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-create-bearer-request": {
@@ -19155,9 +19155,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-create-bearer-request",
       "relation": "contains",
-      "weight": 46.0,
-      "occurrence_count": 46,
-      "last_seen": "2026-04-14T22:17:18.020969+00:00",
+      "weight": 50.0,
+      "occurrence_count": 50,
+      "last_seen": "2026-04-15T05:40:33.216308+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-create-bearer-response--request-accepted": {
@@ -19165,9 +19165,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-create-bearer-response--request-accepted",
       "relation": "contains",
-      "weight": 48.0,
-      "occurrence_count": 48,
-      "last_seen": "2026-04-14T22:17:18.020983+00:00",
+      "weight": 52.0,
+      "occurrence_count": 52,
+      "last_seen": "2026-04-15T05:40:33.216321+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-create-bearer-response--request-accepted": {
@@ -19175,9 +19175,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-create-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T22:17:18.020984+00:00",
+      "weight": 47.0,
+      "occurrence_count": 47,
+      "last_seen": "2026-04-15T05:40:33.216322+00:00",
       "attributes": {}
     },
     "event:gtp-create-bearer-response--request-accepted|precedes|event:udp-udp": {
@@ -19185,9 +19185,9 @@
       "source": "event:gtp-create-bearer-response--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 52.0,
-      "occurrence_count": 52,
-      "last_seen": "2026-04-14T22:17:18.020990+00:00",
+      "weight": 56.0,
+      "occurrence_count": 56,
+      "last_seen": "2026-04-15T05:40:33.216327+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-release-access-bearers-request": {
@@ -19195,9 +19195,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-release-access-bearers-request",
       "relation": "contains",
-      "weight": 382.0,
-      "occurrence_count": 382,
-      "last_seen": "2026-04-14T22:17:18.023078+00:00",
+      "weight": 394.0,
+      "occurrence_count": 394,
+      "last_seen": "2026-04-15T05:40:33.218455+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:icmp-icmp-type-3-code-3": {
@@ -19255,9 +19255,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-0xc6",
       "relation": "contains",
-      "weight": 17.0,
-      "occurrence_count": 17,
-      "last_seen": "2026-04-14T22:17:18.194641+00:00",
+      "weight": 21.0,
+      "occurrence_count": 21,
+      "last_seen": "2026-04-15T05:40:33.394839+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:nas-eps-nas-eps-0xc6": {
@@ -19965,9 +19965,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-initial-context-setup",
       "relation": "precedes",
-      "weight": 81.0,
-      "occurrence_count": 81,
-      "last_seen": "2026-04-14T22:17:17.956836+00:00",
+      "weight": 83.0,
+      "occurrence_count": 83,
+      "last_seen": "2026-04-15T05:40:33.146677+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:nas-eps-nas-eps-attach-accept": {
@@ -19995,9 +19995,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-enb-status-transfer",
       "relation": "contains",
-      "weight": 61.0,
-      "occurrence_count": 61,
-      "last_seen": "2026-04-14T22:17:17.956820+00:00",
+      "weight": 62.0,
+      "occurrence_count": 62,
+      "last_seen": "2026-04-15T05:40:33.146663+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-0x61": {
@@ -20005,9 +20005,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-0x61",
       "relation": "contains",
-      "weight": 38.0,
-      "occurrence_count": 38,
-      "last_seen": "2026-04-14T22:17:18.365896+00:00",
+      "weight": 39.0,
+      "occurrence_count": 39,
+      "last_seen": "2026-04-15T05:40:33.574227+00:00",
       "attributes": {}
     },
     "event:s1ap-downlink-nas-transport|precedes|event:nas-eps-nas-eps-0x61": {
@@ -20025,9 +20025,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-e-rab-setup",
       "relation": "precedes",
-      "weight": 23.0,
-      "occurrence_count": 23,
-      "last_seen": "2026-04-14T22:17:17.956363+00:00",
+      "weight": 25.0,
+      "occurrence_count": 25,
+      "last_seen": "2026-04-15T05:40:33.146228+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-activate-default-eps-bearer-context-request-cause-50": {
@@ -20095,9 +20095,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-e-rab-release",
       "relation": "contains",
-      "weight": 94.0,
-      "occurrence_count": 94,
-      "last_seen": "2026-04-14T22:17:17.956705+00:00",
+      "weight": 102.0,
+      "occurrence_count": 102,
+      "last_seen": "2026-04-15T05:40:33.146556+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-bearer-resource-command-cause-36": {
@@ -20105,9 +20105,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "relation": "contains",
-      "weight": 37.0,
-      "occurrence_count": 37,
-      "last_seen": "2026-04-14T22:17:18.252624+00:00",
+      "weight": 41.0,
+      "occurrence_count": 41,
+      "last_seen": "2026-04-15T05:40:33.456136+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-command-cause-36|correlates_with|error:normal-call": {
@@ -20115,9 +20115,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 44.4,
-      "occurrence_count": 37,
-      "last_seen": "2026-04-14T22:17:18.252628+00:00",
+      "weight": 49.2,
+      "occurrence_count": 41,
+      "last_seen": "2026-04-15T05:40:33.456140+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-bearer-resource-failure-indication": {
@@ -20125,9 +20125,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "relation": "contains",
-      "weight": 34.0,
-      "occurrence_count": 34,
-      "last_seen": "2026-04-14T22:17:18.194624+00:00",
+      "weight": 37.0,
+      "occurrence_count": 37,
+      "last_seen": "2026-04-15T05:40:33.394823+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-failure-indication|correlates_with|error:normal-call": {
@@ -20135,9 +20135,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 40.8,
-      "occurrence_count": 34,
-      "last_seen": "2026-04-14T22:17:18.194627+00:00",
+      "weight": 44.4,
+      "occurrence_count": 37,
+      "last_seen": "2026-04-15T05:40:33.394826+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-0x45": {
@@ -20175,9 +20175,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-mme-status-transfer",
       "relation": "contains",
-      "weight": 431.0,
-      "occurrence_count": 431,
-      "last_seen": "2026-04-14T22:17:17.956956+00:00",
+      "weight": 455.0,
+      "occurrence_count": 455,
+      "last_seen": "2026-04-15T05:40:33.146791+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:s1ap-mme-status-transfer": {
@@ -20185,9 +20185,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-mme-status-transfer",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:17.956728+00:00",
+      "weight": 7.0,
+      "occurrence_count": 7,
+      "last_seen": "2026-04-15T05:40:33.146576+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-activate-default-eps-bearer-context-request-cause-50|causes|error:normal-call": {
@@ -20205,9 +20205,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 31.416,
-      "occurrence_count": 33,
-      "last_seen": "2026-04-14T22:17:18.252655+00:00",
+      "weight": 33.968,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:33.456167+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-failure-indication|causes|error:normal-call": {
@@ -20215,9 +20215,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 32.67,
-      "occurrence_count": 33,
-      "last_seen": "2026-04-14T22:17:18.194775+00:00",
+      "weight": 35.64,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:33.394978+00:00",
       "attributes": {}
     },
     "protocol:inap|participates_in|scenario:nas-registration-rejection": {
@@ -20425,9 +20425,9 @@
       "source": "event:nas-eps-nas-eps-authentication-failure",
       "target": "event:nas-eps-nas-eps-0x5d",
       "relation": "precedes",
-      "weight": 103.0,
-      "occurrence_count": 103,
-      "last_seen": "2026-04-14T22:17:18.365864+00:00",
+      "weight": 104.0,
+      "occurrence_count": 104,
+      "last_seen": "2026-04-15T05:40:33.574197+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x5e|precedes|event:nas-eps-nas-eps-attach-reject-cause-17": {
@@ -20975,9 +20975,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-air",
       "relation": "contains",
-      "weight": 841.0,
-      "occurrence_count": 841,
-      "last_seen": "2026-04-14T22:17:18.477123+00:00",
+      "weight": 842.0,
+      "occurrence_count": 842,
+      "last_seen": "2026-04-15T05:40:33.689817+00:00",
       "attributes": {}
     },
     "event:diameter-air|precedes|event:diameter-air": {
@@ -20995,9 +20995,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-aia-2001",
       "relation": "contains",
-      "weight": 841.0,
-      "occurrence_count": 841,
-      "last_seen": "2026-04-14T22:17:18.477136+00:00",
+      "weight": 842.0,
+      "occurrence_count": 842,
+      "last_seen": "2026-04-15T05:40:33.689831+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-ulr": {
@@ -21005,9 +21005,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-ulr",
       "relation": "contains",
-      "weight": 741.0,
-      "occurrence_count": 741,
-      "last_seen": "2026-04-14T22:17:18.477149+00:00",
+      "weight": 742.0,
+      "occurrence_count": 742,
+      "last_seen": "2026-04-15T05:40:33.689843+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-ula-2001": {
@@ -21015,9 +21015,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-ula-2001",
       "relation": "contains",
-      "weight": 761.0,
-      "occurrence_count": 761,
-      "last_seen": "2026-04-14T22:17:18.477162+00:00",
+      "weight": 762.0,
+      "occurrence_count": 762,
+      "last_seen": "2026-04-15T05:40:33.689856+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-ula-2001": {
@@ -21025,9 +21025,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-ula-2001",
       "relation": "precedes",
-      "weight": 939.0,
-      "occurrence_count": 939,
-      "last_seen": "2026-04-14T22:17:18.477164+00:00",
+      "weight": 940.0,
+      "occurrence_count": 940,
+      "last_seen": "2026-04-15T05:40:33.689858+00:00",
       "attributes": {}
     },
     "event:diameter-ula-2001|precedes|event:sctp-data": {
@@ -21035,9 +21035,9 @@
       "source": "event:diameter-ula-2001",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 939.0,
-      "occurrence_count": 939,
-      "last_seen": "2026-04-14T22:17:18.477170+00:00",
+      "weight": 940.0,
+      "occurrence_count": 940,
+      "last_seen": "2026-04-15T05:40:33.689863+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-321r": {
@@ -21125,9 +21125,9 @@
       "source": "event:diameter-aia-2001",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 21.45,
-      "occurrence_count": 39,
-      "last_seen": "2026-04-14T22:17:18.477189+00:00",
+      "weight": 22.0,
+      "occurrence_count": 40,
+      "last_seen": "2026-04-15T05:40:33.689884+00:00",
       "attributes": {}
     },
     "event:diameter-ulr|causes|error:normal-call": {
@@ -21135,9 +21135,9 @@
       "source": "event:diameter-ulr",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 14.6,
-      "occurrence_count": 27,
-      "last_seen": "2026-04-14T22:17:18.477194+00:00",
+      "weight": 15.15,
+      "occurrence_count": 28,
+      "last_seen": "2026-04-15T05:40:33.689888+00:00",
       "attributes": {}
     },
     "scenario:policy-failure|contains|event:diameter-air": {
@@ -21835,9 +21835,9 @@
       "source": "event:gtp-gtp",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 52.0,
-      "occurrence_count": 52,
-      "last_seen": "2026-04-14T21:41:23.320586+00:00",
+      "weight": 62.0,
+      "occurrence_count": 62,
+      "last_seen": "2026-04-15T05:40:29.041754+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:dns-dns-nri-sgsn0006-rac0038-lac0c58-rac-epc-mnc001-mcc206-3gppnetwork-org": {
@@ -21975,9 +21975,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-release-access-bearers-response--request-accepted",
       "relation": "contains",
-      "weight": 308.0,
-      "occurrence_count": 308,
-      "last_seen": "2026-04-14T22:17:18.023092+00:00",
+      "weight": 320.0,
+      "occurrence_count": 320,
+      "last_seen": "2026-04-15T05:40:33.218472+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-gtpv2-64": {
@@ -22015,9 +22015,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-update-bearer-request",
       "relation": "contains",
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T22:17:18.022931+00:00",
+      "weight": 71.0,
+      "occurrence_count": 71,
+      "last_seen": "2026-04-15T05:40:33.218313+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-update-bearer-request": {
@@ -22025,9 +22025,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-update-bearer-request",
       "relation": "precedes",
-      "weight": 49.0,
-      "occurrence_count": 49,
-      "last_seen": "2026-04-14T22:17:18.022926+00:00",
+      "weight": 53.0,
+      "occurrence_count": 53,
+      "last_seen": "2026-04-15T05:40:33.218308+00:00",
       "attributes": {}
     },
     "event:gtp-update-bearer-request|precedes|event:udp-udp": {
@@ -22035,9 +22035,9 @@
       "source": "event:gtp-update-bearer-request",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 76.0,
-      "occurrence_count": 76,
-      "last_seen": "2026-04-14T22:17:18.022939+00:00",
+      "weight": 89.0,
+      "occurrence_count": 89,
+      "last_seen": "2026-04-15T05:40:33.218320+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-update-bearer-response--request-accepted": {
@@ -22045,9 +22045,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-update-bearer-response--request-accepted",
       "relation": "contains",
-      "weight": 57.0,
-      "occurrence_count": 57,
-      "last_seen": "2026-04-14T22:17:18.022964+00:00",
+      "weight": 71.0,
+      "occurrence_count": 71,
+      "last_seen": "2026-04-15T05:40:33.218344+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-update-bearer-response--request-accepted": {
@@ -22055,9 +22055,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-update-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 44.0,
-      "occurrence_count": 44,
-      "last_seen": "2026-04-14T22:17:18.022965+00:00",
+      "weight": 51.0,
+      "occurrence_count": 51,
+      "last_seen": "2026-04-15T05:40:33.218345+00:00",
       "attributes": {}
     },
     "event:gtp-update-bearer-response--request-accepted|precedes|event:udp-udp": {
@@ -22065,9 +22065,9 @@
       "source": "event:gtp-update-bearer-response--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T22:17:18.022971+00:00",
+      "weight": 83.0,
+      "occurrence_count": 83,
+      "last_seen": "2026-04-15T05:40:33.218351+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-177--request-accepted|causes|error:normal-call": {
@@ -23865,9 +23865,9 @@
       "source": "event:tcp-tcp",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 34.0,
-      "occurrence_count": 34,
-      "last_seen": "2026-04-14T21:41:20.327956+00:00",
+      "weight": 37.0,
+      "occurrence_count": 37,
+      "last_seen": "2026-04-15T05:40:29.042082+00:00",
       "attributes": {}
     },
     "event:ngap-46|precedes|event:tcp-tcp": {
@@ -24135,9 +24135,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-tracking-area-update-accept",
       "relation": "contains",
-      "weight": 66.0,
-      "occurrence_count": 66,
-      "last_seen": "2026-04-14T22:17:18.365879+00:00",
+      "weight": 67.0,
+      "occurrence_count": 67,
+      "last_seen": "2026-04-15T05:40:33.574210+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:nas-eps-nas-eps-tracking-area-update-accept": {
@@ -24165,9 +24165,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "relation": "contains",
-      "weight": 65.0,
-      "occurrence_count": 65,
-      "last_seen": "2026-04-14T22:17:18.365912+00:00",
+      "weight": 75.0,
+      "occurrence_count": 75,
+      "last_seen": "2026-04-15T05:40:33.574243+00:00",
       "attributes": {}
     },
     "event:s1ap-downlink-nas-transport|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -24195,9 +24195,9 @@
       "source": "scenario:normal-session",
       "target": "event:nas-eps-nas-eps-0xca",
       "relation": "contains",
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T22:17:18.365926+00:00",
+      "weight": 81.0,
+      "occurrence_count": 81,
+      "last_seen": "2026-04-15T05:40:33.574256+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:nas-eps-nas-eps-0xca": {
@@ -24225,9 +24225,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-ue-context-release-request",
       "relation": "contains",
-      "weight": 172.0,
-      "occurrence_count": 172,
-      "last_seen": "2026-04-14T22:17:17.956943+00:00",
+      "weight": 184.0,
+      "occurrence_count": 184,
+      "last_seen": "2026-04-15T05:40:33.146778+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:s1ap-s1ap-procedure-0": {
@@ -24315,9 +24315,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-s1ap-procedure-3",
       "relation": "contains",
-      "weight": 122.0,
-      "occurrence_count": 122,
-      "last_seen": "2026-04-14T22:17:17.956652+00:00",
+      "weight": 150.0,
+      "occurrence_count": 150,
+      "last_seen": "2026-04-15T05:40:33.146506+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:s1ap-downlink-nas-transport": {
@@ -24325,9 +24325,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-downlink-nas-transport",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:17.956842+00:00",
+      "weight": 13.0,
+      "occurrence_count": 13,
+      "last_seen": "2026-04-15T05:40:33.146684+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-0x62": {
@@ -24405,9 +24405,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-s1ap-procedure-6",
       "relation": "contains",
-      "weight": 68.0,
-      "occurrence_count": 68,
-      "last_seen": "2026-04-14T22:17:17.956634+00:00",
+      "weight": 84.0,
+      "occurrence_count": 84,
+      "last_seen": "2026-04-15T05:40:33.146488+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:s1ap-s1ap-procedure-6": {
@@ -24415,9 +24415,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-s1ap-procedure-6",
       "relation": "precedes",
-      "weight": 17.0,
-      "occurrence_count": 17,
-      "last_seen": "2026-04-14T22:17:17.956629+00:00",
+      "weight": 21.0,
+      "occurrence_count": 21,
+      "last_seen": "2026-04-15T05:40:33.146483+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-6|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -24455,9 +24455,9 @@
       "source": "event:nas-eps-nas-eps-tracking-area-update-accept",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 8.8,
-      "occurrence_count": 16,
-      "last_seen": "2026-04-14T22:17:18.365969+00:00",
+      "weight": 9.35,
+      "occurrence_count": 17,
+      "last_seen": "2026-04-15T05:40:33.574300+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x5d|causes|error:normal-call": {
@@ -24465,9 +24465,9 @@
       "source": "event:nas-eps-nas-eps-0x5d",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 13.75,
-      "occurrence_count": 25,
-      "last_seen": "2026-04-14T22:17:18.365958+00:00",
+      "weight": 14.3,
+      "occurrence_count": 26,
+      "last_seen": "2026-04-15T05:40:33.574289+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x5e|causes|error:normal-call": {
@@ -24475,9 +24475,9 @@
       "source": "event:nas-eps-nas-eps-0x5e",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 6.05,
-      "occurrence_count": 11,
-      "last_seen": "2026-04-14T22:17:18.365962+00:00",
+      "weight": 6.6,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.574294+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-clr": {
@@ -24485,9 +24485,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-clr",
       "relation": "contains",
-      "weight": 308.0,
-      "occurrence_count": 308,
-      "last_seen": "2026-04-14T22:17:18.531606+00:00",
+      "weight": 309.0,
+      "occurrence_count": 309,
+      "last_seen": "2026-04-15T05:40:33.747611+00:00",
       "attributes": {}
     },
     "event:diameter-clr|precedes|event:sctp-data": {
@@ -24495,9 +24495,9 @@
       "source": "event:diameter-clr",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 323.0,
-      "occurrence_count": 323,
-      "last_seen": "2026-04-14T22:17:18.531613+00:00",
+      "weight": 324.0,
+      "occurrence_count": 324,
+      "last_seen": "2026-04-15T05:40:33.747619+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-clr": {
@@ -24515,9 +24515,9 @@
       "source": "event:diameter-ula-2001",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 33.0,
-      "occurrence_count": 60,
-      "last_seen": "2026-04-14T22:17:18.477198+00:00",
+      "weight": 33.55,
+      "occurrence_count": 61,
+      "last_seen": "2026-04-15T05:40:33.689893+00:00",
       "attributes": {}
     },
     "event:s1ap-paging|causes|error:normal-call": {
@@ -24535,9 +24535,9 @@
       "source": "event:diameter-clr",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 7.15,
-      "occurrence_count": 21,
-      "last_seen": "2026-04-14T22:17:18.531656+00:00",
+      "weight": 7.45,
+      "occurrence_count": 22,
+      "last_seen": "2026-04-15T05:40:33.747667+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:nas-eps-nas-eps": {
@@ -24755,9 +24755,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-99",
       "relation": "contains",
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T22:17:18.022302+00:00",
+      "weight": 49.0,
+      "occurrence_count": 49,
+      "last_seen": "2026-04-15T05:40:33.217667+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-99": {
@@ -24765,9 +24765,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-99",
       "relation": "precedes",
-      "weight": 37.0,
-      "occurrence_count": 37,
-      "last_seen": "2026-04-14T22:17:18.022303+00:00",
+      "weight": 38.0,
+      "occurrence_count": 38,
+      "last_seen": "2026-04-15T05:40:33.217669+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-99|precedes|event:udp-udp": {
@@ -24775,9 +24775,9 @@
       "source": "event:gtp-gtpv2-99",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 46.0,
-      "occurrence_count": 46,
-      "last_seen": "2026-04-14T22:17:18.022309+00:00",
+      "weight": 50.0,
+      "occurrence_count": 50,
+      "last_seen": "2026-04-15T05:40:33.217676+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:gtp-gtpv2-100--request-accepted": {
@@ -24785,9 +24785,9 @@
       "source": "scenario:normal-session",
       "target": "event:gtp-gtpv2-100--request-accepted",
       "relation": "contains",
-      "weight": 43.0,
-      "occurrence_count": 43,
-      "last_seen": "2026-04-14T22:17:18.022314+00:00",
+      "weight": 47.0,
+      "occurrence_count": 47,
+      "last_seen": "2026-04-15T05:40:33.217683+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:gtp-gtpv2-100--request-accepted": {
@@ -24795,9 +24795,9 @@
       "source": "event:udp-udp",
       "target": "event:gtp-gtpv2-100--request-accepted",
       "relation": "precedes",
-      "weight": 45.0,
-      "occurrence_count": 45,
-      "last_seen": "2026-04-14T22:17:18.022316+00:00",
+      "weight": 48.0,
+      "occurrence_count": 48,
+      "last_seen": "2026-04-15T05:40:33.217685+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-100--request-accepted|precedes|event:udp-udp": {
@@ -24805,9 +24805,9 @@
       "source": "event:gtp-gtpv2-100--request-accepted",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 50.0,
-      "occurrence_count": 50,
-      "last_seen": "2026-04-14T22:17:18.022321+00:00",
+      "weight": 54.0,
+      "occurrence_count": 54,
+      "last_seen": "2026-04-15T05:40:33.217691+00:00",
       "attributes": {}
     },
     "event:gtp-create-session-response--new-pdn-type-due-to-network-preference|causes|error:normal-call": {
@@ -26065,9 +26065,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-cla-2001",
       "relation": "contains",
-      "weight": 273.0,
-      "occurrence_count": 273,
-      "last_seen": "2026-04-14T22:17:18.531618+00:00",
+      "weight": 274.0,
+      "occurrence_count": 274,
+      "last_seen": "2026-04-15T05:40:33.747626+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-cla-2001": {
@@ -26075,9 +26075,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-cla-2001",
       "relation": "precedes",
-      "weight": 297.0,
-      "occurrence_count": 297,
-      "last_seen": "2026-04-14T22:17:18.531620+00:00",
+      "weight": 298.0,
+      "occurrence_count": 298,
+      "last_seen": "2026-04-15T05:40:33.747628+00:00",
       "attributes": {}
     },
     "event:diameter-cla-2001|precedes|event:diameter-321a-2001": {
@@ -26095,9 +26095,9 @@
       "source": "event:diameter-cla-2001",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 296.0,
-      "occurrence_count": 296,
-      "last_seen": "2026-04-14T22:17:18.531626+00:00",
+      "weight": 297.0,
+      "occurrence_count": 297,
+      "last_seen": "2026-04-15T05:40:33.747634+00:00",
       "attributes": {}
     },
     "event:sip-invite|precedes|event:gtp-gtp": {
@@ -26105,9 +26105,9 @@
       "source": "event:sip-invite",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110825+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041077+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sctp-data": {
@@ -26115,9 +26115,9 @@
       "source": "event:udp-udp",
       "target": "event:sctp-data",
       "relation": "precedes",
-      "weight": 69.0,
-      "occurrence_count": 69,
-      "last_seen": "2026-04-14T17:51:03.110917+00:00",
+      "weight": 71.0,
+      "occurrence_count": 71,
+      "last_seen": "2026-04-15T05:40:29.041164+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:sip-100": {
@@ -26125,9 +26125,9 @@
       "source": "event:sctp-data",
       "target": "event:sip-100",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110861+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041110+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-gtp": {
@@ -26135,9 +26135,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 80.0,
-      "occurrence_count": 80,
-      "last_seen": "2026-04-14T17:51:03.111559+00:00",
+      "weight": 86.0,
+      "occurrence_count": 86,
+      "last_seen": "2026-04-15T05:40:29.041726+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-265r": {
@@ -26145,9 +26145,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-265r",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110929+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041177+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:diameter-265a-5065": {
@@ -26155,9 +26155,9 @@
       "source": "scenario:normal-session",
       "target": "event:diameter-265a-5065",
       "relation": "contains",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110943+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041191+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:diameter-265a-5065": {
@@ -26165,9 +26165,9 @@
       "source": "event:tcp-tcp",
       "target": "event:diameter-265a-5065",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110945+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041192+00:00",
       "attributes": {}
     },
     "event:diameter-265a-5065|correlates_with|error:normal-call": {
@@ -26175,9 +26175,9 @@
       "source": "event:diameter-265a-5065",
       "target": "error:normal-call",
       "relation": "correlates_with",
-      "weight": 3.6,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110946+00:00",
+      "weight": 4.8,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041194+00:00",
       "attributes": {}
     },
     "event:diameter-265a-5065|precedes|event:tcp-tcp": {
@@ -26185,9 +26185,9 @@
       "source": "event:diameter-265a-5065",
       "target": "event:tcp-tcp",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.110952+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041199+00:00",
       "attributes": {}
     },
     "event:sip-prack|precedes|event:gtp-gtp": {
@@ -26195,9 +26195,9 @@
       "source": "event:sip-prack",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T17:51:03.111382+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041573+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:sip-180": {
@@ -26205,9 +26205,9 @@
       "source": "event:sctp-data",
       "target": "event:sip-180",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.111346+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041538+00:00",
       "attributes": {}
     },
     "event:sip-ack|precedes|event:gtp-gtp": {
@@ -26215,9 +26215,9 @@
       "source": "event:sip-ack",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.111583+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.041749+00:00",
       "attributes": {}
     },
     "event:sip-bye|precedes|event:udp-udp": {
@@ -26225,9 +26225,9 @@
       "source": "event:sip-bye",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T17:51:03.111689+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:29.041850+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:sip-bye": {
@@ -26235,9 +26235,9 @@
       "source": "event:udp-udp",
       "target": "event:sip-bye",
       "relation": "precedes",
-      "weight": 15.0,
-      "occurrence_count": 15,
-      "last_seen": "2026-04-14T17:51:03.111711+00:00",
+      "weight": 20.0,
+      "occurrence_count": 20,
+      "last_seen": "2026-04-15T05:40:29.041871+00:00",
       "attributes": {}
     },
     "event:sip-bye|precedes|event:gtp-gtp": {
@@ -26245,9 +26245,9 @@
       "source": "event:sip-bye",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T17:51:03.111716+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041876+00:00",
       "attributes": {}
     },
     "event:sip-200|precedes|event:gtp-gtp": {
@@ -26255,9 +26255,9 @@
       "source": "event:sip-200",
       "target": "event:gtp-gtp",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T17:51:03.111749+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:29.041908+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:diameter-rar": {
@@ -26265,9 +26265,9 @@
       "source": "event:udp-udp",
       "target": "event:diameter-rar",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.111859+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.042022+00:00",
       "attributes": {}
     },
     "event:sctp-data|precedes|event:diameter-ccr": {
@@ -26275,9 +26275,9 @@
       "source": "event:sctp-data",
       "target": "event:diameter-ccr",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.111922+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.042094+00:00",
       "attributes": {}
     },
     "event:diameter-265a-5065|causes|error:normal-call": {
@@ -26285,9 +26285,9 @@
       "source": "event:diameter-265a-5065",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 2.97,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T17:51:03.112001+00:00",
+      "weight": 3.96,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:29.042174+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:map-map-updatelocation": {
@@ -26685,9 +26685,9 @@
       "source": "event:diameter-cla-2001",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 3.85,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T22:17:18.531644+00:00",
+      "weight": 4.4,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.747655+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -26715,9 +26715,9 @@
       "source": "event:s1ap-s1ap-procedure-3",
       "target": "event:s1ap-ue-context-release-request",
       "relation": "precedes",
-      "weight": 4.0,
-      "occurrence_count": 4,
-      "last_seen": "2026-04-14T22:17:17.956662+00:00",
+      "weight": 5.0,
+      "occurrence_count": 5,
+      "last_seen": "2026-04-15T05:40:33.146514+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:nas-eps-nas-eps-0x45-cause-7": {
@@ -27235,9 +27235,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:17.956898+00:00",
+      "weight": 7.0,
+      "occurrence_count": 7,
+      "last_seen": "2026-04-15T05:40:33.146735+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|causes|error:unknown": {
@@ -27785,9 +27785,9 @@
       "source": "event:s1ap-mme-status-transfer",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 3.8,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:17.956975+00:00",
+      "weight": 4.7,
+      "occurrence_count": 11,
+      "last_seen": "2026-04-15T05:40:33.146809+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:map-map-end-dtid-5c4a040e": {
@@ -29405,9 +29405,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-e-rab-setup",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.955966+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.145842+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-setup|precedes|event:s1ap-e-rab-setup": {
@@ -29415,9 +29415,9 @@
       "source": "event:s1ap-e-rab-setup",
       "target": "event:s1ap-e-rab-setup",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:17.956369+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:33.146234+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-setup|precedes|event:s1ap-uplink-nas-transport": {
@@ -29425,9 +29425,9 @@
       "source": "event:s1ap-e-rab-setup",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 14.0,
-      "occurrence_count": 14,
-      "last_seen": "2026-04-14T22:17:17.956376+00:00",
+      "weight": 18.0,
+      "occurrence_count": 18,
+      "last_seen": "2026-04-15T05:40:33.146240+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-6|precedes|event:s1ap-s1ap-procedure-6": {
@@ -29435,9 +29435,9 @@
       "source": "event:s1ap-s1ap-procedure-6",
       "target": "event:s1ap-s1ap-procedure-6",
       "relation": "precedes",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:17.956635+00:00",
+      "weight": 32.0,
+      "occurrence_count": 32,
+      "last_seen": "2026-04-15T05:40:33.146489+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-6|precedes|event:s1ap-uplink-nas-transport": {
@@ -29445,9 +29445,9 @@
       "source": "event:s1ap-s1ap-procedure-6",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:17.956641+00:00",
+      "weight": 32.0,
+      "occurrence_count": 32,
+      "last_seen": "2026-04-15T05:40:33.146495+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-release|precedes|event:s1ap-e-rab-release": {
@@ -29455,9 +29455,9 @@
       "source": "event:s1ap-e-rab-release",
       "target": "event:s1ap-e-rab-release",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:17.956707+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:33.146557+00:00",
       "attributes": {}
     },
     "event:s1ap-uplink-nas-transport|precedes|event:s1ap-s1ap-procedure-3": {
@@ -29465,9 +29465,9 @@
       "source": "event:s1ap-uplink-nas-transport",
       "target": "event:s1ap-s1ap-procedure-3",
       "relation": "precedes",
-      "weight": 18.0,
-      "occurrence_count": 18,
-      "last_seen": "2026-04-14T22:17:17.956648+00:00",
+      "weight": 24.0,
+      "occurrence_count": 24,
+      "last_seen": "2026-04-15T05:40:33.146501+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-3|precedes|event:s1ap-e-rab-release": {
@@ -29475,9 +29475,9 @@
       "source": "event:s1ap-s1ap-procedure-3",
       "target": "event:s1ap-e-rab-release",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956095+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.145974+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-3|precedes|event:s1ap-e-rab-setup": {
@@ -29485,9 +29485,9 @@
       "source": "event:s1ap-s1ap-procedure-3",
       "target": "event:s1ap-e-rab-setup",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956325+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.146192+00:00",
       "attributes": {}
     },
     "event:s1ap-s1ap-procedure-3|precedes|event:s1ap-s1ap-procedure-6": {
@@ -29495,9 +29495,9 @@
       "source": "event:s1ap-s1ap-procedure-3",
       "target": "event:s1ap-s1ap-procedure-6",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:17.956578+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:33.146434+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|precedes|event:s1ap-e-rab-release": {
@@ -29505,9 +29505,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "event:s1ap-e-rab-release",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956701+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.146552+00:00",
       "attributes": {}
     },
     "event:s1ap-e-rab-release|precedes|event:s1ap-ue-context-release-request": {
@@ -29515,9 +29515,9 @@
       "source": "event:s1ap-e-rab-release",
       "target": "event:s1ap-ue-context-release-request",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956714+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.146564+00:00",
       "attributes": {}
     },
     "event:s1ap-ue-context-release-request|precedes|event:s1ap-uplink-nas-transport": {
@@ -29525,9 +29525,9 @@
       "source": "event:s1ap-ue-context-release-request",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956721+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.146570+00:00",
       "attributes": {}
     },
     "event:s1ap-enb-status-transfer|precedes|event:s1ap-uplink-nas-transport": {
@@ -29535,9 +29535,9 @@
       "source": "event:s1ap-enb-status-transfer",
       "target": "event:s1ap-uplink-nas-transport",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:17.956829+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.146671+00:00",
       "attributes": {}
     },
     "scenario:normal-session|contains|event:s1ap-ue-context-release": {
@@ -29545,9 +29545,9 @@
       "source": "scenario:normal-session",
       "target": "event:s1ap-ue-context-release",
       "relation": "contains",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:17.956876+00:00",
+      "weight": 28.0,
+      "occurrence_count": 28,
+      "last_seen": "2026-04-15T05:40:33.146715+00:00",
       "attributes": {}
     },
     "event:s1ap-ue-context-release|precedes|event:s1ap-ue-context-release": {
@@ -29555,9 +29555,9 @@
       "source": "event:s1ap-ue-context-release",
       "target": "event:s1ap-ue-context-release",
       "relation": "precedes",
-      "weight": 8.0,
-      "occurrence_count": 8,
-      "last_seen": "2026-04-14T22:17:17.956864+00:00",
+      "weight": 10.0,
+      "occurrence_count": 10,
+      "last_seen": "2026-04-15T05:40:33.146704+00:00",
       "attributes": {}
     },
     "event:s1ap-ue-context-release|precedes|event:s1ap-downlink-nas-transport": {
@@ -29565,9 +29565,9 @@
       "source": "event:s1ap-ue-context-release",
       "target": "event:s1ap-downlink-nas-transport",
       "relation": "precedes",
-      "weight": 8.0,
-      "occurrence_count": 8,
-      "last_seen": "2026-04-14T22:17:17.956884+00:00",
+      "weight": 10.0,
+      "occurrence_count": 10,
+      "last_seen": "2026-04-15T05:40:33.146723+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-context-setup|causes|error:normal-call": {
@@ -29575,9 +29575,9 @@
       "source": "event:s1ap-initial-context-setup",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 3.15,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T22:17:17.956990+00:00",
+      "weight": 4.05,
+      "occurrence_count": 9,
+      "last_seen": "2026-04-15T05:40:33.146824+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-create-bearer-request": {
@@ -29585,9 +29585,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-create-bearer-request",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.020750+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.216091+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-update-bearer-request": {
@@ -29595,9 +29595,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-update-bearer-request",
       "relation": "precedes",
-      "weight": 24.0,
-      "occurrence_count": 24,
-      "last_seen": "2026-04-14T22:17:18.022116+00:00",
+      "weight": 32.0,
+      "occurrence_count": 32,
+      "last_seen": "2026-04-15T05:40:33.217457+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-update-bearer-response--request-accepted": {
@@ -29605,9 +29605,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-update-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 21.0,
-      "occurrence_count": 21,
-      "last_seen": "2026-04-14T22:17:18.022136+00:00",
+      "weight": 28.0,
+      "occurrence_count": 28,
+      "last_seen": "2026-04-15T05:40:33.217477+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-gtpv2-99": {
@@ -29615,9 +29615,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-gtpv2-99",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.020898+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.216240+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-create-bearer-response--request-accepted": {
@@ -29625,9 +29625,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-create-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T22:17:18.020770+00:00",
+      "weight": 9.0,
+      "occurrence_count": 9,
+      "last_seen": "2026-04-15T05:40:33.216111+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-gtpv2-100--request-accepted": {
@@ -29635,9 +29635,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-gtpv2-100--request-accepted",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.020958+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.216297+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:diameter-raa-2001": {
@@ -29645,9 +29645,9 @@
       "source": "event:udp-udp",
       "target": "event:diameter-raa-2001",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.021876+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.217190+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-gtpv2-176": {
@@ -29655,9 +29655,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-gtpv2-176",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.022434+00:00",
+      "weight": 7.0,
+      "occurrence_count": 7,
+      "last_seen": "2026-04-15T05:40:33.217813+00:00",
       "attributes": {}
     },
     "event:tcp-tcp|precedes|event:gtp-modify-bearer-response--request-accepted": {
@@ -29665,9 +29665,9 @@
       "source": "event:tcp-tcp",
       "target": "event:gtp-modify-bearer-response--request-accepted",
       "relation": "precedes",
-      "weight": 14.0,
-      "occurrence_count": 14,
-      "last_seen": "2026-04-14T22:17:18.022839+00:00",
+      "weight": 18.0,
+      "occurrence_count": 18,
+      "last_seen": "2026-04-15T05:40:33.218224+00:00",
       "attributes": {}
     },
     "event:udp-udp|precedes|event:diameter-cca-2001": {
@@ -29675,9 +29675,9 @@
       "source": "event:udp-udp",
       "target": "event:diameter-cca-2001",
       "relation": "precedes",
-      "weight": 7.0,
-      "occurrence_count": 7,
-      "last_seen": "2026-04-14T22:17:18.022816+00:00",
+      "weight": 9.0,
+      "occurrence_count": 9,
+      "last_seen": "2026-04-15T05:40:33.218203+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-response--request-accepted|precedes|event:gtp-update-bearer-request": {
@@ -29685,9 +29685,9 @@
       "source": "event:gtp-modify-bearer-response--request-accepted",
       "target": "event:gtp-update-bearer-request",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.022675+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.218060+00:00",
       "attributes": {}
     },
     "event:gtp-modify-bearer-response--request-accepted|precedes|event:gtp-gtpv2-176": {
@@ -29695,9 +29695,9 @@
       "source": "event:gtp-modify-bearer-response--request-accepted",
       "target": "event:gtp-gtpv2-176",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.022845+00:00",
+      "weight": 7.0,
+      "occurrence_count": 7,
+      "last_seen": "2026-04-15T05:40:33.218230+00:00",
       "attributes": {}
     },
     "event:gtp-update-bearer-request|precedes|event:gtp-update-bearer-request": {
@@ -29705,9 +29705,9 @@
       "source": "event:gtp-update-bearer-request",
       "target": "event:gtp-update-bearer-request",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.022933+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.218315+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps|precedes|event:nas-eps-nas-eps-pdn-connectivity-reject": {
@@ -29715,9 +29715,9 @@
       "source": "event:nas-eps-nas-eps",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.194599+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.394796+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-pdn-connectivity-reject|precedes|event:nas-eps-nas-eps-0xc6": {
@@ -29725,9 +29725,9 @@
       "source": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "target": "event:nas-eps-nas-eps-0xc6",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:18.194642+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:33.394841+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xc6|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -29735,9 +29735,9 @@
       "source": "event:nas-eps-nas-eps-0xc6",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.194650+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.394850+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-pdn-connectivity-request|precedes|event:nas-eps-nas-eps-0xca": {
@@ -29745,9 +29745,9 @@
       "source": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "target": "event:nas-eps-nas-eps-0xca",
       "relation": "precedes",
-      "weight": 27.0,
-      "occurrence_count": 27,
-      "last_seen": "2026-04-14T22:17:18.365921+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:33.574252+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xca|precedes|event:nas-eps-nas-eps-bearer-resource-command-cause-36": {
@@ -29755,9 +29755,9 @@
       "source": "event:nas-eps-nas-eps-0xca",
       "target": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.081789+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.277933+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-command-cause-36|precedes|event:nas-eps-nas-eps-bearer-resource-failure-indication": {
@@ -29765,9 +29765,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "target": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.194626+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.394825+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-failure-indication|precedes|event:nas-eps-nas-eps-pdn-connectivity-reject": {
@@ -29775,9 +29775,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-reject",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.194635+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.394833+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xc6|causes|error:normal-call": {
@@ -29785,9 +29785,9 @@
       "source": "event:nas-eps-nas-eps-0xc6",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 1.65,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.081877+00:00",
+      "weight": 2.2,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.278008+00:00",
       "attributes": {}
     },
     "event:diameter-265r|precedes|event:diameter-265a-2001": {
@@ -29795,9 +29795,9 @@
       "source": "event:diameter-265r",
       "target": "event:diameter-265a-2001",
       "relation": "precedes",
-      "weight": 27.0,
-      "occurrence_count": 27,
-      "last_seen": "2026-04-14T22:17:18.141584+00:00",
+      "weight": 36.0,
+      "occurrence_count": 36,
+      "last_seen": "2026-04-15T05:40:33.339375+00:00",
       "attributes": {}
     },
     "event:diameter-265a-2001|precedes|event:diameter-rar": {
@@ -29805,9 +29805,9 @@
       "source": "event:diameter-265a-2001",
       "target": "event:diameter-rar",
       "relation": "precedes",
-      "weight": 15.0,
-      "occurrence_count": 15,
-      "last_seen": "2026-04-14T22:17:18.141566+00:00",
+      "weight": 20.0,
+      "occurrence_count": 20,
+      "last_seen": "2026-04-15T05:40:33.339357+00:00",
       "attributes": {}
     },
     "event:diameter-raa-2001|precedes|event:diameter-265r": {
@@ -29815,9 +29815,9 @@
       "source": "event:diameter-raa-2001",
       "target": "event:diameter-265r",
       "relation": "precedes",
-      "weight": 15.0,
-      "occurrence_count": 15,
-      "last_seen": "2026-04-14T22:17:18.141578+00:00",
+      "weight": 20.0,
+      "occurrence_count": 20,
+      "last_seen": "2026-04-15T05:40:33.339369+00:00",
       "attributes": {}
     },
     "event:diameter-265a-2001|precedes|event:diameter-275r": {
@@ -29825,9 +29825,9 @@
       "source": "event:diameter-265a-2001",
       "target": "event:diameter-275r",
       "relation": "precedes",
-      "weight": 12.0,
-      "occurrence_count": 12,
-      "last_seen": "2026-04-14T22:17:18.141590+00:00",
+      "weight": 16.0,
+      "occurrence_count": 16,
+      "last_seen": "2026-04-15T05:40:33.339380+00:00",
       "attributes": {}
     },
     "event:diameter-275r|precedes|event:diameter-275a-2001": {
@@ -29835,9 +29835,9 @@
       "source": "event:diameter-275r",
       "target": "event:diameter-275a-2001",
       "relation": "precedes",
-      "weight": 15.0,
-      "occurrence_count": 15,
-      "last_seen": "2026-04-14T22:17:18.141596+00:00",
+      "weight": 20.0,
+      "occurrence_count": 20,
+      "last_seen": "2026-04-15T05:40:33.339386+00:00",
       "attributes": {}
     },
     "event:diameter-275a-2001|precedes|event:diameter-265r": {
@@ -29845,9 +29845,9 @@
       "source": "event:diameter-275a-2001",
       "target": "event:diameter-265r",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.141555+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.339346+00:00",
       "attributes": {}
     },
     "event:diameter-265r|precedes|event:diameter-275r": {
@@ -29855,9 +29855,9 @@
       "source": "event:diameter-265r",
       "target": "event:diameter-275r",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141488+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339281+00:00",
       "attributes": {}
     },
     "event:diameter-275a-2001|precedes|event:diameter-265a-2001": {
@@ -29865,9 +29865,9 @@
       "source": "event:diameter-275a-2001",
       "target": "event:diameter-265a-2001",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141500+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339293+00:00",
       "attributes": {}
     },
     "event:diameter-265a-2001|precedes|event:diameter-265r": {
@@ -29875,9 +29875,9 @@
       "source": "event:diameter-265a-2001",
       "target": "event:diameter-265r",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141506+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339299+00:00",
       "attributes": {}
     },
     "event:diameter-265a-2001|causes|error:normal-call": {
@@ -29885,9 +29885,9 @@
       "source": "event:diameter-265a-2001",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 3.3,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.141626+00:00",
+      "weight": 4.4,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.339416+00:00",
       "attributes": {}
     },
     "event:diameter-rar|causes|error:normal-call": {
@@ -29895,9 +29895,9 @@
       "source": "event:diameter-rar",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 1.65,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141613+00:00",
+      "weight": 2.2,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339403+00:00",
       "attributes": {}
     },
     "event:diameter-raa-2001|causes|error:normal-call": {
@@ -29905,9 +29905,9 @@
       "source": "event:diameter-raa-2001",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 1.65,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141617+00:00",
+      "weight": 2.2,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339407+00:00",
       "attributes": {}
     },
     "event:diameter-265r|causes|error:normal-call": {
@@ -29915,9 +29915,9 @@
       "source": "event:diameter-265r",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 1.65,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.141622+00:00",
+      "weight": 2.2,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.339411+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-failure-indication|precedes|event:nas-eps-nas-eps": {
@@ -29925,9 +29925,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-failure-indication",
       "target": "event:nas-eps-nas-eps",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.194566+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.394761+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xc6|precedes|event:nas-eps-nas-eps-bearer-resource-command-cause-36": {
@@ -29935,9 +29935,9 @@
       "source": "event:nas-eps-nas-eps-0xc6",
       "target": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.194616+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.394816+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xca|precedes|event:nas-eps-nas-eps": {
@@ -29945,9 +29945,9 @@
       "source": "event:nas-eps-nas-eps-0xca",
       "target": "event:nas-eps-nas-eps",
       "relation": "precedes",
-      "weight": 9.0,
-      "occurrence_count": 9,
-      "last_seen": "2026-04-14T22:17:18.365934+00:00",
+      "weight": 12.0,
+      "occurrence_count": 12,
+      "last_seen": "2026-04-15T05:40:33.574265+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps|precedes|event:nas-eps-nas-eps-0xca": {
@@ -29955,9 +29955,9 @@
       "source": "event:nas-eps-nas-eps",
       "target": "event:nas-eps-nas-eps-0xca",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.194722+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.394921+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xca|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -29965,9 +29965,9 @@
       "source": "event:nas-eps-nas-eps-0xca",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "relation": "precedes",
-      "weight": 15.0,
-      "occurrence_count": 15,
-      "last_seen": "2026-04-14T22:17:18.194743+00:00",
+      "weight": 20.0,
+      "occurrence_count": 20,
+      "last_seen": "2026-04-15T05:40:33.394946+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps|precedes|event:nas-eps-nas-eps-bearer-resource-command-cause-36": {
@@ -29975,9 +29975,9 @@
       "source": "event:nas-eps-nas-eps",
       "target": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.252626+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.456138+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-bearer-resource-command-cause-36|precedes|event:nas-eps-nas-eps": {
@@ -29985,9 +29985,9 @@
       "source": "event:nas-eps-nas-eps-bearer-resource-command-cause-36",
       "target": "event:nas-eps-nas-eps",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.252635+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.456146+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-130|precedes|event:udp-udp": {
@@ -29995,9 +29995,9 @@
       "source": "event:gtp-gtpv2-130",
       "target": "event:udp-udp",
       "relation": "precedes",
-      "weight": 6.0,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.421539+00:00",
+      "weight": 8.0,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.632002+00:00",
       "attributes": {}
     },
     "event:gtp-gtpv2-132--request-accepted|causes|error:normal-call": {
@@ -30005,9 +30005,9 @@
       "source": "event:gtp-gtpv2-132--request-accepted",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 3.3,
-      "occurrence_count": 6,
-      "last_seen": "2026-04-14T22:17:18.421590+00:00",
+      "weight": 4.4,
+      "occurrence_count": 8,
+      "last_seen": "2026-04-15T05:40:33.632063+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-tracking-area-update-request|precedes|event:nas-eps-nas-eps-authentication-response": {
@@ -30015,9 +30015,9 @@
       "source": "event:nas-eps-nas-eps-tracking-area-update-request",
       "target": "event:nas-eps-nas-eps-authentication-response",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365846+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574178+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-authentication-response|precedes|event:nas-eps-nas-eps-authentication-failure": {
@@ -30025,9 +30025,9 @@
       "source": "event:nas-eps-nas-eps-authentication-response",
       "target": "event:nas-eps-nas-eps-authentication-failure",
       "relation": "precedes",
-      "weight": 4.0,
-      "occurrence_count": 4,
-      "last_seen": "2026-04-14T22:17:18.365854+00:00",
+      "weight": 5.0,
+      "occurrence_count": 5,
+      "last_seen": "2026-04-15T05:40:33.574186+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x5d|precedes|event:nas-eps-nas-eps-0x5e": {
@@ -30035,9 +30035,9 @@
       "source": "event:nas-eps-nas-eps-0x5d",
       "target": "event:nas-eps-nas-eps-0x5e",
       "relation": "precedes",
-      "weight": 4.0,
-      "occurrence_count": 4,
-      "last_seen": "2026-04-14T22:17:18.365871+00:00",
+      "weight": 5.0,
+      "occurrence_count": 5,
+      "last_seen": "2026-04-15T05:40:33.574203+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x5e|precedes|event:nas-eps-nas-eps-tracking-area-update-accept": {
@@ -30045,9 +30045,9 @@
       "source": "event:nas-eps-nas-eps-0x5e",
       "target": "event:nas-eps-nas-eps-tracking-area-update-accept",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365881+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574212+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-tracking-area-update-accept|precedes|event:nas-eps-nas-eps-tracking-area-update-complete": {
@@ -30055,9 +30055,9 @@
       "source": "event:nas-eps-nas-eps-tracking-area-update-accept",
       "target": "event:nas-eps-nas-eps-tracking-area-update-complete",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365890+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574221+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-tracking-area-update-complete|precedes|event:nas-eps-nas-eps-0x61": {
@@ -30065,9 +30065,9 @@
       "source": "event:nas-eps-nas-eps-tracking-area-update-complete",
       "target": "event:nas-eps-nas-eps-0x61",
       "relation": "precedes",
-      "weight": 5.0,
-      "occurrence_count": 5,
-      "last_seen": "2026-04-14T22:17:18.365898+00:00",
+      "weight": 6.0,
+      "occurrence_count": 6,
+      "last_seen": "2026-04-15T05:40:33.574229+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0x61|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -30075,9 +30075,9 @@
       "source": "event:nas-eps-nas-eps-0x61",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365906+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574237+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-pdn-connectivity-request|precedes|event:nas-eps-nas-eps-pdn-connectivity-request": {
@@ -30085,9 +30085,9 @@
       "source": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "target": "event:nas-eps-nas-eps-pdn-connectivity-request",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365914+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574244+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-0xca|precedes|event:nas-eps-nas-eps-0xca": {
@@ -30095,9 +30095,9 @@
       "source": "event:nas-eps-nas-eps-0xca",
       "target": "event:nas-eps-nas-eps-0xca",
       "relation": "precedes",
-      "weight": 3.0,
-      "occurrence_count": 3,
-      "last_seen": "2026-04-14T22:17:18.365927+00:00",
+      "weight": 4.0,
+      "occurrence_count": 4,
+      "last_seen": "2026-04-15T05:40:33.574258+00:00",
       "attributes": {}
     },
     "event:nas-eps-nas-eps-attach-request|precedes|event:nas-eps-nas-eps-authentication-response": {
@@ -44195,9 +44195,9 @@
       "source": "event:s1ap-initial-ue-message",
       "target": "event:s1ap-downlink-nas-transport",
       "relation": "precedes",
-      "weight": 1.0,
-      "occurrence_count": 1,
-      "last_seen": "2026-04-14T22:17:17.956787+00:00",
+      "weight": 2.0,
+      "occurrence_count": 2,
+      "last_seen": "2026-04-15T05:40:33.146633+00:00",
       "attributes": {}
     },
     "event:s1ap-initial-ue-message|causes|error:normal-call": {
@@ -44205,9 +44205,9 @@
       "source": "event:s1ap-initial-ue-message",
       "target": "error:normal-call",
       "relation": "causes",
-      "weight": 0.45,
-      "occurrence_count": 1,
-      "last_seen": "2026-04-14T22:17:17.956980+00:00",
+      "weight": 0.9,
+      "occurrence_count": 2,
+      "last_seen": "2026-04-15T05:40:33.146814+00:00",
       "attributes": {}
     }
   },

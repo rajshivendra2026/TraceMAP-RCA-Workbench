@@ -18293,7 +18293,7 @@
     ],
     "metadata": {
       "root_cause": "NORMAL_CALL",
-      "validation_status": "candidate"
+      "validation_status": "auto_validated"
     }
   },
   {
@@ -18464,7 +18464,7 @@
     ],
     "metadata": {
       "root_cause": "NORMAL_CALL",
-      "validation_status": "candidate"
+      "validation_status": "auto_validated"
     }
   },
   {

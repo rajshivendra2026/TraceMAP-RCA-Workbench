@@ -1,0 +1,24 @@
+{
+  "cycle_id": "20260415T054138Z",
+  "started_at": "2026-04-15T05:41:38.316364+00:00",
+  "watch_paths": [
+    "/Users/shivendraraj/Downloads/Tool-2/data/raw_pcaps"
+  ],
+  "pending_trace_count": 0,
+  "processed_trace_count": 0,
+  "processed_files": [],
+  "session_count": 0,
+  "label_counts": {},
+  "learning_metrics": {},
+  "gate": {
+    "passed": false,
+    "checks": [],
+    "changed_files": []
+  },
+  "git": {
+    "committed": false,
+    "pushed": false
+  },
+  "status": "idle",
+  "finished_at": "2026-04-15T05:41:38.325023+00:00"
+}
