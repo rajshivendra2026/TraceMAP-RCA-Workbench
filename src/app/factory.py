@@ -100,11 +100,19 @@ def create_app() -> Flask:
 
     @app.route("/css/<path:filename>")
     def serve_css(filename):
-        return send_from_directory(BASE_DIR / "css", filename)
+        response = send_from_directory(BASE_DIR / "css", filename)
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.route("/js/<path:filename>")
     def serve_js(filename):
-        return send_from_directory(BASE_DIR / "js", filename)
+        response = send_from_directory(BASE_DIR / "js", filename)
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.route("/health")
     def health():
