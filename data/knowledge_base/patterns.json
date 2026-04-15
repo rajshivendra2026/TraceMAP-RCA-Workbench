@@ -3806,8 +3806,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 57,
-    "last_seen": "2026-04-14T21:41:23.388962+00:00",
+    "occurrence_count": 58,
+    "last_seen": "2026-04-14T22:17:18.031801+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to GTP:Forward Relocation Request; GTP agent proposed NORMAL_CALL with 74% confidence",
     "embedding_vector": [
       0.16786,
@@ -4278,8 +4278,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 15,
-    "last_seen": "2026-04-14T17:49:02.135695+00:00",
+    "occurrence_count": 16,
+    "last_seen": "2026-04-14T22:17:17.966773+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to NAS_EPS:NAS_EPS; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.940035,
@@ -7168,8 +7168,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 12,
-    "last_seen": "2026-04-14T21:41:27.290543+00:00",
+    "occurrence_count": 13,
+    "last_seen": "2026-04-14T22:17:18.537802+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 87%; Causal inference points to SCTP:DATA",
     "embedding_vector": [
       -0.249547,
@@ -8785,8 +8785,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T17:49:02.725232+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-14T22:17:18.427849+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 85%; Causal inference points to GTP:GTPv2 131 (Request Accepted)",
     "embedding_vector": [
       0.005744,
@@ -9684,8 +9684,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T17:49:02.543433+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-14T22:17:18.261768+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NAS_EPS:NAS_EPS Bearer Resource Failure Indication; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.954222,
@@ -10346,8 +10346,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T17:49:02.663691+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-14T22:17:18.372519+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 56%; Causal inference points to NAS_EPS:NAS_EPS Authentication Failure",
     "embedding_vector": [
       0.482641,
@@ -10411,7 +10411,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.53,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "2001:506:425a:c301:0:1:2424:2:-->2600:300:3005:2:::-"
     ],
@@ -10448,8 +10448,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 5,
-    "last_seen": "2026-04-14T20:49:09.164782+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-14T22:17:18.483517+00:00",
     "evidence_template": "3 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 88%",
     "embedding_vector": [
       0.155163,
@@ -10551,8 +10551,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T17:49:02.365476+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-14T22:17:18.091775+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NAS_EPS:NAS_EPS Bearer Resource Failure Indication; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.310683,
@@ -10616,7 +10616,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.45,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "2001:506:4223:c710:0:2:5767:2:-->2600:300:3005:2::2:-"
     ],

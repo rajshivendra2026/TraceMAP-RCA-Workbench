@@ -15635,18 +15635,207 @@
         "sctp"
       ],
       "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:17.962141+00:00",
+      "session_id": "124433268",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "s1ap"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.028809+00:00",
+      "session_id": "0",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "gtp",
+        "tcp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.087324+00:00",
+      "session_id": "2001:506:4223:c710:0:2:5767:2:-->2600:300:3005:2::2:-",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.146884+00:00",
+      "session_id": "DIAMETER:pcsf-prim.imsgroup0-001.so0ca07pcf.so1ca.uvp.els-an.att.net;428398;1;5.745003665.2",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.199666+00:00",
+      "session_id": "2001:506:4224:31:0:2:5749:2:-->2600:300:3005:2::2:-",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.257783+00:00",
+      "session_id": "2001:506:425a:c301:0:1:2424:2:-->2600:300:3005:2::2:-",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.316055+00:00",
+      "session_id": "2",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.371182+00:00",
+      "session_id": "2001:506:425a:c301:0:1:2424:2:-->2600:300:3005:2:::-",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "nas_eps"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.426429+00:00",
+      "session_id": "5",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "gtp",
+        "udp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.482079+00:00",
+      "session_id": "107.79.102.133:3868->172.29.65.146:3868",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-14T22:17:18.536450+00:00",
+      "session_id": "107.79.12.133:3868->172.29.65.45:3868",
+      "pcap_source": "isa-Hung_Bearer_AF-Audio-e13db8f2",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "diameter",
+        "sctp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:30:55.445257+00:00",
+      "session_id": "sess-1",
+      "pcap_source": "roaming_attach_failure",
+      "root_cause": "CHARGING_FAILURE",
+      "protocols": [
+        "SIP",
+        "DIAMETER",
+        "TCP"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:30:55.499395+00:00",
+      "session_id": "sess-2",
+      "pcap_source": "roaming_attach_failure",
+      "root_cause": "CHARGING_FAILURE",
+      "protocols": [
+        "SIP",
+        "DIAMETER",
+        "TCP"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:30:55.535648+00:00",
+      "session_id": "sess-rca-1",
+      "pcap_source": "roaming_auth_reject",
+      "root_cause": "SUBSCRIBER_BARRED",
+      "protocols": [
+        "DIAMETER",
+        "SCTP",
+        "NAS_5GS"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:31:21.240467+00:00",
+      "session_id": "sess-1",
+      "pcap_source": "roaming_attach_failure",
+      "root_cause": "CHARGING_FAILURE",
+      "protocols": [
+        "SIP",
+        "DIAMETER",
+        "TCP"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:31:21.297426+00:00",
+      "session_id": "sess-2",
+      "pcap_source": "roaming_attach_failure",
+      "root_cause": "CHARGING_FAILURE",
+      "protocols": [
+        "SIP",
+        "DIAMETER",
+        "TCP"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-15T05:31:21.337590+00:00",
+      "session_id": "sess-rca-1",
+      "pcap_source": "roaming_auth_reject",
+      "root_cause": "SUBSCRIBER_BARRED",
+      "protocols": [
+        "DIAMETER",
+        "SCTP",
+        "NAS_5GS"
+      ],
+      "signature": null
     }
   ],
-  "last_updated": "2026-04-14T21:41:27.285803+00:00",
+  "last_updated": "2026-04-15T05:31:21.337590+00:00",
   "recurring_summary": {
     "recurring_failures": [
       {
         "root_cause": "SUBSCRIBER_BARRED",
-        "count": 15
+        "count": 17
       },
       {
         "root_cause": "CHARGING_FAILURE",
-        "count": 10
+        "count": 14
       },
       {
         "root_cause": "CORE_NETWORK_FAILURE",
