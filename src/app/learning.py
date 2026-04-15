@@ -23,6 +23,10 @@ def learning_manifest_path() -> Path:
     return learning_base_dir() / "processed_sources.json"
 
 
+def learning_settings_path() -> Path:
+    return learning_base_dir() / "learning_settings.json"
+
+
 def load_learning_manifest() -> dict:
     path = learning_manifest_path()
     if not path.exists():
@@ -37,6 +41,38 @@ def save_learning_manifest(payload: dict) -> None:
     path = learning_manifest_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def load_learning_settings() -> dict:
+    path = learning_settings_path()
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_learning_settings(payload: dict) -> None:
+    path = learning_settings_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def default_learning_path() -> str:
+    settings = load_learning_settings()
+    path = settings.get("learn_path") or cfg_path("data.raw_pcaps", "data/raw_pcaps")
+    return str(Path(path).expanduser().resolve())
+
+
+def save_default_learning_path(path_value: str) -> str:
+    resolved = str(Path(path_value).expanduser().resolve())
+    settings = load_learning_settings()
+    settings["learn_path"] = resolved
+    settings["updated_at"] = time.time()
+    save_learning_settings(settings)
+    return resolved
 
 
 def discover_pcaps(root_path: str) -> list[dict]:
@@ -118,6 +154,7 @@ def load_learning_metrics() -> dict:
             data = {}
     data.setdefault("pattern_count", 0)
     data["learned_pcap_count"] = len(load_learning_manifest())
+    data["default_learning_path"] = default_learning_path()
     return data
 
 
@@ -164,14 +201,18 @@ def load_version_history() -> dict:
 
 __all__ = [
     "APP_VERSION",
+    "default_learning_path",
     "discover_pcaps",
     "get_learning_status",
     "learning_base_dir",
     "load_learning_manifest",
     "load_learning_metrics",
+    "load_learning_settings",
     "load_validation_queue",
     "load_version_history",
     "run_learning_job",
+    "save_default_learning_path",
     "save_learning_manifest",
+    "save_learning_settings",
     "update_learning_status",
 ]

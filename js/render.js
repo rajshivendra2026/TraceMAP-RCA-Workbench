@@ -1408,8 +1408,9 @@ function renderLearningStatus(payload) {
   _setText("learningStatusMessage", status.message || "System learning status will appear here.");
 
   const pathInput = document.getElementById("learningPathInput");
-  if (pathInput && status.path && !pathInput.value) {
-    pathInput.value = status.path;
+  const savedPath = status.path || knowledge.default_learning_path || payload?.settings?.learn_path;
+  if (pathInput && savedPath && !pathInput.value) {
+    pathInput.value = savedPath;
   }
 }
 

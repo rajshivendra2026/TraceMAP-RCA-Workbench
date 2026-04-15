@@ -14,7 +14,7 @@ from typing import Any
 
 from loguru import logger
 
-from src.app.learning import discover_pcaps
+from src.app.learning import default_learning_path, discover_pcaps
 from src.config import cfg, cfg_path, project_root
 from src.pipeline import process_pcap
 
@@ -237,7 +237,7 @@ class AutonomousLearningWatcher:
         policy: SeedRefreshPolicy | None = None,
         git_publisher: GitPublisher | None = None,
     ):
-        configured_paths = cfg("autonomous.watch_paths", [cfg_path("data.raw_pcaps", "data/raw_pcaps")])
+        configured_paths = cfg("autonomous.watch_paths", [default_learning_path()])
         if isinstance(configured_paths, str):
             configured_paths = [configured_paths]
         self.watch_paths = [str(Path(path).resolve()) for path in (watch_paths or configured_paths)]

@@ -17,6 +17,7 @@ window.addEventListener("load", () => {
   const uploadBtn  = document.getElementById("uploadBtn");
   const fileInput  = document.getElementById("fileInput");
   const startLearningBtn = document.getElementById("startLearningBtn");
+  const saveLearningPathBtn = document.getElementById("saveLearningPathBtn");
   const versionButton = document.getElementById("versionButton");
   const closeVersionModal = document.getElementById("closeVersionModal");
   const versionModal = document.getElementById("versionHistoryModal");
@@ -40,6 +41,14 @@ window.addEventListener("load", () => {
     startLearningBtn.addEventListener("click", async () => {
       if (typeof startLearning === "function") {
         await startLearning();
+      }
+    });
+  }
+
+  if (saveLearningPathBtn) {
+    saveLearningPathBtn.addEventListener("click", async () => {
+      if (typeof saveLearningPath === "function") {
+        await saveLearningPath();
       }
     });
   }

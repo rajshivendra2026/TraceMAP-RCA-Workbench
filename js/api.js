@@ -123,6 +123,43 @@ async function startLearning() {
   }
 }
 
+async function saveLearningPath() {
+  const btn = document.getElementById("saveLearningPathBtn");
+  const pathInput = document.getElementById("learningPathInput");
+  const origLabel = btn?.innerText;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Saving…";
+  }
+
+  try {
+    const pathValue = pathInput?.value?.trim() || "";
+    if (!pathValue) {
+      throw new Error("Enter a PCAP learning path first.");
+    }
+    const res = await fetch("/api/learning/path", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: pathValue }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `Server returned ${res.status}`);
+    }
+    if (typeof window.renderLearningStatus === "function") {
+      window.renderLearningStatus(data);
+    }
+    alert("✅ Learning path saved");
+  } catch (err) {
+    alert("❌ Saving learning path failed: " + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = origLabel ?? "Save Path";
+    }
+  }
+}
+
 async function refreshLearningStatus() {
   try {
     const res = await fetch("/api/learning/status");
@@ -205,6 +242,7 @@ function ensureLearningPolling() {
 }
 
 window.startLearning = startLearning;
+window.saveLearningPath = saveLearningPath;
 window.refreshLearningStatus = refreshLearningStatus;
 window.refreshValidationQueue = refreshValidationQueue;
 window.submitValidationAction = submitValidationAction;

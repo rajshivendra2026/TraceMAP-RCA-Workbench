@@ -23,13 +23,16 @@ from src.rules.rca_rules import apply_rca
 
 from .learning import (
     APP_VERSION,
+    default_learning_path,
     discover_pcaps,
     get_learning_status,
     load_learning_manifest,
     load_learning_metrics,
+    load_learning_settings,
     load_validation_queue,
     load_version_history,
     run_learning_job,
+    save_default_learning_path,
     update_learning_status,
 )
 from .state import cache_stats, find_session, purge_expired_sessions, store_sessions
@@ -130,6 +133,30 @@ def create_app() -> Flask:
                 "version": APP_VERSION,
                 "status": get_learning_status(),
                 "knowledge": load_learning_metrics(),
+                "settings": load_learning_settings(),
+            }
+        )
+
+    @app.route("/api/learning/path", methods=["POST"])
+    def learning_path_update():
+        payload = request.get_json(silent=True) or {}
+        raw_path = payload.get("path")
+        if not raw_path:
+            return jsonify({"error": "path is required"}), 400
+
+        resolved = str(Path(raw_path).expanduser().resolve())
+        if not Path(resolved).exists():
+            return jsonify({"error": f"Learning path not found: {resolved}"}), 404
+
+        saved_path = save_default_learning_path(resolved)
+        update_learning_status(path=saved_path)
+        return jsonify(
+            {
+                "saved": True,
+                "path": saved_path,
+                "status": get_learning_status(),
+                "knowledge": load_learning_metrics(),
+                "settings": load_learning_settings(),
             }
         )
 
@@ -166,11 +193,13 @@ def create_app() -> Flask:
     @app.route("/api/learning/start", methods=["POST"])
     def learning_start():
         payload = request.get_json(silent=True) or {}
-        learn_path = payload.get("path") or cfg_path("data.raw_pcaps", "data/raw_pcaps")
+        learn_path = payload.get("path") or default_learning_path()
         learn_path = str(Path(learn_path).expanduser().resolve())
 
         if not Path(learn_path).exists():
             return jsonify({"error": f"Learning path not found: {learn_path}"}), 404
+
+        save_default_learning_path(learn_path)
 
         manifest = load_learning_manifest()
         files = discover_pcaps(learn_path)
