@@ -16,6 +16,7 @@ from loguru import logger
 
 from src.app.learning import default_learning_path, discover_pcaps
 from src.config import cfg, cfg_path, project_root
+from src.eval.benchmark_runner import run_benchmark_suite
 from src.pipeline import process_pcap
 
 
@@ -91,10 +92,14 @@ class SeedRefreshPolicy:
         max_unknown_ratio: float | None = None,
         max_validation_queue_growth: int | None = None,
         max_pattern_drop: int | None = None,
+        benchmark_enabled: bool | None = None,
+        min_benchmark_pass_rate: float | None = None,
     ):
         self.max_unknown_ratio = float(cfg("autonomous.max_unknown_ratio", 0.35)) if max_unknown_ratio is None else float(max_unknown_ratio)
         self.max_validation_queue_growth = int(cfg("autonomous.max_validation_queue_growth", 25)) if max_validation_queue_growth is None else int(max_validation_queue_growth)
         self.max_pattern_drop = int(cfg("autonomous.max_pattern_drop", 0)) if max_pattern_drop is None else int(max_pattern_drop)
+        self.benchmark_enabled = bool(cfg("autonomous.benchmark_enabled", False)) if benchmark_enabled is None else bool(benchmark_enabled)
+        self.min_benchmark_pass_rate = float(cfg("autonomous.min_benchmark_pass_rate", 1.0)) if min_benchmark_pass_rate is None else float(min_benchmark_pass_rate)
 
     def evaluate(
         self,
@@ -141,6 +146,29 @@ class SeedRefreshPolicy:
                 else f"Pattern delta {pattern_delta}.",
             },
         ]
+        benchmark_report = cycle.get("benchmark") or {}
+        if self.benchmark_enabled:
+            pass_rate = float(benchmark_report.get("pass_rate", 0.0) or 0.0)
+            missing_cases = int(benchmark_report.get("missing_cases", 0) or 0)
+            benchmark_passed = (
+                benchmark_report.get("executed") is True
+                and missing_cases == 0
+                and pass_rate >= self.min_benchmark_pass_rate
+            )
+            detail = (
+                f"Benchmark pass rate {pass_rate:.3f}, missing cases {missing_cases}."
+                if benchmark_report.get("executed")
+                else str(benchmark_report.get("reason") or "Benchmark suite was not executed.")
+            )
+            if benchmark_report.get("error"):
+                detail = f"{detail} Error: {benchmark_report['error']}"
+            checks.append(
+                {
+                    "name": "benchmark_suite_passed",
+                    "passed": benchmark_passed,
+                    "detail": detail,
+                }
+            )
         passed = all(check["passed"] for check in checks)
         return {
             "passed": passed,
@@ -270,6 +298,13 @@ class AutonomousLearningWatcher:
             "session_count": 0,
             "label_counts": {},
             "learning_metrics": {},
+            "benchmark": {
+                "executed": False,
+                "pass_rate": 0.0,
+                "passed_cases": 0,
+                "failed_cases": 0,
+                "missing_cases": 0,
+            },
             "gate": {"passed": False, "checks": [], "changed_files": []},
             "git": {"committed": False, "pushed": False},
         }
@@ -318,6 +353,7 @@ class AutonomousLearningWatcher:
             Counter((session.get("rca") or {}).get("rca_label", "UNKNOWN") for session in all_sessions)
         )
         report["learning_metrics"] = dict(learning_metrics)
+        report["benchmark"] = self._run_benchmarks()
 
         after = snapshot_seed_state(self.base_dir)
         gate = self.policy.evaluate(before, after, report)
@@ -386,6 +422,33 @@ class AutonomousLearningWatcher:
         path = directory / f"{report['cycle_id']}.json"
         path.write_text(json.dumps(report, indent=2), encoding="utf-8")
         return str(path)
+
+    def _run_benchmarks(self) -> dict[str, Any]:
+        if not cfg("autonomous.benchmark_enabled", False):
+            return {
+                "executed": False,
+                "reason": "benchmark_disabled",
+                "pass_rate": 0.0,
+                "passed_cases": 0,
+                "failed_cases": 0,
+                "missing_cases": 0,
+            }
+        suite_path = cfg("autonomous.benchmark_suite", "benchmarks/expected_results.json")
+        try:
+            report = run_benchmark_suite(suite_path=suite_path)
+            report["executed"] = True
+            return report
+        except Exception as exc:  # pragma: no cover - defensive runtime path
+            logger.exception("Benchmark suite execution failed: {}", exc)
+            return {
+                "executed": False,
+                "reason": "benchmark_error",
+                "error": str(exc),
+                "pass_rate": 0.0,
+                "passed_cases": 0,
+                "failed_cases": 0,
+                "missing_cases": 0,
+            }
 
 
 def _safe_json(path: Path, default):

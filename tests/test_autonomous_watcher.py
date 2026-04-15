@@ -171,6 +171,83 @@ class AutonomousWatcherTests(unittest.TestCase):
             self.assertEqual(snapshot["pending_validation"], 1)
             self.assertNotIn("validation_queue.json", snapshot["files"])
 
+    def test_seed_refresh_policy_blocks_when_benchmark_gate_fails(self):
+        policy = SeedRefreshPolicy(
+            max_unknown_ratio=0.4,
+            max_validation_queue_growth=1,
+            max_pattern_drop=0,
+            benchmark_enabled=True,
+            min_benchmark_pass_rate=1.0,
+        )
+        before = {
+            "files": {"patterns.json": {"sha1": "old"}},
+            "pattern_count": 4,
+            "pending_validation": 0,
+        }
+        after = {
+            "files": {"patterns.json": {"sha1": "new"}},
+            "pattern_count": 5,
+            "pending_validation": 0,
+        }
+        cycle = {
+            "session_count": 4,
+            "label_counts": {"NORMAL_CALL": 4},
+            "benchmark": {
+                "executed": True,
+                "pass_rate": 0.5,
+                "missing_cases": 0,
+            },
+        }
+        result = policy.evaluate(before, after, cycle)
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["checks"][-1]["name"], "benchmark_suite_passed")
+
+    def test_watcher_runs_benchmark_when_enabled(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir)
+            knowledge = base / "knowledge"
+            input_dir = base / "raw"
+            report_dir = knowledge / "run_reports"
+            input_dir.mkdir(parents=True)
+            _write_json(knowledge / "patterns.json", [])
+            _write_json(knowledge / "metrics.json", {"validation_queue_size": 0})
+            _write_json(knowledge / "vectors.json", [])
+            _write_json(knowledge / "validation_queue.json", [])
+            (input_dir / "trace-1.pcap").write_text("pcap", encoding="utf-8")
+
+            with patch("src.autonomous.watcher.process_pcap", return_value=[{"rca": {"rca_label": "NORMAL_CALL"}}]), patch(
+                "src.autonomous.watcher.run_benchmark_suite",
+                return_value={
+                    "executed": True,
+                    "pass_rate": 1.0,
+                    "passed_cases": 1,
+                    "failed_cases": 0,
+                    "missing_cases": 0,
+                    "cases": [],
+                },
+            ), patch("src.autonomous.watcher.report_dir", return_value=report_dir), patch(
+                "src.autonomous.watcher.cfg",
+                side_effect=lambda key, default=None: (
+                    True if key == "autonomous.benchmark_enabled" else default
+                ),
+            ):
+                watcher = AutonomousLearningWatcher(
+                    watch_paths=[str(input_dir)],
+                    base_dir=knowledge,
+                    manifest_path=knowledge / "processed_sources.json",
+                    policy=SeedRefreshPolicy(
+                        max_unknown_ratio=0.6,
+                        max_validation_queue_growth=2,
+                        max_pattern_drop=0,
+                        benchmark_enabled=True,
+                        min_benchmark_pass_rate=1.0,
+                    ),
+                )
+                report = watcher.run_cycle()
+
+            self.assertTrue(report["benchmark"]["executed"])
+            self.assertEqual(report["benchmark"]["pass_rate"], 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()
