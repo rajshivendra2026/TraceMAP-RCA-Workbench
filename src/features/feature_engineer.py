@@ -32,6 +32,8 @@ import hashlib
 import math
 from collections import Counter
 
+from src.ml.anomaly import score_session_anomaly
+
 try:  # pragma: no cover - optional dependency
     from sklearn.ensemble import IsolationForest
     from sklearn.cluster import DBSCAN
@@ -442,60 +444,10 @@ def detect_session_anomaly(
     features: dict | None = None,
     intelligence: dict | None = None,
 ) -> dict:
-    """Low-latency anomaly scoring with optional IsolationForest support."""
+    """Low-latency telecom anomaly ensemble."""
     features = features or extract_features(session)
     intelligence = intelligence or extract_trace_intelligence(session)
-    sample = np.array(
-        [[
-            float(features.get("duration_ms", 0)),
-            float(features.get("dia_failure_count", 0)),
-            float(features.get("cross_protocol_hops", 0)),
-            float(features.get("timer_anomaly_count", 0)),
-            float(features.get("has_retransmission", 0)),
-            float(features.get("sip_4xx", 0) + features.get("sip_5xx", 0)),
-        ]],
-        dtype=float,
-    )
-
-    if IsolationForest is not None:  # pragma: no branch - tiny code path
-        try:
-            model = IsolationForest(random_state=42, contamination=0.15)
-            baseline = np.vstack([sample, sample * 0.85 + 0.01, sample * 1.15 + 0.02, np.zeros_like(sample)])
-            model.fit(baseline)
-            score = float(-model.score_samples(sample)[0])
-        except Exception:
-            score = min(
-                1.0,
-                (
-                    float(features.get("dia_failure_count", 0)) * 0.18
-                    + float(features.get("timer_anomaly_count", 0)) * 0.22
-                    + float(features.get("has_retransmission", 0)) * 0.2
-                    + float(features.get("sip_4xx", 0) + features.get("sip_5xx", 0)) * 0.2
-                ),
-            )
-    else:
-        score = min(
-            1.0,
-            (
-                float(features.get("dia_failure_count", 0)) * 0.18
-                + float(features.get("timer_anomaly_count", 0)) * 0.22
-                + float(features.get("has_retransmission", 0)) * 0.2
-                + float(features.get("sip_4xx", 0) + features.get("sip_5xx", 0)) * 0.2
-            ),
-        )
-
-    suggested = session.get("rca", {}).get("rca_label", "UNKNOWN")
-    if features.get("charging_failed"):
-        suggested = "CHARGING_FAILURE"
-    elif features.get("q850_network_fail") or features.get("has_retransmission"):
-        suggested = "CORE_NETWORK_FAILURE"
-
-    return {
-        "score": round(score, 4),
-        "is_anomalous": bool(score >= 0.55),
-        "suggested_root_cause": suggested,
-        "signals": intelligence.get("timer_anomalies", [])[:3],
-    }
+    return score_session_anomaly(session, features=features, intelligence=intelligence)
 
 
 def cluster_sequence_signatures(signatures: list[list[float]]) -> list[int]:
