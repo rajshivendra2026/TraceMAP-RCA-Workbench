@@ -2,6 +2,31 @@
 
 TraceMAP RCA Workbench is a telecom packet-analysis and root-cause-analysis workbench for mixed 2G/3G/4G/5G and IMS traces. It combines protocol parsing, session correlation, rule-based RCA, learning/knowledge reuse, and a lightweight web UI for inspecting captures and correlated sessions.
 
+## Tool Summary
+
+TraceMAP RCA Workbench ingests telecom PCAPs, decodes signaling and user-plane protocols, correlates multi-protocol procedures into sessions, applies telecom RCA logic, overlays autonomous reasoning, and persists learned seed knowledge for future traces.
+
+It is designed to improve continuously:
+
+- baseline seed knowledge ships with the repo
+- the autonomous watcher can discover new traces
+- gated learning updates can refresh the knowledge base
+- curated seed updates can auto-commit and auto-push to git
+
+### Architecture And Flow
+
+![TraceMAP architecture and flow](docs/assets/tracemap_overview.svg)
+
+### Standout Capabilities
+
+- Mixed telecom coverage across `2G`, `3G`, `4G/LTE`, `5G`, and `IMS`
+- Cross-protocol RCA over `SIP`, `Diameter`, `INAP`, `NGAP`, `S1AP`, `RANAP`, `MAP`, `NAS_EPS`, `NAS_5GS`, `GTP`, `PFCP`, `TCP`, `UDP`, and `SCTP`
+- Session compaction and stitching for fragmented mobility and inter-RAT procedures
+- Hybrid RCA that combines deterministic rules with autonomous reasoning signals
+- Persistent seed knowledge with knowledge graph, vectors, metrics, and time-series memory
+- Autonomous watcher with gated seed refresh and git-backed publishing
+- Analyst UI with validation queue, autonomous reasoning view, and configurable learning path
+
 ## Quick Start
 
 macOS or Linux:
@@ -23,6 +48,18 @@ git clone https://github.com/rajshivendra2026/TraceMAP-RCA-Workbench.git
 cd TraceMAP-RCA-Workbench
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python main.py
+```
+
+Windows Command Prompt (`cmd.exe`):
+
+```cmd
+git clone https://github.com/rajshivendra2026/TraceMAP-RCA-Workbench.git
+cd TraceMAP-RCA-Workbench
+py -3.11 -m venv .venv
+call .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python main.py
@@ -157,6 +194,27 @@ pip install -r requirements.txt
 python main.py
 ```
 
+Windows `cmd.exe` equivalent:
+
+```cmd
+py -3.11 -m venv .venv
+call .venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+set TC_RCA__TSHARK__BINARY=C:\Program Files\Wireshark\tshark.exe
+set MPLCONFIGDIR=%cd%\.cache\matplotlib
+python main.py
+```
+
+If you want those environment variables every time in `cmd.exe`, run:
+
+```cmd
+setx TC_RCA__TSHARK__BINARY "C:\Program Files\Wireshark\tshark.exe"
+setx MPLCONFIGDIR "%cd%\.cache\matplotlib"
+```
+
+Then close and reopen Command Prompt.
+
 ## Configure a New Machine From Git
 
 1. Clone the repository.
@@ -190,6 +248,21 @@ python -m pytest tests/test_autonomous_watcher.py -q
 python main.py
 ```
 
+Suggested first-run sequence on Windows `cmd.exe`:
+
+```cmd
+git clone https://github.com/rajshivendra2026/TraceMAP-RCA-Workbench.git
+cd TraceMAP-RCA-Workbench
+py -3.11 -m venv .venv
+call .venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+set TC_RCA__TSHARK__BINARY=C:\Program Files\Wireshark\tshark.exe
+set MPLCONFIGDIR=%cd%\.cache\matplotlib
+python -m pytest tests/test_autonomous_watcher.py -q
+python main.py
+```
+
 If you want the new machine to treat all local traces as unseen, clear the watcher state before starting autonomous learning:
 
 ```bash
@@ -200,6 +273,12 @@ Windows PowerShell equivalent:
 
 ```powershell
 Remove-Item data\knowledge_base\processed_sources.json -ErrorAction SilentlyContinue
+```
+
+Windows `cmd.exe` equivalent:
+
+```cmd
+del data\knowledge_base\processed_sources.json
 ```
 
 If you also want a clean analyst-review queue on the new machine, optionally clear:
@@ -214,6 +293,58 @@ Windows PowerShell equivalent:
 ```powershell
 Remove-Item data\knowledge_base\validation_queue.json -ErrorAction SilentlyContinue
 Remove-Item data\knowledge_base\run_reports -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+Windows `cmd.exe` equivalent:
+
+```cmd
+del data\knowledge_base\validation_queue.json
+rmdir /s /q data\knowledge_base\run_reports
+```
+
+### Windows CMD Commands You Will Actually Use
+
+Set environment for the current shell:
+
+```cmd
+set TC_RCA__TSHARK__BINARY=C:\Program Files\Wireshark\tshark.exe
+set MPLCONFIGDIR=%cd%\.cache\matplotlib
+```
+
+Activate the virtual environment:
+
+```cmd
+call .venv\Scripts\activate.bat
+```
+
+Run focused autonomy tests:
+
+```cmd
+python -m pytest tests/test_autonomous_watcher.py tests/test_learning_path_settings.py -q
+```
+
+Run the full test suite:
+
+```cmd
+python -m pytest -q
+```
+
+Run one supervised watcher cycle:
+
+```cmd
+python -m src.autonomous.watcher --once
+```
+
+Run the watcher continuously:
+
+```cmd
+python -m src.autonomous.watcher --interval 60
+```
+
+Run the web app:
+
+```cmd
+python main.py
 ```
 
 ## Docker
