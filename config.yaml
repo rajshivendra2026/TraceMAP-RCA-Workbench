@@ -142,6 +142,7 @@ model:
 
   # Where trained model is stored
   path: "data/models/rca_model.pkl"
+  ranking_path: "data/models/ranking_model.pkl"
   encoder_path: "data/models/label_encoder.pkl"
   meta_path: "data/models/model_meta.json"
 

@@ -89,6 +89,7 @@ class LearningLoop:
                 anomaly_result=anomaly,
                 pattern_match=best_match,
                 confidence_model=autonomous.get("confidence_model"),
+                use_model=True,
             )
             session.update(priority)
             hybrid.update(priority)
