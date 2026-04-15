@@ -1,16 +1,16 @@
 {
-  "root_dir": "benchmarks/golden_traces",
+  "root_dir": ".",
   "cases": [
     {
       "name": "Priority IRAT LTE to 5G",
-      "pcap": "18Dec4G-to-5G.pcap",
+      "pcap_name": "18Dec4G-to-5G.pcap",
       "min_session_count": 2,
       "max_unknown": 0,
       "dominant_label": "NORMAL_CALL"
     },
     {
       "name": "Priority IRAT 5G to 4G",
-      "pcap": "29Nov_5Gto4G_IRATHO_2_9thDec.pcap",
+      "pcap_name": "29Nov_5Gto4G_IRATHO_2_9thDec.pcap",
       "min_session_count": 3,
       "max_unknown": 0,
       "required_labels": {
@@ -19,9 +19,24 @@
     },
     {
       "name": "Legacy 3G to 4G Mobility",
-      "pcap": "3g-4g-ps-ho-sep2.pcap",
+      "pcap_name": "3g-4g-ps-ho-sep2.pcap",
       "min_session_count": 5,
       "max_unknown": 0
+    },
+    {
+      "name": "X2 Mobility Cleanup",
+      "pcap_name": "X2-CSCvc91044.pcap",
+      "min_session_count": 7,
+      "max_unknown": 0
+    },
+    {
+      "name": "5G Registration Baseline",
+      "pcap_name": "gNB-Trace.pcap",
+      "min_session_count": 2,
+      "max_unknown": 0,
+      "required_labels": {
+        "NORMAL_CALL": 1
+      }
     }
   ]
 }

@@ -1,8 +1,9 @@
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
-from src.eval.benchmark_runner import load_expected_results, run_benchmark_suite
+from src.eval.benchmark_runner import load_expected_results, resolve_case_pcap, run_benchmark_suite
 from src.eval.metrics import benchmark_case_passed, compute_session_metrics
 
 
@@ -76,6 +77,50 @@ class BenchmarkRunnerTests(unittest.TestCase):
             path.write_text('[{"name":"a","pcap":"a.pcap"}]', encoding="utf-8")
             payload = load_expected_results(path)
             self.assertEqual(len(payload["cases"]), 1)
+
+    def test_resolve_case_pcap_uses_configured_roots_for_pcap_name(self):
+        with TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            external = root / "external"
+            external.mkdir()
+            target = external / "trace.pcap"
+            target.write_text("pcap", encoding="utf-8")
+            suite = root / "expected_results.json"
+            suite.write_text('{"cases":[]}', encoding="utf-8")
+
+            with patch("src.eval.benchmark_runner.cfg", side_effect=lambda key, default=None: [str(external)] if key == "benchmarks.roots" else default):
+                resolved = resolve_case_pcap({"pcap_name": "trace.pcap"}, suite, root)
+
+            self.assertEqual(resolved, target.resolve())
+
+    def test_run_benchmark_suite_supports_pcap_name_from_external_root(self):
+        with TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            external = root / "external"
+            external.mkdir()
+            target = external / "trace.pcap"
+            target.write_text("pcap", encoding="utf-8")
+            suite = root / "expected_results.json"
+            suite.write_text(
+                """
+                {
+                  "root_dir": "golden",
+                  "cases": [
+                    {"name": "external", "pcap_name": "trace.pcap", "max_unknown": 0}
+                  ]
+                }
+                """,
+                encoding="utf-8",
+            )
+
+            with patch("src.eval.benchmark_runner.cfg", side_effect=lambda key, default=None: [str(external)] if key == "benchmarks.roots" else default):
+                report = run_benchmark_suite(
+                    suite_path=suite,
+                    process_fn=lambda path: [{"rca": {"rca_label": "NORMAL_CALL"}}],
+                )
+
+            self.assertEqual(report["passed_cases"], 1)
+            self.assertEqual(report["missing_cases"], 0)
 
 
 if __name__ == "__main__":

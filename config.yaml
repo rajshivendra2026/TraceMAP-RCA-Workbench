@@ -147,6 +147,17 @@ model:
 
 
 # ============================================================
+# BENCHMARK / GOLDEN TRACE CONFIG
+# ============================================================
+benchmarks:
+  dir: "benchmarks"
+  roots:
+    - "benchmarks/golden_traces"
+    - "data/raw_pcaps"
+    - "/Users/shivendraraj/Documents/Test Cases"
+
+
+# ============================================================
 # SELF-LEARNING RCA INTELLIGENCE
 # ============================================================
 learning:
