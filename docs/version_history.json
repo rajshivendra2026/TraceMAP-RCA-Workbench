@@ -1,5 +1,16 @@
 [
   {
+    "version": "v1.1.0",
+    "date": "2026-04-16",
+    "title": "Trustworthy ML Operations And Model Governance",
+    "changes": [
+      "Added candidate-only model retraining so learned ranking and confidence artifacts are evaluated before replacing live models.",
+      "Added benchmark-gated promotion for retrained ranking and calibration models, protecting pass rate, failed-case count, and abnormal-session priority quality.",
+      "Added drift detection against the golden benchmark baseline to block retraining when new analyst feedback diverges too far in RCA mix, protocol mix, technology mix, or duration shape.",
+      "Expanded benchmark metrics and test coverage for model governance, promotion, and drift detection."
+    ]
+  },
+  {
     "version": "v1.0.0",
     "date": "2026-04-16",
     "title": "Production Dashboard And Analyst Triage Upgrade",

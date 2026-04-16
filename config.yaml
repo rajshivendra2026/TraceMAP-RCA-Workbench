@@ -171,6 +171,11 @@ learning:
   feedback_retrain_enabled: true
   feedback_min_samples: 3
   feedback_dataset_path: "data/knowledge_base/feedback_dataset.jsonl"
+  feedback_drift_detection_enabled: true
+  feedback_max_label_drift: 0.55
+  feedback_max_protocol_drift: 0.6
+  feedback_max_technology_drift: 0.6
+  feedback_max_avg_duration_ratio_delta: 2.5
   feedback_promotion_enabled: true
   feedback_candidate_dir: "data/models/candidates"
   feedback_min_candidate_pass_rate: 1.0
@@ -212,7 +217,7 @@ autonomous:
 # LOGGING CONFIG
 # ============================================================
 logging:
-  level: "DEBUG"
+  level: "INFO"
   log_to_file: true
   log_file: "logs/app.log"
   rotation: "10 MB"

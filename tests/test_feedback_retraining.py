@@ -61,6 +61,7 @@ class FeedbackRetrainingTests(unittest.TestCase):
             "TC_RCA__MODEL__RANKING_PATH": os.environ.get("TC_RCA__MODEL__RANKING_PATH"),
             "TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH": os.environ.get("TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"),
             "TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED": os.environ.get("TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"),
+            "TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED": os.environ.get("TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED"),
         }
 
     def tearDown(self):
@@ -99,6 +100,7 @@ class FeedbackRetrainingTests(unittest.TestCase):
             os.environ["TC_RCA__MODEL__RANKING_PATH"] = os.path.join(tmpdir, "ranking.pkl")
             os.environ["TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"] = os.path.join(tmpdir, "confidence.pkl")
             os.environ["TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"] = "false"
+            os.environ["TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED"] = "false"
             reload_config()
 
             knowledge = KnowledgeEngine(base_dir=tmpdir)

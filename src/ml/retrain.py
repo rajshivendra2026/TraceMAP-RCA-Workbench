@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.config import cfg
+from src.eval.drift import evaluate_feedback_drift
 from src.eval.feedback_dataset import build_feedback_training_sessions, feedback_dataset_path
 
 from .calibration import train_confidence_calibrator
@@ -34,6 +35,22 @@ def retrain_from_feedback(
             "min_samples": minimum,
             "dataset_path": target,
         }
+
+    drift = None
+    if bool(cfg("learning.feedback_drift_detection_enabled", True)):
+        drift = evaluate_feedback_drift(
+            sessions,
+            suite_path=cfg("autonomous.benchmark_suite", "benchmarks/expected_results.json"),
+        )
+        if not drift.get("passed"):
+            return {
+                "retrained": False,
+                "reason": "feedback_drift_exceeds_limit",
+                "sample_count": len(sessions),
+                "min_samples": minimum,
+                "dataset_path": target,
+                "drift": drift,
+            }
 
     candidate_paths = candidate_artifact_paths()
     candidate_paths["ranking"].parent.mkdir(parents=True, exist_ok=True)
@@ -76,6 +93,7 @@ def retrain_from_feedback(
         "sample_count": len(sessions),
         "min_samples": minimum,
         "dataset_path": target,
+        "drift": drift,
         "ranking": ranking,
         "calibration": calibration,
         "promotion": promotion,

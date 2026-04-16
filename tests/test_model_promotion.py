@@ -17,6 +17,7 @@ class ModelPromotionTests(unittest.TestCase):
     def setUp(self):
         self.old_env = {
             "TC_RCA__LEARNING__FEEDBACK_CANDIDATE_DIR": os.environ.get("TC_RCA__LEARNING__FEEDBACK_CANDIDATE_DIR"),
+            "TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED": os.environ.get("TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED"),
             "TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED": os.environ.get("TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"),
             "TC_RCA__MODEL__RANKING_PATH": os.environ.get("TC_RCA__MODEL__RANKING_PATH"),
             "TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH": os.environ.get("TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"),
@@ -100,12 +101,26 @@ class ModelPromotionTests(unittest.TestCase):
             )
 
             os.environ["TC_RCA__LEARNING__FEEDBACK_CANDIDATE_DIR"] = str(tmp / "candidates")
+            os.environ["TC_RCA__LEARNING__FEEDBACK_DRIFT_DETECTION_ENABLED"] = "true"
             os.environ["TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"] = "true"
             os.environ["TC_RCA__MODEL__RANKING_PATH"] = str(tmp / "live-ranking.pkl")
             os.environ["TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"] = str(tmp / "live-calibration.pkl")
             reload_config()
 
-            with patch("src.ml.retrain.evaluate_artifact_set") as mock_eval:
+            with (
+                patch("src.ml.retrain.evaluate_feedback_drift") as mock_drift,
+                patch("src.ml.retrain.evaluate_artifact_set") as mock_eval,
+            ):
+                mock_drift.return_value = {
+                    "passed": True,
+                    "checks": [],
+                    "baseline": {},
+                    "candidate": {},
+                    "label_drift": 0.0,
+                    "protocol_drift": 0.0,
+                    "technology_drift": 0.0,
+                    "avg_duration_ratio_delta": 0.0,
+                }
                 mock_eval.side_effect = [
                     {"pass_rate": 1.0, "failed_cases": 0, "avg_abnormal_priority_score": 82.0},
                     {"pass_rate": 1.0, "failed_cases": 0, "avg_abnormal_priority_score": 84.0},

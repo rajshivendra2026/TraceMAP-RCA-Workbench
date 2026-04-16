@@ -11,7 +11,7 @@ from src.config import cfg_path
 from .state import get_learning_status, update_learning_status
 
 
-APP_VERSION = "v1.0.0"
+APP_VERSION = "v1.1.0"
 VERSION_HISTORY_PATH = Path(cfg_path("docs.version_history", "docs/version_history.json"))
 
 
