@@ -253,7 +253,11 @@ async function submitValidationAction(validationId, action, note = "") {
       window.renderValidationQueue(data.queue);
     }
     if (typeof window.renderLearningStatus === "function") {
-      window.renderLearningStatus({ ...(STATE.learning || {}), knowledge: data.knowledge, status: STATE.learning?.status || {} });
+      window.renderLearningStatus({
+        ...(STATE.learning || {}),
+        knowledge: data.knowledge,
+        status: data.status || STATE.learning?.status || {},
+      });
     }
     return data;
   } catch (err) {

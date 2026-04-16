@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=1.0.2">
+  <link rel="stylesheet" href="/css/styles.css?v=1.0.3">
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 
@@ -269,6 +269,18 @@
                   <button id="startLearningBtn">Start Learning</button>
                 </div>
                 <div id="learningStatusMessage" class="learning-status">System learning status will appear here.</div>
+                <div class="learning-governance">
+                  <div class="mini-panel governance-panel">
+                    <div class="mini-title">Model Governance</div>
+                    <div id="governanceStateLabel" class="governance-value">Awaiting feedback</div>
+                    <div id="governanceDetail" class="governance-detail">Retraining and promotion results will appear here.</div>
+                  </div>
+                  <div class="mini-panel governance-panel">
+                    <div class="mini-title">Feedback Drift</div>
+                    <div id="driftStatusLabel" class="governance-value">Not evaluated</div>
+                    <div id="driftDetail" class="governance-detail">Drift checks against the golden benchmark baseline will appear here.</div>
+                  </div>
+                </div>
               </div>
               <div class="learning-kpis">
                 <div class="mini-panel">

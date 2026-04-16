@@ -201,11 +201,16 @@ def create_app() -> Flask:
                     dataset_path=str((knowledge.base_dir / "feedback_dataset.jsonl").resolve()),
                     min_samples=int(cfg("learning.feedback_min_samples", 3)),
                 )
+                update_learning_status(
+                    last_retraining=retraining,
+                    last_retraining_at=time.time(),
+                )
             return jsonify(
                 {
                     "updated": result,
                     "queue": load_validation_queue(),
                     "knowledge": load_learning_metrics(),
+                    "status": get_learning_status(),
                     "retraining": retraining,
                 }
             )

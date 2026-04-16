@@ -1020,6 +1020,31 @@ button:hover {
   overflow-wrap: anywhere;
 }
 
+.learning-governance {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.governance-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.governance-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.governance-detail {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .learning-kpis {
   display: grid;
   grid-template-columns: 1fr;

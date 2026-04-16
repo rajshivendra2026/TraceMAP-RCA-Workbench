@@ -17,6 +17,8 @@ _learning_status = {
     "new_pcaps": 0,
     "processed_pcaps": 0,
     "last_result": None,
+    "last_retraining": None,
+    "last_retraining_at": None,
 }
 
 

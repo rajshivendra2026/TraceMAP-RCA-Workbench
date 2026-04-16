@@ -1701,6 +1701,7 @@ function renderLearningStatus(payload) {
   STATE.learning = payload || null;
   const status = payload?.status || {};
   const knowledge = payload?.knowledge || {};
+  const retraining = status.last_retraining || null;
   _setText("learnedPatternCount", _formatNumber(knowledge.pattern_count ?? 0));
   _setText("learnedPcapCount", _formatNumber(knowledge.learned_pcap_count ?? 0));
   _setText("learningPendingCount", _formatNumber(status.new_pcaps ?? 0));
@@ -1715,6 +1716,13 @@ function renderLearningStatus(payload) {
   if (pathInput && savedPath && !pathInput.value) {
     pathInput.value = savedPath;
   }
+
+  const governanceState = _summarizeGovernanceState(retraining);
+  const driftState = _summarizeDriftState(retraining?.drift || null);
+  _setText("governanceStateLabel", governanceState.label);
+  _setText("governanceDetail", governanceState.detail);
+  _setText("driftStatusLabel", driftState.label);
+  _setText("driftDetail", driftState.detail);
 }
 
 function renderValidationQueue(payload) {
@@ -1785,6 +1793,87 @@ function renderVersionInfo(payload) {
     `;
     container.appendChild(card);
   });
+}
+
+function _summarizeGovernanceState(retraining) {
+  if (!retraining) {
+    return {
+      label: "Awaiting feedback",
+      detail: "Retraining and promotion results will appear here.",
+    };
+  }
+
+  if (retraining.reason === "insufficient_feedback_samples") {
+    return {
+      label: "Waiting for samples",
+      detail: `Need ${retraining.min_samples || 0} reviewed sessions before retraining. Current feedback set: ${retraining.sample_count || 0}.`,
+    };
+  }
+
+  if (retraining.reason === "feedback_drift_exceeds_limit") {
+    return {
+      label: "Retraining blocked",
+      detail: "Feedback drift exceeded the safety gate, so candidate models were not trained or promoted.",
+    };
+  }
+
+  if (retraining.promotion?.promoted) {
+    return {
+      label: "Candidate promoted",
+      detail: "Candidate ranking and calibration artifacts cleared benchmark gates and were promoted to live models.",
+    };
+  }
+
+  if (retraining.promotion?.evaluated) {
+    return {
+      label: "Candidate held",
+      detail: "Candidate models were evaluated, but benchmark promotion gates kept the current live models in place.",
+    };
+  }
+
+  if (retraining.retrained) {
+    return {
+      label: "Candidate trained",
+      detail: "Retraining produced candidate artifacts. Promotion is disabled or deferred.",
+    };
+  }
+
+  return {
+    label: "No governance event",
+    detail: "No retraining decision has been recorded yet.",
+  };
+}
+
+function _summarizeDriftState(drift) {
+  if (!drift) {
+    return {
+      label: "Not evaluated",
+      detail: "Drift checks against the golden benchmark baseline will appear here.",
+    };
+  }
+
+  const failedChecks = Array.isArray(drift.checks)
+    ? drift.checks.filter(check => check && check.passed === false)
+    : [];
+
+  if (drift.passed) {
+    return {
+      label: "Within limits",
+      detail: `Label ${_formatMetricValue(drift.label_drift)}, protocol ${_formatMetricValue(drift.protocol_drift)}, technology ${_formatMetricValue(drift.technology_drift)}, duration delta ${_formatMetricValue(drift.avg_duration_ratio_delta)}.`,
+    };
+  }
+
+  const leadFailure = failedChecks[0];
+  return {
+    label: "Drift detected",
+    detail: leadFailure?.detail || "One or more drift dimensions exceeded the configured safety limits.",
+  };
+}
+
+function _formatMetricValue(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "n/a";
+  return numeric.toFixed(3);
 }
 
 function toggleVersionHistory(show) {
