@@ -206,7 +206,7 @@ autonomous:
 # LOGGING CONFIG
 # ============================================================
 logging:
-  level: "INFO"
+  level: "DEBUG"
   log_to_file: true
   log_file: "logs/app.log"
   rotation: "10 MB"

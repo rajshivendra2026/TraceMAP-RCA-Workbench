@@ -135,6 +135,12 @@ def create_app() -> Flask:
     def version_history():
         return jsonify(load_version_history())
 
+    @app.route("/api/debug/frontend", methods=["POST"])
+    def frontend_debug():
+        payload = request.get_json(silent=True) or {}
+        logger.debug(f"Frontend debug: {payload}")
+        return jsonify({"ok": True})
+
     @app.route("/api/learning/status")
     def learning_status():
         return jsonify(

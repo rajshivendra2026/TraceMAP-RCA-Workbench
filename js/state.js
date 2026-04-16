@@ -40,6 +40,36 @@ const STATE = {
  */
 window.__TRACE_PENDING_UPLOAD__ = window.__TRACE_PENDING_UPLOAD__ || null;
 
+window.traceDebug = function traceDebug(stage, meta = {}) {
+  try {
+    console.debug(`[TraceMAP] ${stage}`, meta);
+    fetch("/api/debug/frontend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stage,
+        meta,
+        ts: new Date().toISOString(),
+      }),
+    }).catch(() => {});
+  } catch (_) {}
+};
+
+window.addEventListener("error", event => {
+  window.traceDebug("window.error", {
+    message: event.message,
+    source: event.filename,
+    line: event.lineno,
+    column: event.colno,
+  });
+});
+
+window.addEventListener("unhandledrejection", event => {
+  window.traceDebug("window.unhandledrejection", {
+    reason: String(event.reason || "unknown"),
+  });
+});
+
 if (typeof window.loadData !== "function") {
   window.loadData = function queuePendingUpload(data) {
     const payload = data || {};
@@ -52,5 +82,9 @@ if (typeof window.loadData !== "function") {
     STATE.graph = STATE.captureGraph;
     STATE.hydrationPending = true;
     window.__TRACE_PENDING_UPLOAD__ = payload;
+    window.traceDebug("queuePendingUpload", {
+      filename: STATE.filename,
+      sessions: STATE.sessions.length,
+    });
   };
 }

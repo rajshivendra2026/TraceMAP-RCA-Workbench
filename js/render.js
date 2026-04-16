@@ -77,6 +77,12 @@ function renderSessions() {
   const list = document.getElementById("sessionList");
   if (!list) return;
   list.innerHTML = "";
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("renderSessions.start", {
+      total: Array.isArray(STATE.sessions) ? STATE.sessions.length : -1,
+      selected: STATE.selected?.call_id || null,
+    });
+  }
 
   let sessions = [...(STATE.sessions || [])];
   const isNormal = session => session.rca_label === "NORMAL_CALL";
@@ -116,6 +122,12 @@ function renderSessions() {
 
   if (!sessions.length) {
     list.innerHTML = `<div class="empty-state">No sessions found</div>`;
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("renderSessions.empty", {
+        filteredTotal: 0,
+        stateTotal: Array.isArray(STATE.sessions) ? STATE.sessions.length : -1,
+      });
+    }
     return;
   }
 
@@ -154,12 +166,25 @@ function renderSessions() {
     div.onclick = () => selectSession(s);
     list.appendChild(div);
   });
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("renderSessions.done", {
+      rendered: Math.min(sessions.length, 100),
+      stateTotal: Array.isArray(STATE.sessions) ? STATE.sessions.length : -1,
+    });
+  }
 }
 
 function renderOverview() {
   const sessions = STATE.sessions || [];
   const summary = STATE.summary || {};
   const kpis = summary.kpis || {};
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("renderOverview", {
+      filename: STATE.filename || "",
+      sessions: sessions.length,
+      summaryKeys: Object.keys(summary || {}).length,
+    });
+  }
 
   _setText("kpiTotalSessions", String(kpis.total_sessions ?? sessions.length));
   _setText("kpiTotalPackets", _formatNumber(kpis.total_packets ?? 0));
@@ -191,6 +216,13 @@ function renderOverview() {
 }
 
 function hydrateFromState() {
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("hydrateFromState.start", {
+      filename: STATE.filename || "",
+      sessions: Array.isArray(STATE.sessions) ? STATE.sessions.length : -1,
+      hydrationPending: Boolean(STATE.hydrationPending),
+    });
+  }
   STATE.sessions = Array.isArray(STATE.sessions) ? STATE.sessions : [];
   STATE.sessions.sort((left, right) => {
     const priorityDelta = Number(right.priority_score || 0) - Number(left.priority_score || 0);
@@ -211,12 +243,25 @@ function hydrateFromState() {
   }
 
   STATE.hydrationPending = false;
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("hydrateFromState.done", {
+      filename: STATE.filename || "",
+      sessions: STATE.sessions.length,
+      selected: STATE.selected?.call_id || null,
+    });
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════
    SELECT SESSION
    ════════════════════════════════════════════════════════════════ */
 function selectSession(s) {
+  if (typeof window.traceDebug === "function") {
+    window.traceDebug("selectSession", {
+      callId: s?.call_id || null,
+      rca: s?.rca_label || null,
+    });
+  }
   STATE.selected = s;
   STATE.graph = s.graph || STATE.captureGraph || null;
 

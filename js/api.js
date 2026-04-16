@@ -47,6 +47,9 @@ async function uploadPCAP(file) {
 
   try {
     console.log(`Uploading: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.start", { filename: file.name, size: file.size });
+    }
 
     const res = await fetch("/upload", {
       method: "POST",
@@ -64,6 +67,13 @@ async function uploadPCAP(file) {
 
     const data = await res.json();
     console.log("Server response:", data);
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.response", {
+        filename: data.filename || "",
+        sessions: Array.isArray(data.sessions) ? data.sessions.length : -1,
+        hasSummary: Boolean(data.summary),
+      });
+    }
 
     if (typeof STATE !== "undefined") {
       STATE.token = data.token || null;
@@ -77,12 +87,29 @@ async function uploadPCAP(file) {
     }
 
     if (typeof window.hydrateFromState === "function") {
+      if (typeof window.traceDebug === "function") {
+        window.traceDebug("upload.hydrateFromState", {
+          filename: STATE.filename,
+          sessions: STATE.sessions.length,
+        });
+      }
       window.hydrateFromState();
     } else if (typeof window.loadData === "function") {
+      if (typeof window.traceDebug === "function") {
+        window.traceDebug("upload.loadDataFallback", {
+          filename: data.filename || "",
+          sessions: Array.isArray(data.sessions) ? data.sessions.length : -1,
+        });
+      }
       window.loadData(data);
     } else {
       console.error("No render hydrator available after upload completion");
       window.__TRACE_PENDING_UPLOAD__ = data;
+      if (typeof window.traceDebug === "function") {
+        window.traceDebug("upload.noHydrator", {
+          filename: data.filename || "",
+        });
+      }
     }
 
     if (typeof refreshValidationQueue === "function") {
@@ -92,6 +119,9 @@ async function uploadPCAP(file) {
 
   } catch (err) {
     console.error("uploadPCAP error:", err);
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.error", { message: String(err?.message || err) });
+    }
     alert("❌ Upload failed: " + err.message);
   } finally {
     /* FIX [4]: always restore the button regardless of success/failure */
