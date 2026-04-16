@@ -221,7 +221,7 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
         if isinstance(value, list) and value
     }
     protocol_breakdown = _build_protocol_breakdown(parsed)
-    tcp_issues = sum(1 for p in parsed.get("tcp", []) if p.get("is_failure"))
+    tcp_issues = len(_collect_tcp_transport_issues(parsed))
     http_transactions = len(parsed.get("http", []))
     ims_sessions = sum(1 for s in sessions if "IMS" in s.get("technologies", []))
     top_protocol = max(protocol_counts.items(), key=lambda item: item[1])[0] if protocol_counts else "-"
@@ -267,6 +267,7 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
         "top_endpoints": endpoint_activity[:6],
         "expert_findings": expert_findings,
         "details": details,
+        "error_analysis": _build_error_analysis(parsed, sessions, capture_window, details),
         "kpis": {
             "total_sessions": len(sessions),
             "total_packets": capture_window["total_frames"] or total_packets,
@@ -285,6 +286,113 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
             "top_rca": top_rca,
             "top_protocol": top_protocol,
         },
+    }
+
+
+def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, details: dict) -> dict:
+    sip_401_packets = [p for p in parsed.get("sip", []) if str(p.get("status_code")) == "401"]
+    tcp_issue_packets = _collect_tcp_transport_issues(parsed)
+    tcp_issue_breakdown = _tcp_issue_breakdown(tcp_issue_packets)
+    tcp_resets = [p for p in parsed.get("tcp", []) if p.get("reset") is True or "RST" in str(p.get("message", "")).upper()]
+    gtp_context_not_found = [
+        p for p in parsed.get("gtp", [])
+        if str(p.get("cause_code")) == "64" or "CONTEXT NOT FOUND" in str(p.get("message", "")).upper()
+    ]
+    ngap_release = [
+        p for p in parsed.get("ngap", [])
+        if "UE CONTEXT RELEASE" in str(p.get("message", "")).upper() or str(p.get("procedure")) in {"41", "42"}
+    ]
+    s1ap_release = [
+        p for p in parsed.get("s1ap", [])
+        if "UE CONTEXT RELEASE" in str(p.get("message", "")).upper() or str(p.get("procedure")) in {"18"}
+    ]
+    diameter_non_success = [
+        p for p in parsed.get("diameter", [])
+        if p.get("is_failure") and str(p.get("result_code")) not in {"1001"}
+    ]
+    diameter_notable = [
+        p for p in parsed.get("diameter", [])
+        if p.get("is_failure") and str(p.get("result_code")) in {"1001"}
+    ]
+
+    categories = [
+        _error_category("SIP 401 Unauthorized", len(sip_401_packets), "none", "Normal IMS AKA authentication flow"),
+        _error_category("TCP Transport Issues", len(tcp_issue_packets), "low" if len(tcp_issue_packets) < 80 else "medium", _describe_tcp_issue_breakdown(tcp_issue_breakdown)),
+        _error_category("GTPv2 Context Not Found", len(gtp_context_not_found), "medium" if gtp_context_not_found else "none", "Bearer deletion or session cleanup issue"),
+        _error_category("NGAP UE Context Release", len(ngap_release), "none", "Normal 5G mobility or idle-mode control"),
+        _error_category("S1AP UE Context Release", len(s1ap_release), "none", "Normal 4G mobility or context management"),
+        _error_category("Diameter Errors", len(diameter_non_success), "none" if not diameter_non_success else "medium", "AAA or policy transaction issue"),
+        _error_category("Diameter Informational Non-Success", len(diameter_notable), "low" if diameter_notable else "none", "Reviewable but not necessarily a service failure"),
+        _error_category("TCP RST", len(tcp_resets), "none" if not tcp_resets else "medium", "Abrupt transport termination"),
+    ]
+
+    sections = []
+    if sip_401_packets:
+        sections.append(
+            {
+                "title": "SIP — 401 Unauthorized",
+                "severity": "none",
+                "verdict": "Expected behavior",
+                "analysis": "401 responses are treated as normal IMS AKA challenge behavior when registration later succeeds with 200 OK responses.",
+                "examples": _packet_examples(sip_401_packets, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip")),
+            }
+        )
+    if tcp_issue_packets:
+        sections.append(
+            {
+                "title": "TCP Transport Issues",
+                "severity": "low" if len(tcp_issue_packets) < 80 else "medium",
+                "verdict": "Transport noise / packet loss indicator",
+                "analysis": (
+                    f"Detected {len(tcp_issue_packets)} transport-analysis marker(s): "
+                    f"{_describe_tcp_issue_breakdown(tcp_issue_breakdown, include_counts=True)}. "
+                    "These usually reflect packet loss, missing ACKs, incomplete visibility in multi-point captures, or transient tunnel-path instability."
+                ),
+                "examples": _packet_examples(tcp_issue_packets, fields=("frame_number", "time_label", "src_ip", "dst_ip", "message", "issue_type")),
+            }
+        )
+    if gtp_context_not_found:
+        sections.append(
+            {
+                "title": "GTPv2 — Context Not Found",
+                "severity": "medium",
+                "verdict": "Genuine session cleanup issue",
+                "analysis": "Context Not Found on GTPv2 control traffic usually means bearer or session state was already removed on one side before cleanup completed on the peer.",
+                "examples": _packet_examples(gtp_context_not_found, fields=("frame_number", "time_label", "src_ip", "dst_ip", "message", "cause_code")),
+            }
+        )
+    if ngap_release:
+        sections.append(
+            {
+                "title": "NGAP — UE Context Release",
+                "severity": "none",
+                "verdict": "Expected control-plane behavior",
+                "analysis": "These events normally appear during idle-mode transitions, release of radio resources, or mobility cleanup on the 5G side.",
+                "examples": _packet_examples(ngap_release, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip")),
+            }
+        )
+    if s1ap_release:
+        sections.append(
+            {
+                "title": "S1AP — UE Context Release",
+                "severity": "none",
+                "verdict": "Expected control-plane behavior",
+                "analysis": "These events usually reflect LTE-side context cleanup, detach handling, or inter-RAT mobility transitions.",
+                "examples": _packet_examples(s1ap_release, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip")),
+            }
+        )
+
+    timeline = _build_error_timeline(sip_401_packets, parsed.get("sip", []), gtp_context_not_found, ngap_release, s1ap_release)
+    recommendations = _build_error_recommendations(gtp_context_not_found, tcp_issue_packets, diameter_non_success)
+    assessment = _build_error_assessment(gtp_context_not_found, tcp_issue_packets, diameter_non_success, details)
+
+    return {
+        "headline": "Protocol error and expected-behavior analysis",
+        "categories": categories,
+        "sections": sections,
+        "timeline": timeline,
+        "recommendations": recommendations,
+        "assessment": assessment,
     }
 
 
@@ -716,6 +824,161 @@ def _format_party_identity_summary(party: dict) -> str:
     imsi = party.get("imsi") or "Not observed"
     network = party.get("network") or "Unknown"
     return f"{msisdn} · IMSI {imsi} · {network}"
+
+
+def _error_category(category: str, count: int, severity: str, verdict: str) -> dict:
+    return {
+        "category": category,
+        "count": count,
+        "severity": severity,
+        "verdict": verdict,
+    }
+
+
+def _packet_examples(packets: list, fields: tuple[str, ...], limit: int = 5) -> list[dict]:
+    rows = []
+    for packet in packets[:limit]:
+        row = {}
+        for field in fields:
+            if field == "time_label":
+                row[field] = _timestamp_label(packet.get("timestamp"))
+            else:
+                row[field] = packet.get(field)
+        rows.append(row)
+    return rows
+
+
+def _collect_tcp_transport_issues(parsed: dict) -> list[dict]:
+    issue_packets = []
+    for packet in parsed.get("tcp", []):
+        issue_type = _tcp_issue_type(packet)
+        if not issue_type:
+            continue
+        packet_with_issue = dict(packet)
+        packet_with_issue["issue_type"] = issue_type
+        issue_packets.append(packet_with_issue)
+    return issue_packets
+
+
+def _tcp_issue_type(packet: dict) -> str | None:
+    if _flag_true(packet.get("retransmission")) or _flag_true(packet.get("fast_retransmission")):
+        return "Retransmission"
+    if _flag_true(packet.get("duplicate_ack")):
+        return "Duplicate ACK"
+    if _flag_true(packet.get("ack_lost_segment")):
+        return "ACKed Lost Segment"
+    if _flag_true(packet.get("lost_segment")):
+        return "Lost Segment"
+    if packet.get("reset") is True or "RST" in str(packet.get("message", "")).upper():
+        return "TCP Reset"
+    return None
+
+
+def _tcp_issue_breakdown(packets: list) -> Counter:
+    return Counter(packet.get("issue_type", "Unknown") for packet in packets)
+
+
+def _describe_tcp_issue_breakdown(breakdown: Counter, include_counts: bool = False) -> str:
+    ordered = ["ACKed Lost Segment", "Retransmission", "Duplicate ACK", "Lost Segment", "TCP Reset"]
+    parts = []
+    for label in ordered:
+        count = int(breakdown.get(label, 0))
+        if count <= 0:
+            continue
+        parts.append(f"{label} ({count})" if include_counts else label)
+    return ", ".join(parts) if parts else "No notable transport anomalies"
+
+
+def _timestamp_label(timestamp: float | None) -> str:
+    if timestamp is None:
+        return "Unknown"
+    try:
+        return datetime.fromtimestamp(float(timestamp), tz=timezone.utc).strftime("%H:%M:%S")
+    except (TypeError, ValueError, OSError):
+        return "Unknown"
+
+
+def _flag_true(value) -> bool:
+    normalized = str(value).strip().lower()
+    return normalized not in {"", "0", "false", "none", "nan"}
+
+
+def _build_error_timeline(sip_401_packets: list, sip_packets: list, gtp_context_not_found: list, ngap_release: list, s1ap_release: list) -> list[dict]:
+    events = []
+    if sip_401_packets:
+        first = min(sip_401_packets, key=lambda p: float(p.get("timestamp") or 0))
+        events.append({"time": _timestamp_label(first.get("timestamp")), "event": "SIP 401 AKA challenge", "severity": "none"})
+    sip_success = [p for p in sip_packets if str(p.get("status_code")) == "200"]
+    if sip_success:
+        first = min(sip_success, key=lambda p: float(p.get("timestamp") or 0))
+        events.append({"time": _timestamp_label(first.get("timestamp")), "event": "SIP 200 OK registration / call progress", "severity": "none"})
+    if ngap_release:
+        first = min(ngap_release, key=lambda p: float(p.get("timestamp") or 0))
+        events.append({"time": _timestamp_label(first.get("timestamp")), "event": "NGAP UE context release cycle", "severity": "none"})
+    if s1ap_release:
+        first = min(s1ap_release, key=lambda p: float(p.get("timestamp") or 0))
+        events.append({"time": _timestamp_label(first.get("timestamp")), "event": "S1AP UE context release cycle", "severity": "none"})
+    for packet in gtp_context_not_found[:3]:
+        events.append({"time": _timestamp_label(packet.get("timestamp")), "event": f"GTPv2 {packet.get('message') or 'Context Not Found'}", "severity": "medium"})
+    events.sort(key=lambda item: item["time"])
+    return events[:10]
+
+
+def _build_error_recommendations(gtp_context_not_found: list, tcp_issue_packets: list, diameter_non_success: list) -> list[dict]:
+    recommendations = []
+    if gtp_context_not_found:
+        recommendations.append(
+            {
+                "priority": "Medium",
+                "title": "Review GTP bearer and session cleanup ordering",
+                "body": "Inspect inter-RAT or session-release timing between control-plane peers. Context Not Found usually means one side removed bearer state before the peer finished cleanup.",
+            }
+        )
+    if tcp_issue_packets:
+        recommendations.append(
+            {
+                "priority": "Low",
+                "title": "Review transport loss on affected paths",
+                "body": "Correlate transport-analysis markers with GTP-U, PFCP, or IMS links before treating them as service-impacting. Multi-point captures can amplify apparent tunnel or signaling-path noise.",
+            }
+        )
+    if diameter_non_success:
+        recommendations.append(
+            {
+                "priority": "Medium",
+                "title": "Inspect Diameter failures",
+                "body": "Check whether non-success Diameter responses align with subscriber, policy, or charging problems rather than harmless informational exchanges.",
+            }
+        )
+    if not recommendations:
+        recommendations.append(
+            {
+                "priority": "Info",
+                "title": "No high-confidence protocol errors detected",
+                "body": "Most flagged events in this trace look consistent with normal IMS or mobility control behavior. Focus on session-level RCA for any remaining outliers.",
+            }
+        )
+    return recommendations
+
+
+def _build_error_assessment(gtp_context_not_found: list, tcp_issue_packets: list, diameter_non_success: list, details: dict) -> str:
+    if gtp_context_not_found:
+        return (
+            f"The trace is broadly healthy at the IMS signalling layer, but it contains {len(gtp_context_not_found)} "
+            "GTPv2 context-synchronization issue(s) that look like genuine bearer cleanup problems. "
+            "Transport anomalies should be reviewed as supporting context, not as the primary root cause."
+        )
+    if diameter_non_success:
+        return (
+            "The trace contains protocol-level non-success indications outside the SIP registration challenge flow. "
+            "Diameter responses should be reviewed alongside the session RCA to separate informational results from real AAA or policy failures."
+        )
+    if tcp_issue_packets:
+        return (
+            f"The trace does not show a strong protocol-control failure, but it does contain {len(tcp_issue_packets)} transport-analysis marker(s). "
+            "That likely reflects packet loss, tunnel visibility gaps, or mild transport instability rather than a hard service outage."
+        )
+    return f"The capture looks operationally healthy. {details.get('scenario', 'Service validation')} completes without a strong protocol-level failure signature."
 
 
 def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None = None) -> tuple[str | None, str | None]:

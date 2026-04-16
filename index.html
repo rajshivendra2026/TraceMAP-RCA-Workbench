@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=1.0.5">
+  <link rel="stylesheet" href="/css/styles.css?v=1.0.6">
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 
@@ -39,6 +39,7 @@
   </div>
   <nav class="tabs">
     <button class="tab-button active" data-tab="analysis" onclick="switchTab('analysis')">Analysis</button>
+    <button class="tab-button" data-tab="errors" onclick="switchTab('errors')">Error Analysis</button>
     <button class="tab-button" data-tab="visual" onclick="switchTab('visual')">Visualization</button>
     <button class="tab-button" data-tab="validation" onclick="switchTab('validation')">Validation</button>
   </nav>
@@ -381,6 +382,49 @@
       </div>
     </div>
 
+    <div id="errorTab" style="display:none;">
+      <div class="error-shell">
+        <div class="panel error-hero-panel">
+          <div class="panel-header">
+            <h3>Error Summary</h3>
+            <div class="panel-subtitle">Telecom-aware interpretation of protocol anomalies, expected behavior, and notable issues</div>
+          </div>
+          <div id="errorAssessment" class="error-assessment">Upload a capture to generate protocol error analysis.</div>
+        </div>
+
+        <div class="panel error-categories-panel">
+          <div class="panel-header">
+            <h3>Category Summary</h3>
+            <div class="panel-subtitle">Counts, severity, and verdict per protocol family</div>
+          </div>
+          <div id="errorCategoryTable" class="error-category-table">No error analysis available.</div>
+        </div>
+
+        <div class="error-grid">
+          <div class="panel error-sections-panel">
+            <div class="panel-header">
+              <h3>Protocol Findings</h3>
+              <div class="panel-subtitle">Expected flows versus genuine issues</div>
+            </div>
+            <div id="errorSections" class="error-sections"></div>
+          </div>
+
+          <div class="panel error-side-panel">
+            <div class="panel-header">
+              <h3>Timeline</h3>
+              <div class="panel-subtitle">Notable protocol events</div>
+            </div>
+            <div id="errorTimeline" class="error-timeline"></div>
+            <div class="panel-header error-side-subheader">
+              <h3>Recommendations</h3>
+              <div class="panel-subtitle">What to inspect next</div>
+            </div>
+            <div id="errorRecommendations" class="error-recommendations"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="validationTab" style="display:none;">
       <div class="validation-shell">
         <div class="panel validation-hero-panel">
@@ -431,10 +475,10 @@
   </div>
 </div>
 
-<script src="js/state.js?v=1.0.5"></script>
-<script src="js/render.js?v=1.0.5"></script>
-<script src="js/api.js?v=1.0.5"></script>
-<script src="js/events.js?v=1.0.5"></script>
+<script src="js/state.js?v=1.0.6"></script>
+<script src="js/render.js?v=1.0.6"></script>
+<script src="js/api.js?v=1.0.6"></script>
+<script src="js/events.js?v=1.0.6"></script>
 
 </body>
 </html>

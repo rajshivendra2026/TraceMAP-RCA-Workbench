@@ -225,6 +225,48 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertIn("SMF/PGW-C", roles)
         self.assertIn("P-CSCF", roles)
 
+    def test_capture_summary_builds_error_analysis_report(self):
+        parsed = {
+            "sip": [
+                {"status_code": "401", "message": "401 Unauthorized", "frame_number": 10, "timestamp": 1.0, "src_ip": "1.1.1.1", "dst_ip": "2.2.2.2"},
+                {"status_code": "200", "message": "200 OK", "frame_number": 11, "timestamp": 2.0, "src_ip": "2.2.2.2", "dst_ip": "1.1.1.1"},
+            ],
+            "tcp": [
+                {"retransmission": "1", "frame_number": 20, "timestamp": 3.0, "src_ip": "3.3.3.3", "dst_ip": "4.4.4.4", "message": "TCP"},
+                {"duplicate_ack": "1", "frame_number": 21, "timestamp": 3.5, "src_ip": "3.3.3.3", "dst_ip": "4.4.4.4", "message": "TCP"},
+            ],
+            "gtp": [
+                {"cause_code": "64", "message": "Delete Bearer Response (Context Not Found)", "frame_number": 30, "timestamp": 4.0, "src_ip": "5.5.5.5", "dst_ip": "6.6.6.6"},
+            ],
+            "ngap": [{"message": "UE Context Release", "procedure": "41", "frame_number": 40, "timestamp": 5.0, "src_ip": "7.7.7.7", "dst_ip": "8.8.8.8"}],
+            "s1ap": [{"message": "UE Context Release Request", "procedure": "18", "frame_number": 50, "timestamp": 6.0, "src_ip": "9.9.9.9", "dst_ip": "10.10.10.10"}],
+            "diameter": [],
+            "map": [],
+            "inap": [],
+            "ranap": [],
+            "bssap": [],
+            "http": [],
+            "udp": [],
+            "pfcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+        }
+
+        summary = build_capture_summary(parsed, [])
+        report = summary["error_analysis"]
+        categories = {item["category"]: item for item in report["categories"]}
+        self.assertEqual(categories["SIP 401 Unauthorized"]["count"], 1)
+        self.assertEqual(categories["SIP 401 Unauthorized"]["severity"], "none")
+        self.assertEqual(categories["TCP Transport Issues"]["count"], 2)
+        self.assertEqual(categories["GTPv2 Context Not Found"]["count"], 1)
+        self.assertEqual(categories["GTPv2 Context Not Found"]["severity"], "medium")
+        titles = [section["title"] for section in report["sections"]]
+        self.assertIn("SIP — 401 Unauthorized", titles)
+        self.assertIn("TCP Transport Issues", titles)
+        self.assertIn("GTPv2 — Context Not Found", titles)
+
 
 if __name__ == "__main__":
     unittest.main()

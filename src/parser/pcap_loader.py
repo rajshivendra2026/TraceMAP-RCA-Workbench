@@ -225,6 +225,8 @@ NAS_5GS_FIELDS = [
 TCP_FIELDS = [
     "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "tcp.stream",
     "tcp.srcport", "tcp.dstport", "tcp.flags.reset", "tcp.analysis.retransmission",
+    "tcp.analysis.fast_retransmission", "tcp.analysis.duplicate_ack",
+    "tcp.analysis.ack_lost_segment", "tcp.analysis.lost_segment",
 ]
 
 UDP_FIELDS = [

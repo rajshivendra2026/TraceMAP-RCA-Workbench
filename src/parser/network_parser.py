@@ -333,7 +333,11 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     )
     tls_type = _clean_text(_get(raw, "tls.handshake.type"))
     retransmission = bool(_clean_text(_get(raw, "tcp.analysis.retransmission")))
-    reset = bool(_clean_text(_get(raw, "tcp.flags.reset")))
+    fast_retransmission = bool(_clean_text(_get(raw, "tcp.analysis.fast_retransmission")))
+    duplicate_ack = bool(_clean_text(_get(raw, "tcp.analysis.duplicate_ack")))
+    ack_lost_segment = bool(_clean_text(_get(raw, "tcp.analysis.ack_lost_segment")))
+    lost_segment = bool(_clean_text(_get(raw, "tcp.analysis.lost_segment")))
+    reset = str(_clean_text(_get(raw, "tcp.flags.reset"))).strip() in {"1", "true", "True"}
 
     if frame_number is None and timestamp is None and not (src_ip or dst_ip):
         return None
@@ -400,6 +404,10 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "tls_type": tls_type,
         "ws_info": ws_info,
         "retransmission": retransmission,
+        "fast_retransmission": fast_retransmission,
+        "duplicate_ack": duplicate_ack,
+        "ack_lost_segment": ack_lost_segment,
+        "lost_segment": lost_segment,
         "reset": reset,
         "is_failure": _is_failure(protocol, message, status_code, cause_code, retransmission, reset, icmp_type, icmp_code),
     }

@@ -210,6 +210,7 @@ function renderOverview() {
   _renderEndpointList("topEndpoints", summary.top_endpoints || []);
   _renderMetricList("rcaDistribution", summary.rca_distribution || {});
   _renderExpertFindings(summary.expert_findings || [], sessions);
+  _renderErrorAnalysis(summary.error_analysis || null);
   _renderTrafficTrendChart(sessions, summary.protocol_counts || {});
   _renderProtocolShareChart(summary.protocol_counts || {});
   _renderDurationProfileChart(sessions);
@@ -1505,6 +1506,81 @@ function _renderTraceOverview(details) {
     item.innerText = line;
     list.appendChild(item);
   });
+}
+
+function _renderErrorAnalysis(report) {
+  const assessment = document.getElementById("errorAssessment");
+  const categoryTable = document.getElementById("errorCategoryTable");
+  const sections = document.getElementById("errorSections");
+  const timeline = document.getElementById("errorTimeline");
+  const recommendations = document.getElementById("errorRecommendations");
+  if (!assessment || !categoryTable || !sections || !timeline || !recommendations) return;
+
+  if (!report) {
+    assessment.innerText = "Upload a capture to generate protocol error analysis.";
+    categoryTable.innerHTML = "No error analysis available.";
+    sections.innerHTML = "";
+    timeline.innerHTML = "";
+    recommendations.innerHTML = "";
+    return;
+  }
+
+  assessment.innerText = report.assessment || "No analyst assessment available.";
+
+  categoryTable.innerHTML = `
+    <div class="error-category-header">
+      <span>Category</span>
+      <span>Count</span>
+      <span>Severity</span>
+      <span>Verdict</span>
+    </div>
+    ${(report.categories || []).map(item => `
+      <div class="error-category-row">
+        <strong>${item.category}</strong>
+        <span>${item.count}</span>
+        <span class="error-severity-pill ${String(item.severity || "none").toLowerCase()}">${String(item.severity || "none").toUpperCase()}</span>
+        <span>${item.verdict || ""}</span>
+      </div>
+    `).join("")}
+  `;
+
+  sections.innerHTML = (report.sections || []).map(section => `
+    <section class="error-section-card">
+      <div class="error-section-header">
+        <div>
+          <h4>${section.title}</h4>
+          <div class="panel-subtitle">${section.verdict || ""}</div>
+        </div>
+        <span class="error-severity-pill ${String(section.severity || "none").toLowerCase()}">${String(section.severity || "none").toUpperCase()}</span>
+      </div>
+      <p class="error-section-body">${section.analysis || ""}</p>
+      ${(section.examples || []).length ? `
+        <div class="error-example-list">
+          ${(section.examples || []).map(example => `
+            <div class="error-example-item">
+              ${Object.entries(example).map(([key, value]) => `<div><span>${key.replace(/_/g, " ")}</span><strong>${value ?? "—"}</strong></div>`).join("")}
+            </div>
+          `).join("")}
+        </div>
+      ` : ""}
+    </section>
+  `).join("");
+
+  timeline.innerHTML = (report.timeline || []).map(item => `
+    <div class="timeline-item">
+      <span class="timeline-time">${item.time || "Unknown"}</span>
+      <span class="timeline-event">${item.event || ""}</span>
+      <span class="error-severity-pill ${String(item.severity || "none").toLowerCase()}">${String(item.severity || "none").toUpperCase()}</span>
+    </div>
+  `).join("");
+
+  recommendations.innerHTML = (report.recommendations || []).map(item => `
+    <div class="recommendation-card">
+      <div class="recommendation-priority">${item.priority || "Info"}</div>
+      <h4>${item.title || ""}</h4>
+      <p>${item.body || ""}</p>
+    </div>
+  `).join("");
 }
 
 function _renderMetricList(targetId, values) {

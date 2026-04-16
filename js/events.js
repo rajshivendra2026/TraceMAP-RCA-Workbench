@@ -135,11 +135,13 @@ window.addEventListener("load", () => {
    ════════════════════════════════════════════════════════════════ */
 function switchTab(tab) {
   const analysisTab = document.getElementById("analysisTab");
+  const errorTab = document.getElementById("errorTab");
   const visualTab   = document.getElementById("visualTab");
   const validationTab = document.getElementById("validationTab");
   const tabButtons = document.querySelectorAll(".tab-button");
 
   if (analysisTab) analysisTab.style.display = tab === "analysis" ? "block" : "none";
+  if (errorTab) errorTab.style.display = tab === "errors" ? "block" : "none";
   if (visualTab)   visualTab.style.display   = tab === "visual"   ? "block" : "none";
   if (validationTab) validationTab.style.display = tab === "validation" ? "block" : "none";
   tabButtons.forEach(btn => {
