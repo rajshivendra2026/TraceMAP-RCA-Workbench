@@ -857,6 +857,79 @@ button:hover {
   overflow-wrap: anywhere;
 }
 
+.capture-summary-sections {
+  display: grid;
+  gap: 16px;
+}
+
+.summary-section {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-section h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.summary-table {
+  display: grid;
+  gap: 8px;
+}
+
+.summary-table-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 180px) minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff, var(--surface-inset));
+  align-items: start;
+}
+
+.summary-table-row span {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.summary-table-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+.summary-table-row-protocol {
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+}
+
+.summary-subtext {
+  grid-column: 2;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.topology-block {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff, var(--surface-inset));
+}
+
+.topology-line {
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 12px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
 .bullet-list {
   margin: 0;
   padding-left: 18px;

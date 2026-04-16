@@ -316,7 +316,15 @@ def create_app() -> Flask:
                     "filename": save_path.name,
                     "sessions": [session_summary(s) for s in sessions],
                     "graph": graph,
-                    "summary": build_capture_summary(parsed, sessions),
+                    "summary": build_capture_summary(
+                        parsed,
+                        sessions,
+                        capture_meta={
+                            "filename": Path(uploaded.filename or save_path.name).name,
+                            "stored_filename": save_path.name,
+                            "size_bytes": save_path.stat().st_size if save_path.exists() else None,
+                        },
+                    ),
                     "learning": learning["metrics"],
                     "model": load_model_status(),
                 }

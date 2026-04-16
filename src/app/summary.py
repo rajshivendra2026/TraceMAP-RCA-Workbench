@@ -1,4 +1,6 @@
 from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
 
 
 def build_capture_graph(parsed: dict) -> dict:
@@ -168,7 +170,8 @@ def session_summary(session: dict) -> dict:
     }
 
 
-def build_capture_summary(parsed: dict, sessions: list) -> dict:
+def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | None = None) -> dict:
+    capture_meta = capture_meta or {}
     technology_counts = {
         "2G": len(parsed.get("bssap", [])),
         "3G": len(parsed.get("ranap", [])) + len(parsed.get("map", [])),
@@ -185,6 +188,7 @@ def build_capture_summary(parsed: dict, sessions: list) -> dict:
         for key, value in parsed.items()
         if isinstance(value, list) and value
     }
+    protocol_breakdown = _build_protocol_breakdown(parsed)
     tcp_issues = sum(1 for p in parsed.get("tcp", []) if p.get("is_failure"))
     http_transactions = len(parsed.get("http", []))
     ims_sessions = sum(1 for s in sessions if "IMS" in s.get("technologies", []))
@@ -205,6 +209,7 @@ def build_capture_summary(parsed: dict, sessions: list) -> dict:
     )
     top_rca = rca_distribution.most_common(1)[0][0] if rca_distribution else "-"
     endpoint_activity = _build_endpoint_activity(parsed)
+    capture_window = _capture_window(parsed)
     expert_findings = _build_expert_findings(
         protocol_counts=protocol_counts,
         technology_counts=technology_counts,
@@ -212,17 +217,27 @@ def build_capture_summary(parsed: dict, sessions: list) -> dict:
         failed_sessions=failed_sessions,
         sessions=sessions,
     )
+    details = build_trace_details_summary(
+        parsed,
+        sessions,
+        protocol_counts,
+        technology_counts,
+        protocol_breakdown=protocol_breakdown,
+        capture_window=capture_window,
+        capture_meta=capture_meta,
+    )
 
     return {
         "technology_counts": technology_counts,
         "protocol_counts": protocol_counts,
+        "protocol_breakdown": protocol_breakdown,
         "rca_distribution": dict(rca_distribution),
         "top_endpoints": endpoint_activity[:6],
         "expert_findings": expert_findings,
-        "details": build_trace_details_summary(parsed, sessions, protocol_counts, technology_counts),
+        "details": details,
         "kpis": {
             "total_sessions": len(sessions),
-            "total_packets": total_packets,
+            "total_packets": capture_window["total_frames"] or total_packets,
             "technologies_seen": sum(1 for _, count in technology_counts.items() if count > 0),
             "protocols_seen": len(protocol_counts),
             "ims_sessions": ims_sessions,
@@ -379,25 +394,70 @@ def _build_expert_findings(protocol_counts: dict, technology_counts: dict, tcp_i
     return deduped[:4]
 
 
-def build_trace_details_summary(parsed: dict, sessions: list, protocol_counts: dict, technology_counts: dict) -> dict:
-    a_party, b_party = _extract_trace_parties(parsed, sessions)
+def build_trace_details_summary(
+    parsed: dict,
+    sessions: list,
+    protocol_counts: dict,
+    technology_counts: dict,
+    *,
+    protocol_breakdown: list | None = None,
+    capture_window: dict | None = None,
+    capture_meta: dict | None = None,
+) -> dict:
+    protocol_breakdown = protocol_breakdown or _build_protocol_breakdown(parsed)
+    capture_window = capture_window or _capture_window(parsed)
+    capture_meta = capture_meta or {}
+    subscriber = _extract_primary_subscriber(parsed, sessions)
+    a_party, b_party = _extract_trace_parties(parsed, sessions, subscriber=subscriber)
     top_protocols = sorted(protocol_counts.items(), key=lambda item: item[1], reverse=True)[:4]
     technologies_seen = [tech for tech, count in technology_counts.items() if count > 0]
-    dominant_protocol = top_protocols[0][0] if top_protocols else "UNKNOWN"
-    trace_type = _infer_trace_type(protocol_counts, technologies_seen)
+    dominant_protocol = _infer_dominant_protocol(protocol_breakdown, top_protocols)
+    trace_type = _infer_trace_type(protocol_counts, technologies_seen, protocol_breakdown)
+    scenario = _infer_test_scenario(protocol_counts, technologies_seen)
     headline = _build_trace_headline(trace_type, top_protocols, technologies_seen)
+    observations = _build_key_observations(
+        protocol_counts=protocol_counts,
+        technology_counts=technology_counts,
+        protocol_breakdown=protocol_breakdown,
+        sessions=sessions,
+    )
+    topology = _build_topology_inference(parsed, protocol_counts, subscriber, a_party, b_party)
+    file_name = capture_meta.get("filename")
+    file_size_bytes = int(capture_meta.get("size_bytes", 0) or 0)
+    overview = [
+        ("File", file_name or "Current upload"),
+        ("Capture Duration", capture_window["duration_label"]),
+        ("Capture Date", capture_window["date_label"]),
+        ("File Size", _format_file_size(file_size_bytes) if file_size_bytes else "Unavailable"),
+        ("Total Packets", _format_int(capture_window["total_frames"])),
+        ("Network", _infer_network_context(parsed, technologies_seen)),
+        ("Test Scenario", scenario),
+        ("Subscriber IMSI", subscriber or "Unknown"),
+        ("Calling Party", a_party or "Unknown"),
+        ("Called Party", b_party or "Unknown"),
+    ]
 
     return {
         "headline": headline,
         "trace_type": trace_type,
+        "scenario": scenario,
         "a_party": a_party,
         "b_party": b_party,
+        "subscriber_imsi": subscriber,
         "top_protocols": top_protocols,
         "technologies_seen": technologies_seen,
+        "dominant_protocol": dominant_protocol,
+        "overview": overview,
+        "protocol_breakdown": protocol_breakdown,
+        "observations": observations,
+        "topology": topology,
         "summary_lines": [
             f"Primary trace type: {trace_type}",
+            f"Test scenario: {scenario}",
+            f"Capture window: {capture_window['window_label']}",
             f"Technologies observed: {', '.join(technologies_seen) if technologies_seen else 'Unknown'}",
             f"Dominant protocol: {dominant_protocol}",
+            f"Subscriber IMSI: {subscriber or 'Unknown'}",
             f"A-party: {a_party or 'Unknown'}",
             f"B-party: {b_party or 'Unknown'}",
             f"Sessions correlated: {len(sessions)}",
@@ -427,10 +487,21 @@ def build_session_details_summary(session: dict) -> dict:
     }
 
 
-def _extract_trace_parties(parsed: dict, sessions: list) -> tuple[str | None, str | None]:
+def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None = None) -> tuple[str | None, str | None]:
+    for packet in parsed.get("sip", []):
+        caller = _extract_number(packet.get("from_uri"))
+        callee = _extract_number(packet.get("to_uri"))
+        if caller or callee:
+            return caller or packet.get("src_ip"), callee or packet.get("dst_ip")
+
     for session in sessions:
         if session.get("calling") or session.get("called"):
             return session.get("calling"), session.get("called")
+
+    if subscriber:
+        for packet in parsed.get("diameter", []):
+            if packet.get("imsi") == subscriber or packet.get("msisdn"):
+                return packet.get("msisdn") or packet.get("src_ip"), packet.get("apn") or packet.get("dst_ip")
 
     for packet in parsed.get("map", []):
         if packet.get("msisdn") or packet.get("dst_ip"):
@@ -444,15 +515,18 @@ def _extract_trace_parties(parsed: dict, sessions: list) -> tuple[str | None, st
     return None, None
 
 
-def _infer_trace_type(protocol_counts: dict, technologies_seen: list) -> str:
-    if protocol_counts.get("MAP"):
-        return "MAP mobility/signalling trace"
-    if protocol_counts.get("SIP"):
+def _infer_trace_type(protocol_counts: dict, technologies_seen: list, protocol_breakdown: list | None = None) -> str:
+    top_family = (protocol_breakdown or [{}])[0].get("label", "") if protocol_breakdown else ""
+    if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
         return "IMS call trace"
+    if protocol_counts.get("NGAP") and protocol_counts.get("S1AP"):
+        return "Multi-RAT 5G/4G signalling trace"
     if protocol_counts.get("NGAP") or protocol_counts.get("PFCP"):
         return "5G signalling trace"
     if protocol_counts.get("S1AP") or protocol_counts.get("GTP"):
         return "LTE/4G signalling trace"
+    if protocol_counts.get("MAP") and top_family == "MAP":
+        return "MAP mobility/signalling trace"
     if protocol_counts.get("RANAP"):
         return "3G signalling trace"
     if protocol_counts.get("BSSAP"):
@@ -466,6 +540,278 @@ def _build_trace_headline(trace_type: str, top_protocols: list, technologies_see
     proto_summary = ", ".join(protocol for protocol, _count in top_protocols[:2]) if top_protocols else "no dominant protocol"
     tech_summary = ", ".join(technologies_seen[:3]) if technologies_seen else "unknown technologies"
     return f"{trace_type} with {proto_summary} activity across {tech_summary}"
+
+
+def _build_protocol_breakdown(parsed: dict) -> list[dict]:
+    total_frames = _total_unique_frames(parsed)
+    buckets = [
+        ("NGAP", parsed.get("ngap", []), "5G NR access signalling"),
+        ("S1AP", parsed.get("s1ap", []), "4G LTE access signalling"),
+        ("PFCP", parsed.get("pfcp", []), "User-plane session management"),
+        ("GTPv2", [packet for packet in parsed.get("gtp", []) if packet.get("gtpv2.message_type")], "Control-plane bearer and session setup"),
+        ("GTP-U", [packet for packet in parsed.get("gtp", []) if not packet.get("gtpv2.message_type")], "User-plane data tunnelling"),
+        ("SIP", parsed.get("sip", []), "IMS registration and voice signalling"),
+        ("Diameter", parsed.get("diameter", []), "AAA, policy, and charging"),
+        ("GSM MAP", parsed.get("map", []), "Legacy HLR/HSS interworking"),
+        ("TCP/SCTP", [*parsed.get("tcp", []), *parsed.get("sctp", [])], "Transport layer"),
+    ]
+
+    breakdown = []
+    for label, packets, purpose in buckets:
+        frames = _unique_frame_count(packets)
+        if frames <= 0:
+            continue
+        breakdown.append(
+            {
+                "label": label,
+                "frames": frames,
+                "percentage": round((frames / total_frames) * 100, 1) if total_frames else 0.0,
+                "purpose": purpose,
+            }
+        )
+    return breakdown
+
+
+def _capture_window(parsed: dict) -> dict:
+    timestamps = []
+    frame_numbers = set()
+    for packets in parsed.values():
+        if not isinstance(packets, list):
+            continue
+        for packet in packets:
+            timestamp = packet.get("timestamp")
+            if timestamp is not None:
+                try:
+                    timestamps.append(float(timestamp))
+                except (TypeError, ValueError):
+                    pass
+            frame_number = packet.get("frame_number")
+            if frame_number is not None:
+                frame_numbers.add(frame_number)
+
+    if not timestamps:
+        return {
+            "start": None,
+            "end": None,
+            "total_frames": len(frame_numbers),
+            "duration_seconds": 0.0,
+            "duration_label": "Unavailable",
+            "date_label": "Unavailable",
+            "window_label": "Unavailable",
+        }
+
+    start = min(timestamps)
+    end = max(timestamps)
+    start_dt = datetime.fromtimestamp(start, tz=timezone.utc)
+    end_dt = datetime.fromtimestamp(end, tz=timezone.utc)
+    duration_seconds = max(0.0, end - start)
+    return {
+        "start": start_dt,
+        "end": end_dt,
+        "total_frames": len(frame_numbers),
+        "duration_seconds": duration_seconds,
+        "duration_label": _format_duration(duration_seconds),
+        "date_label": start_dt.strftime("%B %-d, %Y") if hasattr(start_dt, "strftime") else "Unavailable",
+        "window_label": f"{start_dt.strftime('%H:%M:%S')} – {end_dt.strftime('%H:%M:%S')} UTC",
+    }
+
+
+def _build_key_observations(protocol_counts: dict, technology_counts: dict, protocol_breakdown: list, sessions: list) -> list[str]:
+    observations = []
+    if protocol_counts.get("NGAP") and protocol_counts.get("S1AP"):
+        observations.append("Dual radio access is visible, with both 5G NGAP and 4G S1AP signalling present in the same capture.")
+    if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
+        observations.append("The capture contains a full IMS control stack, including SIP signalling and Diameter-based subscriber, policy, or charging exchanges.")
+    if any(item["label"] == "GTP-U" and item["frames"] > 0 for item in protocol_breakdown):
+        observations.append("User-plane tunnelling is present through GTP-U, so the trace includes both control-plane setup and bearer-side traffic.")
+    if protocol_counts.get("PFCP") and any(item["label"] == "GTPv2" for item in protocol_breakdown):
+        observations.append("Core session control is visible through both PFCP and GTPv2, which is a strong indicator of end-to-end packet-core session orchestration.")
+    if protocol_counts.get("MAP"):
+        observations.append("Legacy SS7 or MAP interworking is present, which suggests HLR/HSS interoperability or subscriber-data lookup beyond pure EPC/5GC signalling.")
+    if len([tech for tech, count in technology_counts.items() if count > 0]) >= 4:
+        observations.append("This is a multi-interface capture spanning access, core control, IMS, and transport layers, which makes it suitable for end-to-end RCA.")
+    if not observations and sessions:
+        observations.append("The capture provides enough correlated telecom sessions to build a protocol-aware end-to-end service narrative.")
+    return observations[:5]
+
+
+def _build_topology_inference(parsed: dict, protocol_counts: dict, subscriber: str | None, calling_party: str | None, called_party: str | None) -> dict:
+    access_peer = _top_pair(parsed.get("ngap", []) or parsed.get("s1ap", []))
+    core_user_peer = _top_pair(parsed.get("pfcp", []) or parsed.get("gtp", []))
+    user_plane_peer = _top_pair([packet for packet in parsed.get("gtp", []) if not packet.get("gtpv2.message_type")])
+    ims_peer = _top_pair(parsed.get("sip", []))
+    diameter_peer = _top_pair(parsed.get("diameter", []))
+    upf_addr = user_plane_peer["src"] or user_plane_peer["dst"] or core_user_peer["src"]
+    smf_addr = core_user_peer["dst"] or core_user_peer["src"]
+    pcscf_addr = ims_peer["src"] or user_plane_peer["dst"]
+    icscf_addr = ims_peer["dst"] or diameter_peer["dst"]
+
+    nodes = [
+        {"role": "UE", "label": calling_party or subscriber or "Subscriber", "address": subscriber},
+        {"role": "gNB/eNB", "label": "gNB/eNB", "address": access_peer["src"]},
+        {"role": "AMF/MME", "label": "AMF/MME", "address": access_peer["dst"]},
+        {"role": "UPF/SGW", "label": "UPF/SGW", "address": upf_addr},
+        {"role": "SMF/PGW-C", "label": "SMF/PGW-C", "address": smf_addr},
+        {"role": "P-CSCF", "label": "P-CSCF", "address": pcscf_addr},
+        {"role": "I/S-CSCF", "label": "I/S-CSCF", "address": icscf_addr},
+        {"role": "Called Party", "label": called_party or "Called party", "address": called_party},
+    ]
+    lines = []
+    if calling_party or subscriber:
+        lines.append(f"UE ({calling_party or subscriber})")
+    if access_peer["src"] or access_peer["dst"]:
+        lines.append(f"gNB/eNB {_mask_ip(access_peer['src'])} -> NGAP/S1AP -> AMF/MME {_mask_ip(access_peer['dst'])}")
+    if upf_addr or smf_addr:
+        labels = []
+        if user_plane_peer["src"] or user_plane_peer["dst"]:
+            labels.append("GTP-U")
+        if core_user_peer["src"] or core_user_peer["dst"]:
+            labels.append("PFCP/GTPv2")
+        mid_label = " + ".join(labels) if labels else "User-plane control"
+        lines.append(f"UPF/SGW {_mask_ip(upf_addr)} <-> {mid_label} <-> SMF/PGW-C {_mask_ip(smf_addr)}")
+    if pcscf_addr or icscf_addr:
+        lines.append(f"P-CSCF {_mask_ip(pcscf_addr)} -> SIP -> I/S-CSCF {_mask_ip(icscf_addr)}")
+    if called_party:
+        lines.append(f"SIP INVITE -> {called_party}")
+    return {"nodes": nodes, "lines": lines[:5]}
+
+
+def _extract_primary_subscriber(parsed: dict, sessions: list) -> str | None:
+    for key in ("nas_eps", "map", "nas_5gs", "diameter", "gtp"):
+        for packet in parsed.get(key, []):
+            value = packet.get("imsi") or packet.get("gtpv2.imsi")
+            if _looks_like_imsi(value):
+                return str(value)
+    for session in sessions:
+        if _looks_like_imsi(session.get("imsi")):
+            return str(session["imsi"])
+    return None
+
+
+def _infer_dominant_protocol(protocol_breakdown: list, top_protocols: list) -> str:
+    if protocol_breakdown:
+        meaningful = [item for item in protocol_breakdown if item["label"] not in {"TCP/SCTP"}]
+        if meaningful:
+            return meaningful[0]["label"]
+    return top_protocols[0][0] if top_protocols else "UNKNOWN"
+
+
+def _infer_test_scenario(protocol_counts: dict, technologies_seen: list) -> str:
+    if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER") and (protocol_counts.get("NGAP") or protocol_counts.get("S1AP")):
+        return "IMS registration and mobile-originated VoIP call over a converged 5G/4G core"
+    if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
+        return "IMS registration and voice signalling validation"
+    if protocol_counts.get("PFCP") and protocol_counts.get("GTP"):
+        return "Packet-core session establishment and bearer validation"
+    if protocol_counts.get("NGAP") and protocol_counts.get("S1AP"):
+        return "Multi-RAT signalling and interworking validation"
+    return "Telecom signalling and service validation"
+
+
+def _infer_network_context(parsed: dict, technologies_seen: list) -> str:
+    if any(
+        str(packet.get("src_ip", "")).startswith("62.156.") or str(packet.get("dst_ip", "")).startswith("62.156.")
+        for packet in parsed.get("sip", [])
+    ):
+        return "Deutsche Telekom 5G/4G mobile core (IMS)"
+    if "IMS" in technologies_seen and ("5G" in technologies_seen or "LTE/4G" in technologies_seen):
+        return "5G/4G mobile core with IMS signalling"
+    if "5G" in technologies_seen:
+        return "5G mobile core signalling"
+    if "LTE/4G" in technologies_seen:
+        return "LTE/4G mobile core signalling"
+    return "Telecom core signalling environment"
+
+
+def _total_unique_frames(parsed: dict) -> int:
+    frames = set()
+    for packets in parsed.values():
+        if not isinstance(packets, list):
+            continue
+        for packet in packets:
+            frame = packet.get("frame_number")
+            if frame is not None:
+                frames.add(frame)
+    return len(frames)
+
+
+def _unique_frame_count(packets: list) -> int:
+    frames = {packet.get("frame_number") for packet in packets if packet.get("frame_number") is not None}
+    return len(frames)
+
+
+def _top_pair(packets: list) -> dict:
+    pairs = Counter()
+    for packet in packets:
+        src = packet.get("src_ip")
+        dst = packet.get("dst_ip")
+        if src and dst:
+            pairs[(src, dst)] += 1
+    if not pairs:
+        return {"src": None, "dst": None}
+    (src, dst), _count = pairs.most_common(1)[0]
+    return {"src": src, "dst": dst}
+
+
+def _extract_number(value: str | None) -> str | None:
+    if not value:
+        return None
+    text = str(value)
+    best = None
+    for token in text.replace("<", " ").replace(">", " ").replace(";", " ").replace(":", " ").split():
+        normalized = token.strip()
+        if normalized.startswith("tel="):
+            normalized = normalized[4:]
+        normalized = "".join(ch for ch in normalized if ch.isdigit() or ch == "+")
+        digit_count = len("".join(ch for ch in normalized if ch.isdigit()))
+        if 8 <= digit_count <= 15:
+            if normalized.startswith("+"):
+                return normalized
+            best = best or normalized
+    return best
+
+
+def _looks_like_imsi(value: str | None) -> bool:
+    if value is None:
+        return False
+    digits = "".join(ch for ch in str(value) if ch.isdigit())
+    return digits.isdigit() and len(digits) >= 14
+
+
+def _mask_ip(value: str | None) -> str:
+    if not value:
+        return "unknown"
+    if ":" in value:
+        parts = value.split(":")
+        return ":".join(parts[:3]) + ":x"
+    parts = value.split(".")
+    if len(parts) == 4:
+        return ".".join(parts[:3]) + ".x"
+    return value
+
+
+def _format_duration(seconds: float) -> str:
+    minutes = seconds / 60.0
+    if minutes >= 1:
+        return f"~{minutes:.1f} minutes"
+    return f"{seconds:.1f} seconds"
+
+
+def _format_file_size(size_bytes: int) -> str:
+    if size_bytes <= 0:
+        return "Unavailable"
+    size = float(size_bytes)
+    for unit in ("B", "KB", "MB", "GB"):
+        if size < 1024 or unit == "GB":
+            if unit == "B":
+                return f"{int(size)} {unit}"
+            return f"~{size:.1f} {unit}"
+        size /= 1024.0
+    return f"{size_bytes} B"
+
+
+def _format_int(value: int | float | None) -> str:
+    return f"{int(value or 0):,}"
 
 
 def _infer_session_type(session: dict) -> str:

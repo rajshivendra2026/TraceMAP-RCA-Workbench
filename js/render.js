@@ -1390,6 +1390,54 @@ function _renderDetails(details, isCaptureSummary) {
     return;
   }
 
+  if (isCaptureSummary) {
+    const overviewRows = (details.overview || [])
+      .map(([label, value]) => `
+        <div class="summary-table-row">
+          <span>${label}</span>
+          <strong>${value || "Unknown"}</strong>
+        </div>
+      `)
+      .join("");
+    const protocolRows = (details.protocol_breakdown || [])
+      .map(item => `
+        <div class="summary-table-row summary-table-row-protocol">
+          <span>${item.label}</span>
+          <strong>${item.frames} frames · ${item.percentage}%</strong>
+          <div class="summary-subtext">${item.purpose}</div>
+        </div>
+      `)
+      .join("");
+    const observations = (details.observations || [])
+      .map(line => `<li>${line}</li>`)
+      .join("");
+    const topology = (details.topology?.lines || [])
+      .map(line => `<div class="topology-line">${line}</div>`)
+      .join("");
+
+    el.innerHTML = `
+      <div class="capture-summary-sections">
+        <section class="summary-section">
+          <h4>PCAP Summary</h4>
+          <div class="summary-table">${overviewRows || '<div class="trace-summary-item">No overview available.</div>'}</div>
+        </section>
+        <section class="summary-section">
+          <h4>Protocol Breakdown</h4>
+          <div class="summary-table">${protocolRows || '<div class="trace-summary-item">No protocol breakdown available.</div>'}</div>
+        </section>
+        <section class="summary-section">
+          <h4>Key Observations</h4>
+          <ul class="bullet-list">${observations || "<li>No analyst observations available.</li>"}</ul>
+        </section>
+        <section class="summary-section">
+          <h4>Network Topology (Inferred)</h4>
+          <div class="topology-block">${topology || "No topology inference available."}</div>
+        </section>
+      </div>
+    `;
+    return;
+  }
+
   const lines = [];
   if (details.headline) lines.push(details.headline);
   if (details.summary_lines?.length) {
@@ -1412,6 +1460,8 @@ function _renderTraceOverview(details) {
 
   [
     details?.trace_type,
+    details?.scenario,
+    details?.subscriber_imsi ? `IMSI ${details.subscriber_imsi}` : null,
     details?.a_party ? `A ${details.a_party}` : null,
     details?.b_party ? `B ${details.b_party}` : null,
   ].filter(Boolean).forEach(value => {
