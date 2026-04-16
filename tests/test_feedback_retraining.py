@@ -60,6 +60,7 @@ class FeedbackRetrainingTests(unittest.TestCase):
         self.old_paths = {
             "TC_RCA__MODEL__RANKING_PATH": os.environ.get("TC_RCA__MODEL__RANKING_PATH"),
             "TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH": os.environ.get("TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"),
+            "TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED": os.environ.get("TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"),
         }
 
     def tearDown(self):
@@ -97,6 +98,7 @@ class FeedbackRetrainingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             os.environ["TC_RCA__MODEL__RANKING_PATH"] = os.path.join(tmpdir, "ranking.pkl")
             os.environ["TC_RCA__MODEL__CONFIDENCE_CALIBRATION_PATH"] = os.path.join(tmpdir, "confidence.pkl")
+            os.environ["TC_RCA__LEARNING__FEEDBACK_PROMOTION_ENABLED"] = "false"
             reload_config()
 
             knowledge = KnowledgeEngine(base_dir=tmpdir)
@@ -122,6 +124,7 @@ class FeedbackRetrainingTests(unittest.TestCase):
             self.assertTrue(result["retrained"])
             self.assertTrue(result["ranking"]["trained"])
             self.assertTrue(result["calibration"]["trained"])
+            self.assertIsNone(result["promotion"])
             sessions = build_feedback_training_sessions(Path(tmpdir) / "feedback_dataset.jsonl")
             self.assertEqual(len(sessions), 3)
 

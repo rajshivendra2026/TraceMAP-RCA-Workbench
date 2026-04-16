@@ -111,7 +111,11 @@ def build_confidence_training_rows(sessions: list[dict[str, Any]]) -> tuple[list
     return scores, labels
 
 
-def train_confidence_calibrator(sessions: list[dict[str, Any]]) -> dict[str, Any]:
+def train_confidence_calibrator(
+    sessions: list[dict[str, Any]],
+    *,
+    model_path: str | Path | None = None,
+) -> dict[str, Any]:
     scores, labels = build_confidence_training_rows(sessions)
     used_bootstrap_anchors = False
     if scores and len(set(labels)) < 2:
@@ -127,7 +131,7 @@ def train_confidence_calibrator(sessions: list[dict[str, Any]]) -> dict[str, Any
         }
 
     calibrator = ConfidenceCalibrator().fit(scores, labels)
-    target = calibration_model_path()
+    target = Path(model_path) if model_path is not None else calibration_model_path()
     model = calibrator._model
     payload = {
         "thresholds_x": [float(value) for value in getattr(model, "X_thresholds_", [])],

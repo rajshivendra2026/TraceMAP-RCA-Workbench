@@ -171,6 +171,12 @@ learning:
   feedback_retrain_enabled: true
   feedback_min_samples: 3
   feedback_dataset_path: "data/knowledge_base/feedback_dataset.jsonl"
+  feedback_promotion_enabled: true
+  feedback_candidate_dir: "data/models/candidates"
+  feedback_min_candidate_pass_rate: 1.0
+  feedback_max_pass_rate_drop: 0.0
+  feedback_max_failed_case_increase: 0
+  feedback_max_avg_abnormal_priority_drop: 3.0
 
 
 # ============================================================

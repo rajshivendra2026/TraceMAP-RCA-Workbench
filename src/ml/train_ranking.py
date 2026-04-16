@@ -106,7 +106,11 @@ def _fit_model(matrix: list[list[float]], labels: list[float]) -> tuple[object |
     return None, None
 
 
-def train_ranking_model(sessions: list[dict[str, Any]]) -> dict[str, Any]:
+def train_ranking_model(
+    sessions: list[dict[str, Any]],
+    *,
+    model_path: str | Path | None = None,
+) -> dict[str, Any]:
     rows, labels = build_training_rows(sessions)
     names = feature_names()
     matrix = [[row.get(name, 0.0) for name in names] for row in rows]
@@ -118,7 +122,7 @@ def train_ranking_model(sessions: list[dict[str, Any]]) -> dict[str, Any]:
             "row_count": len(rows),
         }
 
-    target = ranking_model_path()
+    target = Path(model_path) if model_path is not None else ranking_model_path()
     metadata = {
         "model": model,
         "features": names,

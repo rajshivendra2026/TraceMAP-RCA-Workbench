@@ -22,8 +22,23 @@ def compute_session_metrics(sessions: list[dict[str, Any]]) -> dict[str, Any]:
     session_count = len(sessions)
     unknown_count = int(label_counts.get("UNKNOWN", 0))
     abnormal_count = sum(count for label, count in label_counts.items() if label != "NORMAL_CALL")
+    priority_scores = [float(session.get("priority_score", 0) or 0) for session in sessions]
+    abnormal_priorities = [
+        float(session.get("priority_score", 0) or 0)
+        for session in sessions
+        if _session_label(session) != "NORMAL_CALL"
+    ]
+    confidence_scores = [
+        float(
+            session.get("confidence")
+            or (session.get("hybrid_rca") or {}).get("confidence_pct")
+            or (session.get("rca") or {}).get("confidence_pct")
+            or 0
+        )
+        for session in sessions
+    ]
     top_priority = max(
-        (float(session.get("priority_score", 0) or 0) for session in sessions),
+        priority_scores,
         default=0.0,
     )
     return {
@@ -34,6 +49,9 @@ def compute_session_metrics(sessions: list[dict[str, Any]]) -> dict[str, Any]:
         "abnormal_count": abnormal_count,
         "top_label": label_counts.most_common(1)[0][0] if label_counts else "UNKNOWN",
         "top_priority_score": round(top_priority, 2),
+        "avg_priority_score": round((sum(priority_scores) / len(priority_scores)) if priority_scores else 0.0, 2),
+        "avg_abnormal_priority_score": round((sum(abnormal_priorities) / len(abnormal_priorities)) if abnormal_priorities else 0.0, 2),
+        "avg_confidence_pct": round((sum(confidence_scores) / len(confidence_scores)) if confidence_scores else 0.0, 2),
     }
 
 
