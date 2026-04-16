@@ -1408,6 +1408,24 @@ function _renderDetails(details, isCaptureSummary) {
         </div>
       `)
       .join("");
+    const identityRows = (details.subscriber_identity || [])
+      .map(item => `
+        <div class="summary-table-row summary-table-row-identity">
+          <span>${item.label}</span>
+          <strong>${item.value || "Unknown"}</strong>
+          <div class="summary-subtext">${item.source || "Unavailable"} · ${String(item.confidence || "low").toUpperCase()} confidence</div>
+        </div>
+      `)
+      .join("");
+    const nodeRows = (details.node_inventory || [])
+      .map(item => `
+        <div class="summary-table-row summary-table-row-node">
+          <span>${item.role}</span>
+          <strong>${item.ip || "Unknown"}</strong>
+          <div class="summary-subtext">${(item.protocols || []).join(", ") || "No protocol evidence"} · ${item.evidence || "No supporting evidence"} · ${String(item.confidence || "low").toUpperCase()} confidence</div>
+        </div>
+      `)
+      .join("");
     const observations = (details.observations || [])
       .map(line => `<li>${line}</li>`)
       .join("");
@@ -1422,8 +1440,16 @@ function _renderDetails(details, isCaptureSummary) {
           <div class="summary-table">${overviewRows || '<div class="trace-summary-item">No overview available.</div>'}</div>
         </section>
         <section class="summary-section">
+          <h4>Subscriber Identity</h4>
+          <div class="summary-table">${identityRows || '<div class="trace-summary-item">No subscriber identity available.</div>'}</div>
+        </section>
+        <section class="summary-section">
           <h4>Protocol Breakdown</h4>
           <div class="summary-table">${protocolRows || '<div class="trace-summary-item">No protocol breakdown available.</div>'}</div>
+        </section>
+        <section class="summary-section">
+          <h4>Detected Network Nodes</h4>
+          <div class="summary-table">${nodeRows || '<div class="trace-summary-item">No node inventory available.</div>'}</div>
         </section>
         <section class="summary-section">
           <h4>Key Observations</h4>

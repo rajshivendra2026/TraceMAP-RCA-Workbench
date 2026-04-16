@@ -907,11 +907,21 @@ button:hover {
   grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
 }
 
+.summary-table-row-identity,
+.summary-table-row-node {
+  grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+}
+
 .summary-subtext {
   grid-column: 2;
   color: var(--text-soft);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.summary-table-row-node strong {
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 13px;
 }
 
 .topology-block {

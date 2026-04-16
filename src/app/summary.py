@@ -421,6 +421,8 @@ def build_trace_details_summary(
         protocol_breakdown=protocol_breakdown,
         sessions=sessions,
     )
+    subscriber_identity = _build_subscriber_identity(parsed, sessions, subscriber, a_party, b_party)
+    node_inventory = _build_node_inventory(parsed, protocol_counts)
     topology = _build_topology_inference(parsed, protocol_counts, subscriber, a_party, b_party)
     file_name = capture_meta.get("filename")
     file_size_bytes = int(capture_meta.get("size_bytes", 0) or 0)
@@ -448,6 +450,8 @@ def build_trace_details_summary(
         "technologies_seen": technologies_seen,
         "dominant_protocol": dominant_protocol,
         "overview": overview,
+        "subscriber_identity": subscriber_identity,
+        "node_inventory": node_inventory,
         "protocol_breakdown": protocol_breakdown,
         "observations": observations,
         "topology": topology,
@@ -485,6 +489,141 @@ def build_session_details_summary(session: dict) -> dict:
             f"Flow summary: {session.get('flow_summary') or 'Unavailable'}",
         ],
     }
+
+
+def _build_subscriber_identity(parsed: dict, sessions: list, subscriber: str | None, calling_party: str | None, called_party: str | None) -> list[dict]:
+    msisdn = None
+    msisdn_sources = []
+
+    if calling_party and calling_party.startswith("+"):
+        msisdn = calling_party
+        msisdn_sources.append("SIP From")
+
+    for packet in parsed.get("diameter", []):
+        value = _extract_number(packet.get("msisdn"))
+        if value:
+            msisdn = msisdn or value
+            msisdn_sources.append("Diameter")
+            break
+
+    for packet in parsed.get("map", []):
+        value = _extract_number(packet.get("msisdn"))
+        if value:
+            msisdn = msisdn or value
+            msisdn_sources.append("MAP")
+            break
+
+    confidence = "high" if subscriber and msisdn else "medium" if subscriber or msisdn else "low"
+    records = [
+        {
+            "label": "IMSI",
+            "value": subscriber or "Unknown",
+            "source": _subscriber_sources(parsed, sessions),
+            "confidence": "high" if subscriber else "low",
+        },
+        {
+            "label": "MSISDN",
+            "value": msisdn or "Unknown",
+            "source": ", ".join(dict.fromkeys(msisdn_sources)) or "Unavailable",
+            "confidence": "medium" if msisdn else "low",
+        },
+        {
+            "label": "Calling Party",
+            "value": calling_party or "Unknown",
+            "source": "SIP / session correlation" if calling_party else "Unavailable",
+            "confidence": "high" if calling_party else "low",
+        },
+        {
+            "label": "Called Party",
+            "value": called_party or "Unknown",
+            "source": "SIP / session correlation" if called_party else "Unavailable",
+            "confidence": "high" if called_party else "low",
+        },
+        {
+            "label": "Subscriber Confidence",
+            "value": confidence.title(),
+            "source": "Identity synthesis",
+            "confidence": confidence,
+        },
+    ]
+    return records
+
+
+def _build_node_inventory(parsed: dict, protocol_counts: dict) -> list[dict]:
+    nodes = []
+    seen = set()
+
+    def add_node(role: str, ip: str | None, protocols: list[str], evidence: str, confidence: str) -> None:
+        key = (role, ip)
+        if not ip or key in seen:
+            return
+        seen.add(key)
+        nodes.append(
+            {
+                "role": role,
+                "ip": ip,
+                "protocols": protocols,
+                "evidence": evidence,
+                "confidence": confidence,
+            }
+        )
+
+    ngap_pair = _top_pair(parsed.get("ngap", []))
+    s1ap_pair = _top_pair(parsed.get("s1ap", []))
+    pfcp_pair = _top_pair(parsed.get("pfcp", []))
+    gtpv2_pair = _top_pair([packet for packet in parsed.get("gtp", []) if packet.get("gtpv2.message_type")])
+    gtpu_pair = _top_pair([packet for packet in parsed.get("gtp", []) if not packet.get("gtpv2.message_type")])
+    sip_pair = _top_pair(parsed.get("sip", []))
+    diameter_pair = _top_pair(parsed.get("diameter", []))
+
+    add_node("gNB", ngap_pair["src"], ["NGAP"], "Top NGAP source endpoint", "high" if ngap_pair["src"] else "low")
+    add_node("AMF", ngap_pair["dst"], ["NGAP"], "Top NGAP destination endpoint", "high" if ngap_pair["dst"] else "low")
+
+    add_node("eNB", s1ap_pair["src"], ["S1AP"], "Top S1AP source endpoint", "high" if s1ap_pair["src"] else "low")
+    mme_confidence = "high" if s1ap_pair["dst"] and diameter_pair["src"] == s1ap_pair["dst"] else "medium"
+    mme_evidence = "S1AP control endpoint with Diameter adjacency" if mme_confidence == "high" else "Top S1AP destination endpoint"
+    add_node("MME", s1ap_pair["dst"], ["S1AP", "Diameter"] if mme_confidence == "high" else ["S1AP"], mme_evidence, mme_confidence)
+
+    smf_ip = pfcp_pair["dst"] or gtpv2_pair["dst"]
+    upf_ip = gtpu_pair["src"] or pfcp_pair["src"]
+    add_node("SMF/PGW-C", smf_ip, [p for p in ["PFCP", "GTPv2"] if protocol_counts.get(p.upper() if p != "GTPv2" else "GTP")], "PFCP/GTPv2 control-plane endpoint", "high" if pfcp_pair["dst"] else "medium")
+    add_node("UPF/SGW", upf_ip, ["GTP-U", "PFCP"], "User-plane endpoint participating in GTP-U and PFCP", "high" if gtpu_pair["src"] and pfcp_pair["src"] else "medium")
+
+    pcscf_confidence = "high" if sip_pair["src"] else "low"
+    add_node("P-CSCF", sip_pair["src"], ["SIP"], "Top SIP ingress/core-facing endpoint", pcscf_confidence)
+
+    icscf_ip = sip_pair["dst"] or diameter_pair["dst"]
+    icscf_protocols = ["SIP"]
+    if diameter_pair["dst"] == icscf_ip and icscf_ip:
+        icscf_protocols.append("Diameter")
+    add_node("I/S-CSCF", icscf_ip, icscf_protocols, "SIP core endpoint with optional Diameter adjacency", "high" if sip_pair["dst"] else "medium")
+
+    if diameter_pair["dst"] and diameter_pair["dst"] not in seen:
+        add_node("HSS/PCRF", diameter_pair["dst"], ["Diameter"], "Diameter peer carrying subscriber or policy state", "medium")
+
+    if protocol_counts.get("MAP"):
+        map_pair = _top_pair(parsed.get("map", []))
+        add_node("HLR/HSS", map_pair["dst"], ["MAP"], "MAP signalling peer suggesting legacy subscriber-data interworking", "medium")
+
+    return nodes
+
+
+def _subscriber_sources(parsed: dict, sessions: list) -> str:
+    sources = []
+    for key, label in (
+        ("nas_eps", "NAS_EPS"),
+        ("nas_5gs", "NAS_5GS"),
+        ("map", "MAP"),
+        ("diameter", "Diameter"),
+        ("gtp", "GTPv2"),
+    ):
+        for packet in parsed.get(key, []):
+            if _looks_like_imsi(packet.get("imsi") or packet.get("gtpv2.imsi")):
+                sources.append(label)
+                break
+    if not sources and any(_looks_like_imsi(session.get("imsi")) for session in sessions):
+        sources.append("Session correlation")
+    return ", ".join(sources) or "Unavailable"
 
 
 def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None = None) -> tuple[str | None, str | None]:

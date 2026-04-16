@@ -170,6 +170,60 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertEqual(session_payload["confidence_band"], "high")
         self.assertEqual(session_payload["calibration_source"], "isotonic")
 
+    def test_capture_summary_includes_subscriber_identity_and_node_inventory(self):
+        parsed = {
+            "sip": [
+                {
+                    "from_uri": "sip:+4915167536469@ims.example.net",
+                    "to_uri": "sip:+491706543966@ims.example.net",
+                    "src_ip": "62.156.115.252",
+                    "dst_ip": "62.156.113.12",
+                    "frame_number": 1,
+                }
+            ],
+            "diameter": [
+                {
+                    "imsi": "262011905251670",
+                    "msisdn": "+4915167536469",
+                    "src_ip": "10.114.0.6",
+                    "dst_ip": "10.114.1.10",
+                    "frame_number": 2,
+                }
+            ],
+            "ngap": [{"src_ip": "10.69.230.79", "dst_ip": "10.114.0.6", "frame_number": 3}],
+            "s1ap": [{"src_ip": "10.69.230.80", "dst_ip": "10.114.0.6", "frame_number": 4}],
+            "gtp": [
+                {"src_ip": "10.114.5.143", "dst_ip": "10.112.189.225", "frame_number": 5},
+                {"src_ip": "10.100.196.40", "dst_ip": "10.100.196.153", "gtpv2.message_type": "32", "frame_number": 6},
+            ],
+            "pfcp": [{"src_ip": "10.100.196.40", "dst_ip": "10.100.196.153", "frame_number": 7}],
+            "map": [],
+            "inap": [],
+            "ranap": [],
+            "bssap": [],
+            "http": [],
+            "tcp": [],
+            "udp": [],
+            "sctp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [{"imsi": "262011905251670", "frame_number": 8}],
+            "nas_5gs": [],
+        }
+
+        summary = build_capture_summary(parsed, [])
+        identity = {item["label"]: item for item in summary["details"]["subscriber_identity"]}
+        self.assertEqual(identity["IMSI"]["value"], "262011905251670")
+        self.assertEqual(identity["MSISDN"]["value"], "+4915167536469")
+        self.assertEqual(identity["Calling Party"]["value"], "+4915167536469")
+        self.assertEqual(identity["Called Party"]["value"], "+491706543966")
+
+        roles = {item["role"] for item in summary["details"]["node_inventory"]}
+        self.assertIn("MME", roles)
+        self.assertIn("UPF/SGW", roles)
+        self.assertIn("SMF/PGW-C", roles)
+        self.assertIn("P-CSCF", roles)
+
 
 if __name__ == "__main__":
     unittest.main()
