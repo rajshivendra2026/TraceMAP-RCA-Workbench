@@ -1346,8 +1346,8 @@ function _renderConfidenceModel(model) {
   const scores = model.source_scores || {};
   const rows = [
     ["Final Label", model.final_label || "UNKNOWN"],
-    ["Calibrated Confidence", `${Math.round((Number(model.calibrated_confidence_score ?? model.confidence_score || 0)) * 100)}%`],
-    ["Raw Confidence", `${Math.round((Number(model.raw_confidence_score ?? model.confidence_score || 0)) * 100)}%`],
+    ["Calibrated Confidence", `${Math.round((Number(model.calibrated_confidence_score ?? model.confidence_score ?? 0)) * 100)}%`],
+    ["Raw Confidence", `${Math.round((Number(model.raw_confidence_score ?? model.confidence_score ?? 0)) * 100)}%`],
     ["Band", String(model.confidence_band || "uncalibrated").toUpperCase()],
     ["Source", model.calibration_source || "uncalibrated"],
     ["Uncertainty", `${Math.round((Number(model.uncertainty || 0)) * 100)}%`],
