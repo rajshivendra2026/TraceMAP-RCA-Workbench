@@ -1175,7 +1175,7 @@ function _formatLadderDetails(f) {
       lines.push(`Result       ${details.result_code || "—"} ${details.result_text || ""}`.trim());
     }
     if (details.cc_request_type || details.cc_request_number != null) {
-      lines.push(`CC Request   ${(details.cc_request_type || "—")} #${details.cc_request_number ?? "—"}`);
+      lines.push(`CC Request   ${(details.cc_request_type ?? "—")} #${details.cc_request_number ?? "—"}`);
     }
     if (details.diameter_interface) lines.push(`Interface    ${details.diameter_interface}`);
     if (details.origin_host || details.origin_realm) {
