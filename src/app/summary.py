@@ -1,6 +1,38 @@
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+import re
+
+
+PLMN_NETWORKS = {
+    "262001": "Deutsche Telekom Germany",
+    "26201": "Deutsche Telekom Germany",
+    "262002": "Vodafone Germany",
+    "26202": "Vodafone Germany",
+    "262003": "O2 Germany",
+    "26203": "O2 Germany",
+    "262007": "O2 Germany",
+    "26207": "O2 Germany",
+}
+
+GERMAN_MSISDN_PREFIX_NETWORKS = {
+    "151": "Deutsche Telekom Germany",
+    "160": "Deutsche Telekom Germany",
+    "170": "Deutsche Telekom Germany",
+    "171": "Deutsche Telekom Germany",
+    "175": "Deutsche Telekom Germany",
+    "152": "Vodafone Germany",
+    "162": "Vodafone Germany",
+    "172": "Vodafone Germany",
+    "173": "Vodafone Germany",
+    "174": "Vodafone Germany",
+    "157": "O2 Germany",
+    "163": "O2 Germany",
+    "176": "O2 Germany",
+    "177": "O2 Germany",
+    "178": "O2 Germany",
+    "179": "O2 Germany",
+}
 
 
 def build_capture_graph(parsed: dict) -> dict:
@@ -421,7 +453,7 @@ def build_trace_details_summary(
         protocol_breakdown=protocol_breakdown,
         sessions=sessions,
     )
-    subscriber_identity = _build_subscriber_identity(parsed, sessions, subscriber, a_party, b_party)
+    party_identities = _build_party_identities(parsed, sessions, subscriber, a_party, b_party)
     node_inventory = _build_node_inventory(parsed, protocol_counts)
     topology = _build_topology_inference(parsed, protocol_counts, subscriber, a_party, b_party)
     file_name = capture_meta.get("filename")
@@ -434,9 +466,8 @@ def build_trace_details_summary(
         ("Total Packets", _format_int(capture_window["total_frames"])),
         ("Network", _infer_network_context(parsed, technologies_seen)),
         ("Test Scenario", scenario),
-        ("Subscriber IMSI", subscriber or "Unknown"),
-        ("Calling Party", a_party or "Unknown"),
-        ("Called Party", b_party or "Unknown"),
+        ("A-party", _format_party_identity_summary(party_identities[0]) if party_identities else (a_party or "Unknown")),
+        ("B-party", _format_party_identity_summary(party_identities[1]) if len(party_identities) > 1 else (b_party or "Unknown")),
     ]
 
     return {
@@ -450,7 +481,7 @@ def build_trace_details_summary(
         "technologies_seen": technologies_seen,
         "dominant_protocol": dominant_protocol,
         "overview": overview,
-        "subscriber_identity": subscriber_identity,
+        "party_identities": party_identities,
         "node_inventory": node_inventory,
         "protocol_breakdown": protocol_breakdown,
         "observations": observations,
@@ -461,9 +492,8 @@ def build_trace_details_summary(
             f"Capture window: {capture_window['window_label']}",
             f"Technologies observed: {', '.join(technologies_seen) if technologies_seen else 'Unknown'}",
             f"Dominant protocol: {dominant_protocol}",
-            f"Subscriber IMSI: {subscriber or 'Unknown'}",
-            f"A-party: {a_party or 'Unknown'}",
-            f"B-party: {b_party or 'Unknown'}",
+            f"A-party: {_format_party_identity_summary(party_identities[0]) if party_identities else (a_party or 'Unknown')}",
+            f"B-party: {_format_party_identity_summary(party_identities[1]) if len(party_identities) > 1 else (b_party or 'Unknown')}",
             f"Sessions correlated: {len(sessions)}",
         ],
     }
@@ -491,62 +521,32 @@ def build_session_details_summary(session: dict) -> dict:
     }
 
 
-def _build_subscriber_identity(parsed: dict, sessions: list, subscriber: str | None, calling_party: str | None, called_party: str | None) -> list[dict]:
-    msisdn = None
-    msisdn_sources = []
+def _build_party_identities(parsed: dict, sessions: list, subscriber: str | None, calling_party: str | None, called_party: str | None) -> list[dict]:
+    a_imsi = subscriber
+    b_imsi = _find_related_imsi(parsed, called_party)
+    a_network = _infer_party_network(parsed, calling_party, a_imsi)
+    b_network = _infer_party_network(parsed, called_party, b_imsi)
 
-    if calling_party and calling_party.startswith("+"):
-        msisdn = calling_party
-        msisdn_sources.append("SIP From")
-
-    for packet in parsed.get("diameter", []):
-        value = _extract_number(packet.get("msisdn"))
-        if value:
-            msisdn = msisdn or value
-            msisdn_sources.append("Diameter")
-            break
-
-    for packet in parsed.get("map", []):
-        value = _extract_number(packet.get("msisdn"))
-        if value:
-            msisdn = msisdn or value
-            msisdn_sources.append("MAP")
-            break
-
-    confidence = "high" if subscriber and msisdn else "medium" if subscriber or msisdn else "low"
-    records = [
+    return [
         {
-            "label": "IMSI",
-            "value": subscriber or "Unknown",
+            "label": "A-party",
+            "msisdn": calling_party or "Unknown",
+            "imsi": a_imsi or "Not observed",
+            "network": a_network["name"],
+            "network_source": a_network["source"],
             "source": _subscriber_sources(parsed, sessions),
-            "confidence": "high" if subscriber else "low",
+            "confidence": "high" if a_imsi and calling_party else "medium" if calling_party else "low",
         },
         {
-            "label": "MSISDN",
-            "value": msisdn or "Unknown",
-            "source": ", ".join(dict.fromkeys(msisdn_sources)) or "Unavailable",
-            "confidence": "medium" if msisdn else "low",
-        },
-        {
-            "label": "Calling Party",
-            "value": calling_party or "Unknown",
-            "source": "SIP / session correlation" if calling_party else "Unavailable",
-            "confidence": "high" if calling_party else "low",
-        },
-        {
-            "label": "Called Party",
-            "value": called_party or "Unknown",
-            "source": "SIP / session correlation" if called_party else "Unavailable",
-            "confidence": "high" if called_party else "low",
-        },
-        {
-            "label": "Subscriber Confidence",
-            "value": confidence.title(),
-            "source": "Identity synthesis",
-            "confidence": confidence,
+            "label": "B-party",
+            "msisdn": called_party or "Unknown",
+            "imsi": b_imsi or "Not observed",
+            "network": b_network["name"],
+            "network_source": b_network["source"],
+            "source": "SIP destination / called party" if called_party else "Unavailable",
+            "confidence": "medium" if b_imsi else ("low" if called_party else "low"),
         },
     ]
-    return records
 
 
 def _build_node_inventory(parsed: dict, protocol_counts: dict) -> list[dict]:
@@ -624,6 +624,98 @@ def _subscriber_sources(parsed: dict, sessions: list) -> str:
     if not sources and any(_looks_like_imsi(session.get("imsi")) for session in sessions):
         sources.append("Session correlation")
     return ", ".join(sources) or "Unavailable"
+
+
+def _find_related_imsi(parsed: dict, msisdn: str | None) -> str | None:
+    if not msisdn:
+        return None
+    normalized_msisdn = _normalize_msisdn(msisdn)
+    if not normalized_msisdn:
+        return None
+
+    for packet in parsed.get("diameter", []):
+        packet_msisdn = _normalize_msisdn(packet.get("msisdn"))
+        if packet_msisdn and packet_msisdn == normalized_msisdn and _looks_like_imsi(packet.get("imsi")):
+            return str(packet.get("imsi"))
+
+    for packet in parsed.get("map", []):
+        packet_msisdn = _normalize_msisdn(packet.get("msisdn"))
+        if packet_msisdn and normalized_msisdn.endswith(packet_msisdn[-len(packet_msisdn):]) and _looks_like_imsi(packet.get("imsi")):
+            return str(packet.get("imsi"))
+
+    return None
+
+
+def _infer_party_network(parsed: dict, msisdn: str | None, imsi: str | None) -> dict:
+    plmn_hint = _extract_party_plmn_hint(parsed, msisdn, imsi)
+    if plmn_hint:
+        plmn = plmn_hint["plmn"]
+        return {
+            "name": PLMN_NETWORKS.get(plmn, f"PLMN {plmn[:3]}-{plmn[3:]}"),
+            "source": f"{plmn_hint['source']} {plmn[:3]}-{plmn[3:]}",
+        }
+
+    normalized = _normalize_msisdn(msisdn)
+    if normalized and normalized.startswith("49") and len(normalized) >= 5:
+        prefix = normalized[2:5]
+        network = GERMAN_MSISDN_PREFIX_NETWORKS.get(prefix)
+        if network:
+            return {
+                "name": f"{network} (heuristic)",
+                "source": f"MSISDN prefix +49 {prefix}; number portability may apply",
+            }
+
+    return {"name": "Unknown", "source": "No MCC/MNC or trusted operator hint observed"}
+
+
+def _extract_party_plmn_hint(parsed: dict, msisdn: str | None, imsi: str | None) -> dict | None:
+    hints = []
+    pattern = re.compile(r"mnc(\d{2,3})\.mcc(\d{3})", re.IGNORECASE)
+    msisdn_digits = _normalize_msisdn(msisdn)
+    for packet in parsed.get("sip", []):
+        for field in ("from_uri", "to_uri", "uri", "host"):
+            value = packet.get(field)
+            if not value:
+                continue
+            text = str(value)
+            if imsi and imsi not in text and not (msisdn_digits and msisdn_digits[-10:] in "".join(ch for ch in text if ch.isdigit())):
+                continue
+            match = pattern.search(text)
+            if match:
+                mnc, mcc = match.group(1), match.group(2)
+                hints.append({"plmn": f"{mcc}{mnc}", "source": "SIP routing domain MCC/MNC"})
+    if hints:
+        if imsi:
+            for hint in hints:
+                if str(imsi).startswith(hint["plmn"]):
+                    return hint
+        return hints[0]
+
+    if imsi and _looks_like_imsi(imsi):
+        digits = "".join(ch for ch in str(imsi) if ch.isdigit())
+        for mnc_len in (3, 2):
+            candidate = digits[: 3 + mnc_len]
+            if candidate in PLMN_NETWORKS:
+                return {"plmn": candidate, "source": "IMSI MCC/MNC"}
+    return None
+
+
+def _normalize_msisdn(value: str | None) -> str | None:
+    if not value:
+        return None
+    digits = "".join(ch for ch in str(value) if ch.isdigit())
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if digits.startswith("0") and len(digits) >= 10:
+        digits = f"49{digits[1:]}"
+    return digits or None
+
+
+def _format_party_identity_summary(party: dict) -> str:
+    msisdn = party.get("msisdn") or "Unknown"
+    imsi = party.get("imsi") or "Not observed"
+    network = party.get("network") or "Unknown"
+    return f"{msisdn} · IMSI {imsi} · {network}"
 
 
 def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None = None) -> tuple[str | None, str | None]:

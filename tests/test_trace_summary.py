@@ -212,11 +212,12 @@ class TraceSummaryTests(unittest.TestCase):
         }
 
         summary = build_capture_summary(parsed, [])
-        identity = {item["label"]: item for item in summary["details"]["subscriber_identity"]}
-        self.assertEqual(identity["IMSI"]["value"], "262011905251670")
-        self.assertEqual(identity["MSISDN"]["value"], "+4915167536469")
-        self.assertEqual(identity["Calling Party"]["value"], "+4915167536469")
-        self.assertEqual(identity["Called Party"]["value"], "+491706543966")
+        identities = {item["label"]: item for item in summary["details"]["party_identities"]}
+        self.assertEqual(identities["A-party"]["msisdn"], "+4915167536469")
+        self.assertEqual(identities["A-party"]["imsi"], "262011905251670")
+        self.assertIn("Deutsche Telekom Germany", identities["A-party"]["network"])
+        self.assertEqual(identities["B-party"]["msisdn"], "+491706543966")
+        self.assertEqual(identities["B-party"]["imsi"], "Not observed")
 
         roles = {item["role"] for item in summary["details"]["node_inventory"]}
         self.assertIn("MME", roles)

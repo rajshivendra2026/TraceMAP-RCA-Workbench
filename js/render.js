@@ -1408,11 +1408,13 @@ function _renderDetails(details, isCaptureSummary) {
         </div>
       `)
       .join("");
-    const identityRows = (details.subscriber_identity || [])
+    const identityRows = (details.party_identities || [])
       .map(item => `
         <div class="summary-table-row summary-table-row-identity">
           <span>${item.label}</span>
-          <strong>${item.value || "Unknown"}</strong>
+          <strong>${item.msisdn || "Unknown"}</strong>
+          <div class="summary-subtext">IMSI: ${item.imsi || "Not observed"}</div>
+          <div class="summary-subtext">Network: ${item.network || "Unknown"} (${item.network_source || "Unavailable"})</div>
           <div class="summary-subtext">${item.source || "Unavailable"} · ${String(item.confidence || "low").toUpperCase()} confidence</div>
         </div>
       `)
