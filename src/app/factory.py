@@ -83,8 +83,27 @@ def create_app() -> Flask:
         cfg("server.max_upload_mb", 500) * 1024 * 1024
     )
 
-    cors_origins = cfg("server.cors_origins", ["*"])
+    cors_origins = cfg("server.cors_origins", ["http://localhost:5050", "http://127.0.0.1:5050"])
     CORS(app, resources={r"/api/*": {"origins": cors_origins}, r"/upload": {"origins": cors_origins}})
+
+    @app.before_request
+    def require_api_auth():
+        if request.method == "OPTIONS":
+            return None
+        if request.path in {"/", "/health"} or request.path.startswith("/css/") or request.path.startswith("/js/"):
+            return None
+        if not (request.path.startswith("/api/") or request.path == "/upload"):
+            return None
+
+        token = str(cfg("auth.token", "") or "").strip()
+        if not token:
+            return None
+
+        provided = _request_auth_token()
+        if provided == token:
+            return None
+
+        return jsonify({"error": "Unauthorized"}), 401
 
     @app.errorhandler(RequestEntityTooLarge)
     def handle_upload_too_large(_exc):
@@ -374,6 +393,21 @@ def build_upload_path(original_name: str) -> Path:
 def is_allowed_pcap(filename: str) -> bool:
     allowed = {ext.lower() for ext in cfg("server.allowed_extensions", [".pcap", ".pcapng", ".cap"])}
     return Path(filename).suffix.lower() in allowed
+
+
+def _request_auth_token() -> str | None:
+    auth_header = (request.headers.get("Authorization") or "").strip()
+    if auth_header.lower().startswith("bearer "):
+        candidate = auth_header[7:].strip()
+        if candidate:
+            return candidate
+
+    for header_name in ("X-API-Key", "X-Auth-Token"):
+        candidate = (request.headers.get(header_name) or "").strip()
+        if candidate:
+            return candidate
+
+    return None
 
 
 def system_status() -> dict:

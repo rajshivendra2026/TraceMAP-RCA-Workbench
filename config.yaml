@@ -74,7 +74,11 @@ server:
   session_ttl_sec: 3600
   max_cached_uploads: 20
   cors_origins:
-    - "*"
+    - "http://localhost:5050"
+    - "http://127.0.0.1:5050"
+
+auth:
+  token: ""
 
 
 # ============================================================
