@@ -20,7 +20,7 @@ It is designed to improve continuously:
 ### Standout Capabilities
 
 - Mixed telecom coverage across `2G`, `3G`, `4G/LTE`, `5G`, and `IMS`
-- Cross-protocol RCA over `SIP`, `Diameter`, `INAP`, `NGAP`, `S1AP`, `RANAP`, `MAP`, `NAS_EPS`, `NAS_5GS`, `GTP`, `PFCP`, `TCP`, `UDP`, and `SCTP`
+- Cross-protocol RCA over `SIP`, `Diameter`, `RADIUS`, `INAP`, `NGAP`, `S1AP`, `RANAP`, `MAP`, `NAS_EPS`, `NAS_5GS`, `GTP`, `PFCP`, `TCP`, `UDP`, and `SCTP`
 - Session compaction and stitching for fragmented mobility and inter-RAT procedures
 - Hybrid RCA that combines deterministic rules with autonomous reasoning signals
 - Persistent seed knowledge with knowledge graph, vectors, metrics, and time-series memory

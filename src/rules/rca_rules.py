@@ -17,6 +17,9 @@ HIGH = "HIGH"
 MEDIUM = "MEDIUM"
 LOW = "LOW"
 DIAMETER_SUCCESS_CODES = {"2001", "2002"}
+RADIUS_ACCEPT_CODES = {"2", "5", "41", "44"}
+RADIUS_REJECT_CODES = {"3", "42", "45"}
+RADIUS_CHALLENGE_CODES = {"11"}
 
 RCA_METADATA = {
     "CHARGING_FAILURE": {
@@ -231,6 +234,7 @@ def classify_session(session: dict) -> dict:
     icmp_msgs = session.get("icmp_msgs", [])
     nas_eps_msgs = session.get("nas_eps_msgs", [])
     nas_5gs_msgs = session.get("nas_5gs_msgs", [])
+    radius_msgs = session.get("radius_msgs", [])
 
     final_code = str(session.get("final_sip_code") or "")
 
@@ -275,6 +279,9 @@ def classify_session(session: dict) -> dict:
     icmp_failed = any(m.get("is_failure") for m in icmp_msgs) and not benign_icmp_cleanup
     nas_failures = [m for m in nas_eps_msgs + nas_5gs_msgs if _nas_is_failure(m)]
     nas_successes = [m for m in nas_eps_msgs + nas_5gs_msgs if _nas_is_success(m)]
+    radius_rejects = [m for m in radius_msgs if _radius_is_failure(m)]
+    radius_accepts = [m for m in radius_msgs if _radius_is_success(m)]
+    radius_challenges = [m for m in radius_msgs if str(m.get("radius_code") or "") in RADIUS_CHALLENGE_CODES]
 
     # ========================================================
     # TCP signals
@@ -304,6 +311,11 @@ def classify_session(session: dict) -> dict:
         return _result("POLICY_FAILURE", HIGH, 88,
                        ["Policy control rejected"],
                        "R0_POLICY")
+    if radius_rejects:
+        evidence = [_radius_failure_evidence(radius_rejects[0])]
+        if radius_challenges:
+            evidence.append(f"{len(radius_challenges)} Access-Challenge exchange(s) observed before rejection")
+        return _result("SUBSCRIBER_BARRED", HIGH, 88, evidence, "R0_RADIUS_REJECT")
     if dia_msgs and diameter_successes and not any(m.get("is_failure") for m in dia_msgs):
         return _result(
             "NORMAL_CALL",
@@ -320,6 +332,11 @@ def classify_session(session: dict) -> dict:
             diameter_housekeeping["evidence"],
             "R0AA_DIAMETER_HOUSEKEEPING",
         )
+    if radius_msgs and radius_accepts and not radius_rejects and not (gtp_failures or nas_failures or icmp_failed):
+        evidence = [f"{len(radius_accepts)} successful RADIUS response(s) observed", "No RADIUS reject or NAK codes present"]
+        if radius_challenges:
+            evidence.append(f"{len(radius_challenges)} Access-Challenge exchange(s) observed")
+        return _result("NORMAL_CALL", LOW, 66, evidence, "R0AB_RADIUS_SUCCESS")
 
     if lte_profile["successful_mobility"]:
         return _result(
@@ -518,6 +535,29 @@ def _nas_is_success(message: dict) -> bool:
         return False
     text = str(message.get("message") or "").upper()
     return any(keyword in text for keyword in ("ACCEPT", "COMPLETE", "REQUEST")) and not _nas_is_failure(message)
+
+
+def _radius_is_failure(message: dict) -> bool:
+    if not message:
+        return False
+    code = str(message.get("radius_code") or "").strip()
+    text = str(message.get("message") or "").upper()
+    return code in RADIUS_REJECT_CODES or any(marker in text for marker in ("REJECT", "NAK", "DENIED"))
+
+
+def _radius_is_success(message: dict) -> bool:
+    if not message:
+        return False
+    code = str(message.get("radius_code") or "").strip()
+    return code in RADIUS_ACCEPT_CODES
+
+
+def _radius_failure_evidence(message: dict) -> str:
+    text = str(message.get("message") or "RADIUS reject").strip()
+    user = str(message.get("radius_user_name") or message.get("radius_calling_station_id") or "").strip()
+    if user:
+        return f"{text} for {user}"
+    return text
 
 
 def _legacy_mobility_profile(session: dict) -> dict:

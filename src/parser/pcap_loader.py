@@ -194,6 +194,15 @@ HTTP_FIELDS = [
     "http2.headers.status", "http2.headers.authority", "tls.handshake.type",
 ]
 
+RADIUS_FIELDS = [
+    "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "ipv6.src", "ipv6.dst",
+    "udp.stream", "udp.srcport", "udp.dstport",
+    "radius.code", "radius.id", "radius.User_Name", "radius.Calling_Station_Id",
+    "radius.Called_Station_Id", "radius.Acct_Status_Type", "radius.Framed_IP_Address",
+    "radius.Acct_Session_Id", "radius.NAS_Identifier", "radius.Service_Type",
+    "radius.Reply_Message", "radius.State", "radius.Class",
+]
+
 DNS_FIELDS = [
     "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "ipv6.src", "ipv6.dst",
     "udp.stream", "tcp.stream", "udp.srcport", "udp.dstport", "tcp.srcport", "tcp.dstport",
@@ -340,6 +349,7 @@ def load_pcap(pcap_path: str,
         ("bssap", filters.get("bssap", "bssap"), BSSAP_FIELDS, "BSSAP"),
         ("map", filters.get("map", "gsm_map or tcap"), MAP_FIELDS, "MAP"),
         ("http", filters.get("http", "http or http2 or tls"), HTTP_FIELDS, "HTTP"),
+        ("radius", filters.get("radius", "radius"), RADIUS_FIELDS, "RADIUS"),
         ("dns", filters.get("dns", "dns"), DNS_FIELDS, "DNS"),
         ("icmp", filters.get("icmp", "icmp or icmpv6"), ICMP_FIELDS, "ICMP"),
         ("nas_eps", filters.get("nas_eps", "nas-eps"), NAS_EPS_FIELDS, "NAS_EPS"),

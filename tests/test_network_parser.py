@@ -132,6 +132,32 @@ class NetworkParserTests(unittest.TestCase):
         self.assertIn("Session Establishment Response", packet["message"])
         self.assertFalse(packet["is_failure"])
 
+    def test_parses_radius_access_reject_packet(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "15",
+                "frame.time_epoch": "128.0",
+                "ip.src": "10.40.0.10",
+                "ip.dst": "10.40.0.20",
+                "udp.stream": "44",
+                "udp.srcport": "1812",
+                "udp.dstport": "1812",
+                "radius.code": "3",
+                "radius.id": "91",
+                "radius.User_Name": "alice@example.net",
+                "radius.Calling_Station_Id": "+491701234567",
+                "radius.Acct_Session_Id": "acct-91",
+                "radius.Reply_Message": "subscriber barred",
+            },
+            "RADIUS",
+        )
+
+        self.assertEqual(packet["technology"], "AAA")
+        self.assertEqual(packet["transport"], "UDP")
+        self.assertEqual(packet["transaction_id"], "acct-91")
+        self.assertIn("Access-Reject", packet["message"])
+        self.assertTrue(packet["is_failure"])
+
 
 if __name__ == "__main__":
     unittest.main()

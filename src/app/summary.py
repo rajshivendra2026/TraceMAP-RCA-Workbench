@@ -210,6 +210,7 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
         "LTE/4G": len(parsed.get("s1ap", [])) + len(parsed.get("gtp", [])) + len(parsed.get("nas_eps", [])),
         "5G": len(parsed.get("ngap", [])) + len(parsed.get("pfcp", [])) + len(parsed.get("http", [])) + len(parsed.get("nas_5gs", [])),
         "IMS": len(parsed.get("sip", [])) + len(parsed.get("diameter", [])) + len(parsed.get("inap", [])),
+        "AAA": len(parsed.get("radius", [])),
         "Transport": len(parsed.get("tcp", [])) + len(parsed.get("udp", [])) + len(parsed.get("sctp", [])),
         "SCTP": len(parsed.get("sctp", [])),
         "Core Services": len(parsed.get("dns", [])) + len(parsed.get("icmp", [])),
@@ -314,6 +315,14 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
         p for p in parsed.get("diameter", [])
         if p.get("is_failure") and str(p.get("result_code")) in {"1001"}
     ]
+    radius_failures = [
+        p for p in parsed.get("radius", [])
+        if p.get("is_failure") or str(p.get("radius_code") or "") in {"3", "42", "45"}
+    ]
+    radius_challenges = [
+        p for p in parsed.get("radius", [])
+        if str(p.get("radius_code") or "") == "11"
+    ]
 
     categories = [
         _error_category("SIP 401 Unauthorized", len(sip_401_packets), "none", "Normal IMS AKA authentication flow"),
@@ -323,6 +332,7 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
         _error_category("S1AP UE Context Release", len(s1ap_release), "none", "Normal 4G mobility or context management"),
         _error_category("Diameter Errors", len(diameter_non_success), "none" if not diameter_non_success else "medium", "AAA or policy transaction issue"),
         _error_category("Diameter Informational Non-Success", len(diameter_notable), "low" if diameter_notable else "none", "Reviewable but not necessarily a service failure"),
+        _error_category("RADIUS Errors", len(radius_failures), "none" if not radius_failures else "medium", "Access control or accounting reject / NAK"),
         _error_category("TCP RST", len(tcp_resets), "none" if not tcp_resets else "medium", "Abrupt transport termination"),
     ]
 
@@ -379,6 +389,20 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
                 "verdict": "Expected control-plane behavior",
                 "analysis": "These events usually reflect LTE-side context cleanup, detach handling, or inter-RAT mobility transitions.",
                 "examples": _packet_examples(s1ap_release, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip")),
+            }
+        )
+    if radius_failures or radius_challenges:
+        sections.append(
+            {
+                "title": "RADIUS — AAA Control",
+                "severity": "medium" if radius_failures else "none",
+                "verdict": "Reviewable AAA exchange" if radius_failures else "Expected challenge / authorization flow",
+                "analysis": (
+                    f"Observed {len(radius_failures)} reject-or-NAK RADIUS event(s)"
+                    f"{' and ' if radius_failures and radius_challenges else ''}"
+                    f"{len(radius_challenges)} challenge event(s)." if radius_failures or radius_challenges else ""
+                ),
+                "examples": _packet_examples(radius_failures or radius_challenges, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip", "radius_user_name")),
             }
         )
 
@@ -683,6 +707,7 @@ def _build_node_inventory(parsed: dict, protocol_counts: dict) -> list[dict]:
     gtpu_pair = _top_pair([packet for packet in parsed.get("gtp", []) if not packet.get("gtpv2.message_type")])
     sip_pair = _top_pair(parsed.get("sip", []))
     diameter_pair = _top_pair(parsed.get("diameter", []))
+    radius_pair = _top_pair(parsed.get("radius", []))
 
     add_node("gNB", ngap_pair["src"], ["NGAP"], "Top NGAP source endpoint", "high" if ngap_pair["src"] else "low")
     add_node("AMF", ngap_pair["dst"], ["NGAP"], "Top NGAP destination endpoint", "high" if ngap_pair["dst"] else "low")
@@ -708,6 +733,9 @@ def _build_node_inventory(parsed: dict, protocol_counts: dict) -> list[dict]:
 
     if diameter_pair["dst"] and diameter_pair["dst"] not in seen:
         add_node("HSS/PCRF", diameter_pair["dst"], ["Diameter"], "Diameter peer carrying subscriber or policy state", "medium")
+
+    add_node("NAS / Access Device", radius_pair["src"], ["RADIUS"], "Top RADIUS request source endpoint", "medium" if radius_pair["src"] else "low")
+    add_node("RADIUS Server", radius_pair["dst"], ["RADIUS"], "Top RADIUS response endpoint", "medium" if radius_pair["dst"] else "low")
 
     if protocol_counts.get("MAP"):
         map_pair = _top_pair(parsed.get("map", []))
@@ -997,6 +1025,13 @@ def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None 
             if packet.get("imsi") == subscriber or packet.get("msisdn"):
                 return packet.get("msisdn") or packet.get("src_ip"), packet.get("apn") or packet.get("dst_ip")
 
+    for packet in parsed.get("radius", []):
+        if packet.get("radius_calling_station_id") or packet.get("radius_called_station_id") or packet.get("radius_user_name"):
+            return (
+                packet.get("radius_calling_station_id") or packet.get("radius_user_name") or packet.get("src_ip"),
+                packet.get("radius_called_station_id") or packet.get("dst_ip"),
+            )
+
     for packet in parsed.get("map", []):
         if packet.get("msisdn") or packet.get("dst_ip"):
             return packet.get("msisdn") or packet.get("src_ip"), packet.get("dst_ip")
@@ -1013,6 +1048,8 @@ def _infer_trace_type(protocol_counts: dict, technologies_seen: list, protocol_b
     top_family = (protocol_breakdown or [{}])[0].get("label", "") if protocol_breakdown else ""
     if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
         return "IMS call trace"
+    if protocol_counts.get("RADIUS") and not (protocol_counts.get("SIP") or protocol_counts.get("DIAMETER")):
+        return "RADIUS AAA trace"
     if protocol_counts.get("NGAP") and protocol_counts.get("S1AP"):
         return "Multi-RAT 5G/4G signalling trace"
     if protocol_counts.get("NGAP") or protocol_counts.get("PFCP"):
@@ -1046,6 +1083,7 @@ def _build_protocol_breakdown(parsed: dict) -> list[dict]:
         ("GTP-U", [packet for packet in parsed.get("gtp", []) if not packet.get("gtpv2.message_type")], "User-plane data tunnelling"),
         ("SIP", parsed.get("sip", []), "IMS registration and voice signalling"),
         ("Diameter", parsed.get("diameter", []), "AAA, policy, and charging"),
+        ("RADIUS", parsed.get("radius", []), "AAA access control and accounting"),
         ("GSM MAP", parsed.get("map", []), "Legacy HLR/HSS interworking"),
         ("TCP/SCTP", [*parsed.get("tcp", []), *parsed.get("sctp", [])], "Transport layer"),
     ]
@@ -1116,6 +1154,8 @@ def _build_key_observations(protocol_counts: dict, technology_counts: dict, prot
         observations.append("Dual radio access is visible, with both 5G NGAP and 4G S1AP signalling present in the same capture.")
     if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
         observations.append("The capture contains a full IMS control stack, including SIP signalling and Diameter-based subscriber, policy, or charging exchanges.")
+    if protocol_counts.get("RADIUS"):
+        observations.append("RADIUS signalling is present, which gives visibility into access authentication, authorization, or accounting exchanges beyond Diameter-only control.")
     if any(item["label"] == "GTP-U" and item["frames"] > 0 for item in protocol_breakdown):
         observations.append("User-plane tunnelling is present through GTP-U, so the trace includes both control-plane setup and bearer-side traffic.")
     if protocol_counts.get("PFCP") and any(item["label"] == "GTPv2" for item in protocol_breakdown):
@@ -1195,6 +1235,8 @@ def _infer_test_scenario(protocol_counts: dict, technologies_seen: list) -> str:
         return "IMS registration and mobile-originated VoIP call over a converged 5G/4G core"
     if protocol_counts.get("SIP") and protocol_counts.get("DIAMETER"):
         return "IMS registration and voice signalling validation"
+    if protocol_counts.get("RADIUS"):
+        return "RADIUS authentication, authorization, and accounting validation"
     if protocol_counts.get("PFCP") and protocol_counts.get("GTP"):
         return "Packet-core session establishment and bearer validation"
     if protocol_counts.get("NGAP") and protocol_counts.get("S1AP"):

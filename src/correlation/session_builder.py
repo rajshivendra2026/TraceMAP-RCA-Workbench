@@ -1019,6 +1019,7 @@ def _refresh_session_record(session: dict) -> dict:
         "nas_eps_msgs": protocol_buckets["NAS_EPS"],
         "nas_5gs_msgs": protocol_buckets["NAS_5GS"],
         "pfcp_msgs": protocol_buckets["PFCP"],
+        "radius_msgs": protocol_buckets["RADIUS"],
         "flow": flow,
         "flow_summary": flow_summary,
         "imsi": _extract_imsi(dia_msgs) or _first_generic_identity(generic_msgs, "imsi"),
@@ -1051,6 +1052,7 @@ def _bucket_generic_messages(generic_msgs: list) -> dict:
         "NAS_EPS": [],
         "NAS_5GS": [],
         "PFCP": [],
+        "RADIUS": [],
     }
     for message in generic_msgs:
         protocol = str(message.get("protocol") or "").upper()
@@ -1148,6 +1150,7 @@ def _collect_generic_packets(parsed: dict) -> list:
         "udp",
         "sctp",
         "pfcp",
+        "radius",
     ):
         packets.extend(parsed.get(key, []))
     return _sort_ts(packets)

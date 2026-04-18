@@ -257,6 +257,56 @@ class ProtocolExpansionTests(unittest.TestCase):
 
         self.assertEqual(result["rca_label"], "NORMAL_CALL")
 
+    def test_classifies_radius_reject_session(self):
+        result = classify_session(
+            {
+                "sip_msgs": [],
+                "dia_msgs": [],
+                "inap_msgs": [],
+                "gtp_msgs": [],
+                "http_msgs": [],
+                "tcp_msgs": [],
+                "dns_msgs": [],
+                "icmp_msgs": [],
+                "nas_eps_msgs": [],
+                "nas_5gs_msgs": [],
+                "radius_msgs": [
+                    {
+                        "radius_code": "3",
+                        "message": "Access-Reject (subscriber barred)",
+                        "radius_user_name": "alice@example.net",
+                        "is_failure": True,
+                    }
+                ],
+                "final_sip_code": "",
+            }
+        )
+
+        self.assertEqual(result["rca_label"], "SUBSCRIBER_BARRED")
+
+    def test_classifies_radius_accept_session_as_normal(self):
+        result = classify_session(
+            {
+                "sip_msgs": [],
+                "dia_msgs": [],
+                "inap_msgs": [],
+                "gtp_msgs": [],
+                "http_msgs": [],
+                "tcp_msgs": [],
+                "dns_msgs": [],
+                "icmp_msgs": [],
+                "nas_eps_msgs": [],
+                "nas_5gs_msgs": [],
+                "radius_msgs": [
+                    {"radius_code": "11", "message": "Access-Challenge", "is_failure": False},
+                    {"radius_code": "2", "message": "Access-Accept", "is_failure": False},
+                ],
+                "final_sip_code": "",
+            }
+        )
+
+        self.assertEqual(result["rca_label"], "NORMAL_CALL")
+
     def test_classifies_successful_handover_sequence_as_normal(self):
         result = classify_session(
             {

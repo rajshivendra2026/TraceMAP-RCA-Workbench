@@ -19,6 +19,7 @@ TECH_BY_PROTOCOL = {
     "NAS_5GS": "5G",
     "HTTP2": "5G",
     "PFCP": "5G",
+    "RADIUS": "AAA",
     "DNS": "Core",
     "ICMP": "Core",
     "SCTP": "Transport",
@@ -184,6 +185,34 @@ NAS_5GS_SM_MESSAGE_NAMES = {
 
 SUCCESS_CAUSE_CODES = {"0", "16", "18", "128", "REQUEST_ACCEPTED", "DIAMETER_SUCCESS"}
 NAS_FAILURE_KEYWORDS = ("REJECT", "FAIL", "DENIED")
+RADIUS_CODE_NAMES = {
+    "1": "Access-Request",
+    "2": "Access-Accept",
+    "3": "Access-Reject",
+    "4": "Accounting-Request",
+    "5": "Accounting-Response",
+    "11": "Access-Challenge",
+    "40": "Disconnect-Request",
+    "41": "Disconnect-ACK",
+    "42": "Disconnect-NAK",
+    "43": "CoA-Request",
+    "44": "CoA-ACK",
+    "45": "CoA-NAK",
+}
+RADIUS_ACCT_STATUS_NAMES = {
+    "1": "Start",
+    "2": "Stop",
+    "3": "Interim-Update",
+    "7": "Accounting-On",
+    "8": "Accounting-Off",
+}
+RADIUS_SERVICE_TYPE_NAMES = {
+    "1": "Login",
+    "2": "Framed",
+    "5": "Outbound",
+    "8": "Authenticate-Only",
+    "10": "Call-Check",
+}
 
 
 def parse_network_packets(raw_packets: list, protocol_name: str) -> list:
@@ -251,6 +280,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
             "pfcp.seid",
             "pfcp.seqno",
             "dns.id",
+            "radius.Acct_Session_Id",
+            "radius.id",
             "e164.msisdn",
             "e212.imsi",
         )
@@ -258,6 +289,21 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     method = _clean_text(_get(raw, "http.request.method", "http2.headers.method"))
     status_code = _clean_text(_get(raw, "http.response.code", "http2.headers.status"))
     uri = _clean_text(_get(raw, "http.request.uri", "http2.headers.path"))
+    radius_code = _clean_text(_get(raw, "radius.code"))
+    radius_id = _clean_text(_get(raw, "radius.id"))
+    radius_user_name = _clean_text(_get(raw, "radius.User_Name"))
+    radius_calling_station = _clean_text(_get(raw, "radius.Calling_Station_Id"))
+    radius_called_station = _clean_text(_get(raw, "radius.Called_Station_Id"))
+    radius_acct_status = _clean_text(_get(raw, "radius.Acct_Status_Type"))
+    radius_framed_ip = _clean_text(_get(raw, "radius.Framed_IP_Address"))
+    radius_acct_session_id = _clean_text(_get(raw, "radius.Acct_Session_Id"))
+    radius_nas_identifier = _clean_text(_get(raw, "radius.NAS_Identifier"))
+    radius_service_type = _clean_text(_get(raw, "radius.Service_Type"))
+    radius_reply_message = _clean_text(_get(raw, "radius.Reply_Message"))
+    radius_state = _clean_text(_get(raw, "radius.State"))
+    radius_class = _clean_text(_get(raw, "radius.Class"))
+    if protocol == "RADIUS" and not status_code:
+        status_code = radius_code
     host = _clean_text(_get(raw, "http.host", "http2.headers.authority"))
     ws_info = _clean_text(_get(raw, "_ws.col.info"))
     dns_query = _clean_text(_get(raw, "dns.qry.name", "dns.resp.name"))
@@ -343,6 +389,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         return None
 
     message = _first_non_null(
+        _format_radius_message(radius_code, radius_acct_status, radius_service_type, radius_reply_message),
         _format_http_message(method, status_code, uri),
         _format_dns_message(dns_query, dns_answer, dns_rcode),
         _format_icmp_message(icmp_type, icmp_code),
@@ -388,6 +435,19 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "status_code": status_code,
         "host": host,
         "uri": uri,
+        "radius_code": radius_code,
+        "radius_id": radius_id,
+        "radius_user_name": radius_user_name,
+        "radius_calling_station_id": radius_calling_station,
+        "radius_called_station_id": radius_called_station,
+        "radius_acct_status_type": radius_acct_status,
+        "radius_framed_ip": radius_framed_ip,
+        "radius_acct_session_id": radius_acct_session_id,
+        "radius_nas_identifier": radius_nas_identifier,
+        "radius_service_type": radius_service_type,
+        "radius_reply_message": radius_reply_message,
+        "radius_state": radius_state,
+        "radius_class": radius_class,
         "dns_query": dns_query,
         "dns_answer": dns_answer,
         "dns_rcode": dns_rcode,
@@ -436,6 +496,27 @@ def _format_http_message(method: Optional[str], status_code: Optional[str], uri:
     if status_code:
         return f"HTTP {status_code}"
     return None
+
+
+def _format_radius_message(
+    radius_code: Optional[str],
+    acct_status: Optional[str],
+    service_type: Optional[str],
+    reply_message: Optional[str],
+) -> Optional[str]:
+    if not radius_code:
+        return None
+    message = RADIUS_CODE_NAMES.get(str(radius_code), f"RADIUS code {radius_code}")
+    details = []
+    if acct_status:
+        details.append(RADIUS_ACCT_STATUS_NAMES.get(str(acct_status), f"Acct {acct_status}"))
+    if service_type:
+        details.append(RADIUS_SERVICE_TYPE_NAMES.get(str(service_type), f"Service {service_type}"))
+    if reply_message:
+        details.append(reply_message)
+    if details:
+        return f"{message} ({'; '.join(details)})"
+    return message
 
 
 def _format_dns_message(query: Optional[str], answer: Optional[str], rcode: Optional[str]) -> Optional[str]:
@@ -591,6 +672,14 @@ def _is_failure(
         return bool(cause_code and str(cause_code) not in {"0", "NOERROR"})
     if protocol == "ICMP":
         return str(icmp_type or "") in {"3", "11", "1"} or str(icmp_code or "") not in {"", "0"}
+    if protocol == "RADIUS":
+        code = str(status_code or "").strip()
+        upper_message = str(message or "").upper()
+        if code in {"3", "42", "45"}:
+            return True
+        if any(marker in upper_message for marker in ("REJECT", "NAK", "DENIED")):
+            return True
+        return False
     if protocol in {"TCP", "UDP"}:
         return retransmission or reset
     if protocol == "NAS_EPS":

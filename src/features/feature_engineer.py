@@ -105,6 +105,7 @@ def extract_features(session: dict) -> dict:
     sip_msgs  = session.get("sip_msgs",  [])
     dia_msgs  = session.get("dia_msgs",  [])
     inap_msgs = session.get("inap_msgs", [])
+    radius_msgs = session.get("radius_msgs", [])
 
     # ── 1. Core SIP features ───────────────────────────────────
     final_code   = session.get("final_sip_code")
@@ -247,6 +248,10 @@ def extract_features(session: dict) -> dict:
     # Diameter present = online charging involved
     has_diameter        = int(dia_count > 0)
     has_inap            = int(inap_count > 0)
+    radius_count        = len(radius_msgs)
+    radius_failure_count = sum(1 for m in radius_msgs if m.get("is_failure"))
+    radius_accept_count = sum(1 for m in radius_msgs if str(m.get("radius_code") or "") in {"2", "5", "41", "44"})
+    has_radius          = int(radius_count > 0)
 
     # Retransmissions = network instability signal
     has_retransmission  = int(invite_count > 1)
@@ -321,6 +326,12 @@ def extract_features(session: dict) -> dict:
         "sub_unreachable_dia":  sub_unreachable_dia,
         "auth_failed_dia":      auth_failed_dia,
         "has_diameter":         has_diameter,
+
+        # RADIUS
+        "radius_count":         radius_count,
+        "radius_failure_count": radius_failure_count,
+        "radius_accept_count":  radius_accept_count,
+        "has_radius":           has_radius,
 
         # INAP
         "inap_count":           inap_count,
@@ -535,6 +546,7 @@ ML_FEATURE_COLS = [
     "has_ccr_initial", "has_ccr_term", "ccr_initial_ok",
     "charging_failed", "sub_unreachable_dia",
     "auth_failed_dia", "has_diameter",
+    "radius_count", "radius_failure_count", "radius_accept_count", "has_radius",
     "inap_count", "mrf_invoked", "inap_routing_fail",
     "inap_service_logic", "inap_release_call",
     "has_service_key", "has_inap",

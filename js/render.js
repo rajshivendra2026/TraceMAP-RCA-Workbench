@@ -27,6 +27,7 @@ const PROTOCOL_STYLE = {
   RANAP:    { color: "#22c55e" },
   BSSAP:    { color: "#84cc16" },
   MAP:      { color: "#65a30d" },
+  RADIUS:   { color: "#8b5cf6" },
   HTTP:     { color: "#a855f7" },
   DNS:      { color: "#2563eb" },
   ICMP:     { color: "#7c3aed" },
