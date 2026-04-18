@@ -272,8 +272,8 @@ def classify_session(session: dict) -> dict:
     # ========================================================
     # HTTP / SBI signals
     # ========================================================
-    http_4xx = any(str(m.get("status", "")).startswith("4") for m in http_msgs)
-    http_5xx = any(str(m.get("status", "")).startswith("5") for m in http_msgs)
+    http_4xx = any(str(m.get("status_code", "")).startswith("4") for m in http_msgs)
+    http_5xx = any(str(m.get("status_code", "")).startswith("5") for m in http_msgs)
     dns_failed = any(m.get("is_failure") for m in dns_msgs)
     benign_icmp_cleanup = _is_benign_icmp_cleanup(session)
     icmp_failed = any(m.get("is_failure") for m in icmp_msgs) and not benign_icmp_cleanup
@@ -363,12 +363,13 @@ def classify_session(session: dict) -> dict:
             ["Release Access Bearers cleanup observed", "Port-unreachable ICMP followed bearer release rather than setup failure"],
             "R0D_BENIGN_ICMP_CLEANUP",
         )
-    if _pfcp_profile(session)["healthy_session"]:
+    pfcp_info = _pfcp_profile(session)
+    if pfcp_info["healthy_session"]:
         return _result(
             "NORMAL_CALL",
             LOW,
             64,
-            _pfcp_profile(session)["evidence"],
+            pfcp_info["evidence"],
             "R0E_PFCP_HEALTHY",
         )
 
@@ -852,7 +853,7 @@ def blend_hybrid_rca(
     rule_rca = deepcopy(rule_rca or _result("UNKNOWN", LOW, 30, ["No rule evidence"], "R0_EMPTY"))
     rule_label = rule_rca.get("rca_label", "UNKNOWN")
     rule_score = min(1.0, max(0.0, float(rule_rca.get("confidence_pct", 0)) / 100.0))
-    scores = {rule_label: 0.55 * rule_score}
+    scores = {rule_label: 0.4 * rule_score}
 
     pattern_root = None
     pattern_score = 0.0
@@ -861,7 +862,7 @@ def blend_hybrid_rca(
         historical_success = float(pattern_match.get("historical_success", pattern_match.get("confidence", 0.5)))
         pattern_score = min(1.0, max(0.0, float(pattern_match.get("similarity", 0)) * historical_success))
         if pattern_root:
-            scores[pattern_root] = scores.get(pattern_root, 0.0) + (0.3 * pattern_score)
+            scores[pattern_root] = scores.get(pattern_root, 0.0) + (0.25 * pattern_score)
 
     anomaly_score = 0.0
     anomaly_root = None
@@ -869,14 +870,14 @@ def blend_hybrid_rca(
         anomaly_root = anomaly_result.get("suggested_root_cause") or rule_label
         anomaly_score = min(1.0, max(0.0, float(anomaly_result.get("score", 0))))
         if anomaly_result.get("is_anomalous"):
-            scores[anomaly_root] = scores.get(anomaly_root, 0.0) + (0.15 * anomaly_score)
+            scores[anomaly_root] = scores.get(anomaly_root, 0.0) + (0.12 * anomaly_score)
 
     causal_score = 0.0
     causal_root = None
     if causal_result:
         causal_root = causal_result.get("root_cause") or rule_label
         causal_score = min(1.0, max(0.0, float(causal_result.get("causal_strength", causal_result.get("confidence", 0)))))
-        scores[causal_root] = scores.get(causal_root, 0.0) + (0.2 * causal_score)
+        scores[causal_root] = scores.get(causal_root, 0.0) + (0.15 * causal_score)
 
     agent_score = 0.0
     agent_root = None
@@ -884,7 +885,7 @@ def blend_hybrid_rca(
         top_hypothesis = agent_result.get("top_hypothesis") or {}
         agent_root = top_hypothesis.get("label") or rule_label
         agent_score = min(1.0, max(0.0, float(agent_result.get("consensus_score", top_hypothesis.get("confidence", 0)))))
-        scores[agent_root] = scores.get(agent_root, 0.0) + (0.15 * agent_score)
+        scores[agent_root] = scores.get(agent_root, 0.0) + (0.08 * agent_score)
 
     final_label = max(scores.items(), key=lambda item: item[1])[0] if scores else rule_label
     meta = RCA_METADATA.get(final_label, RCA_METADATA["UNKNOWN"])

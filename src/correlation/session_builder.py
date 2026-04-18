@@ -390,9 +390,13 @@ def _classify_node(ip: str) -> str:
         if ip.startswith("10.") or ip.startswith("192.168."):
             return "CORE"
         if ip.startswith("172."):
-            return "IMS"
+            parts = ip.split(".")
+            if len(parts) > 1:
+                second_octet = int(parts[1])
+                if 16 <= second_octet <= 31:
+                    return "IMS"
         return "EXT"
-    except AttributeError:
+    except (AttributeError, ValueError):
         return "UNKNOWN"
 
 

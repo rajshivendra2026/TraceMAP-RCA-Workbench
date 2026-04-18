@@ -158,7 +158,7 @@ def _extract_subscription_ids(raw: dict) -> tuple[Optional[str], Optional[str]]:
     msisdn = None
     for value in values:
         digits = value.replace("+", "").strip()
-        if digits.isdigit() and len(digits) >= 14 and imsi is None:
+        if digits.isdigit() and len(digits) == 15 and imsi is None:
             imsi = digits
         elif digits and msisdn is None:
             msisdn = digits

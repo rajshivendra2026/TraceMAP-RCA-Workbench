@@ -7,11 +7,11 @@ from typing import Any
 
 
 def _session_label(session: dict[str, Any]) -> str:
-    rca = session.get("rca") or {}
     hybrid = session.get("hybrid_rca") or {}
+    rca = session.get("rca") or {}
     return str(
-        rca.get("rca_label")
-        or hybrid.get("rca_label")
+        hybrid.get("rca_label")
+        or rca.get("rca_label")
         or session.get("rca_label")
         or "UNKNOWN"
     ).upper()

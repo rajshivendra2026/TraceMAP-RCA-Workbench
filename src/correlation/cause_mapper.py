@@ -58,7 +58,7 @@ def correlate_root_cause(session: dict) -> dict:
     # ============================================================
 
     for m in http_msgs:
-        status = str(m.get("status", ""))
+        status = str(m.get("status_code", ""))
 
         if status.startswith("5"):
             root_cause = "NF_FAILURE"

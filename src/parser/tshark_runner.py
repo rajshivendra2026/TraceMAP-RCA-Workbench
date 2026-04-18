@@ -231,6 +231,6 @@ class TSharkRunner:
                 text=True,
                 timeout=10,
             )
-            return r.returncode in (0, 1, 2)
+            return r.returncode in (0, 1)
         except Exception:
             return False

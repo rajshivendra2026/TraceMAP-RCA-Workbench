@@ -49,7 +49,7 @@ INAP_OPERATIONS = {
 }
 
 SERVICE_LOGIC_OPS  = {"0", "20", "22", "29", "46", "60", "63"}
-FAILURE_OPS        = {"3", "4", "5", "22"}
+FAILURE_OPS        = {"3", "4", "5"}
 
 
 def parse_inap_packet(raw: dict) -> Optional[dict]:

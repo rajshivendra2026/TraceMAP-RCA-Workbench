@@ -216,6 +216,27 @@ class ProtocolExpansionTests(unittest.TestCase):
 
         self.assertEqual(result["rca_label"], "DNS_FAILURE")
 
+    def test_classifies_http_5xx_session_as_nf_failure(self):
+        result = classify_session(
+            {
+                "sip_msgs": [],
+                "dia_msgs": [],
+                "inap_msgs": [],
+                "gtp_msgs": [],
+                "pfcp_msgs": [],
+                "http_msgs": [{"status_code": "503", "message": "HTTP 503"}],
+                "tcp_msgs": [],
+                "dns_msgs": [],
+                "icmp_msgs": [],
+                "nas_eps_msgs": [],
+                "nas_5gs_msgs": [],
+                "radius_msgs": [],
+                "final_sip_code": "",
+            }
+        )
+
+        self.assertEqual(result["rca_label"], "NF_FAILURE")
+
     def test_classifies_nas_rejection_session(self):
         result = classify_session(
             {

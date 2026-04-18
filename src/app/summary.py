@@ -55,6 +55,7 @@ def build_capture_graph(parsed: dict) -> dict:
         ("DIAMETER", parsed.get("diameter", []), lambda p: p.get("command_code") or p.get("cmd_code") or "DIAMETER"),
         ("INAP", parsed.get("inap", []), lambda p: p.get("inap_op_name") or p.get("inap_opcode") or "INAP"),
         ("GTP", parsed.get("gtp", []), lambda p: p.get("gtpv2.message_type") or p.get("gtp.message_type") or "GTP"),
+        ("RADIUS", parsed.get("radius", []), lambda p: p.get("message") or "RADIUS"),
         ("S1AP", parsed.get("s1ap", []), lambda p: p.get("message") or "S1AP"),
         ("NGAP", parsed.get("ngap", []), lambda p: p.get("message") or "NGAP"),
         ("RANAP", parsed.get("ranap", []), lambda p: p.get("message") or "RANAP"),
@@ -133,7 +134,14 @@ def classify_node(ip: str) -> str:
     if ip.startswith("10."):
         return "CORE"
     if ip.startswith("172."):
-        return "IMS"
+        parts = ip.split(".")
+        if len(parts) > 1:
+            try:
+                second_octet = int(parts[1])
+            except ValueError:
+                second_octet = -1
+            if 16 <= second_octet <= 31:
+                return "IMS"
     return "EXTERNAL"
 
 
@@ -141,21 +149,9 @@ def session_summary(session: dict) -> dict:
     rca = session.get("hybrid_rca") or session.get("rca", {})
     autonomous = session.get("autonomous_rca") or {}
     packet_count = sum(
-        len(session.get(key, []))
-        for key in (
-            "sip_msgs",
-            "dia_msgs",
-            "inap_msgs",
-            "gtp_msgs",
-            "generic_msgs",
-            "dns_msgs",
-            "icmp_msgs",
-            "nas_eps_msgs",
-            "nas_5gs_msgs",
-            "ngap_msgs",
-            "s1ap_msgs",
-            "pfcp_msgs",
-        )
+        len(value)
+        for key, value in session.items()
+        if key.endswith("_msgs") and isinstance(value, list)
     )
     return {
         "call_id": session.get("call_id"),
