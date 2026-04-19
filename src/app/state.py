@@ -1,13 +1,15 @@
+import json
+import sqlite3
 import time
 import uuid
+from pathlib import Path
 from threading import Lock, RLock
 
-from src.config import cfg
+from src.config import cfg, cfg_path
 
 
 _store: dict[str, dict] = {}
 _lock = Lock()
-_job_store: dict[str, dict] = {}
 _job_lock = Lock()
 _learning_lock = RLock()
 _learning_status = {
@@ -23,6 +25,8 @@ _learning_status = {
     "last_retraining_at": None,
     "retraining_running": False,
     "retraining_message": "Idle",
+    "retraining_job_id": None,
+    "learning_job_id": None,
 }
 
 
@@ -73,7 +77,7 @@ def purge_expired_sessions(locked: bool = False) -> None:
 def cache_stats() -> dict:
     return {
         "entries": len(_store),
-        "jobs": len(_job_store),
+        "jobs": _job_count(),
         "ttl_sec": int(cfg("server.session_ttl_sec", 3600)),
     }
 
@@ -90,30 +94,60 @@ def create_job(kind: str, **values) -> dict:
         "updated_at": now,
     }
     payload.update(values)
-    ttl_sec = int(cfg("server.session_ttl_sec", 3600))
     with _job_lock:
+        _init_job_store()
         purge_expired_jobs(locked=True)
-        _job_store[job_id] = payload
-        while len(_job_store) > int(cfg("server.max_cached_uploads", 20)) * 4:
-            oldest = min(_job_store.items(), key=lambda item: item[1]["updated_at"])[0]
-            _job_store.pop(oldest, None)
+        with _job_conn() as conn:
+            conn.execute(
+                """
+                INSERT INTO jobs (job_id, kind, status, created_at, updated_at, payload)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    job_id,
+                    kind,
+                    payload["status"],
+                    payload["created_at"],
+                    payload["updated_at"],
+                    json.dumps(payload),
+                ),
+            )
+            conn.commit()
+        _trim_jobs_locked()
     return dict(payload)
 
 
 def update_job(job_id: str, **values) -> dict | None:
     with _job_lock:
-        entry = _job_store.get(job_id)
+        _init_job_store()
+        entry = _fetch_job_locked(job_id)
         if not entry:
             return None
         entry.update(values)
         entry["updated_at"] = time.time()
+        with _job_conn() as conn:
+            conn.execute(
+                """
+                UPDATE jobs
+                SET status = ?, updated_at = ?, payload = ?
+                WHERE job_id = ?
+                """,
+                (
+                    entry.get("status", "queued"),
+                    entry["updated_at"],
+                    json.dumps(entry),
+                    job_id,
+                ),
+            )
+            conn.commit()
         return dict(entry)
 
 
 def get_job(job_id: str) -> dict | None:
     purge_expired_jobs()
     with _job_lock:
-        entry = _job_store.get(job_id)
+        _init_job_store()
+        entry = _fetch_job_locked(job_id)
         return dict(entry) if entry else None
 
 
@@ -122,9 +156,11 @@ def purge_expired_jobs(locked: bool = False) -> None:
     now = time.time()
 
     def purge() -> None:
-        expired = [job_id for job_id, entry in _job_store.items() if now - float(entry.get("updated_at", now)) > ttl_sec]
-        for job_id in expired:
-            _job_store.pop(job_id, None)
+        _init_job_store()
+        cutoff = now - ttl_sec
+        with _job_conn() as conn:
+            conn.execute("DELETE FROM jobs WHERE updated_at < ?", (cutoff,))
+            conn.commit()
 
     if locked:
         purge()
@@ -142,3 +178,76 @@ def update_learning_status(**values) -> None:
 def get_learning_status() -> dict:
     with _learning_lock:
         return dict(_learning_status)
+
+
+def _job_store_path() -> Path:
+    return Path(cfg_path("data.jobs_db", "data/knowledge_base/jobs.sqlite"))
+
+
+def _job_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(_job_store_path(), timeout=5.0)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_job_store() -> None:
+    path = _job_store_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with _job_conn() as conn:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS jobs (
+                job_id TEXT PRIMARY KEY,
+                kind TEXT NOT NULL,
+                status TEXT NOT NULL,
+                created_at REAL NOT NULL,
+                updated_at REAL NOT NULL,
+                payload TEXT NOT NULL
+            )
+            """
+        )
+        conn.commit()
+
+
+def _fetch_job_locked(job_id: str) -> dict | None:
+    with _job_conn() as conn:
+        row = conn.execute("SELECT payload FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
+    if not row:
+        return None
+    try:
+        return json.loads(row["payload"])
+    except Exception:
+        return None
+
+
+def _job_count() -> int:
+    with _job_lock:
+        _init_job_store()
+        with _job_conn() as conn:
+            row = conn.execute("SELECT COUNT(*) AS count FROM jobs").fetchone()
+        return int(row["count"] if row else 0)
+
+
+def _trim_jobs_locked() -> None:
+    max_jobs = int(cfg("server.max_cached_uploads", 20)) * 4
+    with _job_conn() as conn:
+        row = conn.execute("SELECT COUNT(*) AS count FROM jobs").fetchone()
+        count = int(row["count"] if row else 0)
+        if count <= max_jobs:
+            return
+        excess = count - max_jobs
+        conn.execute(
+            """
+            DELETE FROM jobs
+            WHERE job_id IN (
+                SELECT job_id
+                FROM jobs
+                ORDER BY updated_at ASC
+                LIMIT ?
+            )
+            """,
+            (excess,),
+        )
+        conn.commit()

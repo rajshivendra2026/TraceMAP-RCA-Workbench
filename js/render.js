@@ -273,7 +273,7 @@ function selectSession(s) {
   _setText("rcaConfidence", `Confidence ${s.confidence || 0}%`);
   _setText("rcaSeverity",   `Severity ${s.severity || "N/A"}`);
   _setText("rcaRule",       s.rule_id || "Rule unavailable");
-  _setText("rcaNarrative",  s.rca_detail || "Detailed RCA narrative is not available for this session.");
+  _setText("rcaNarrative",  s.analyst_brief || s.rca_detail || "Detailed RCA narrative is not available for this session.");
   _setText("corr",          s.dia_correlation || "No correlation");
   _setText("tech",          (s.technologies || []).join(", ") || "Unknown technology");
   _renderEvidence(s.evidence || []);

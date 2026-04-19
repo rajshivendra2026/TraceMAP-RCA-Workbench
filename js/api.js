@@ -13,6 +13,12 @@ const MAX_FILE_BYTES      = 500 * 1024 * 1024; // 500 MB
 let learningStatusTimer = null;
 let uploadStatusTimer = null;
 
+function resetUploadButton(uploadBtn, label = "Upload PCAP") {
+  if (!uploadBtn) return;
+  uploadBtn.disabled = false;
+  uploadBtn.innerText = label;
+}
+
 async function uploadPCAP(file) {
   let uploadInProgress = false;
 
@@ -95,12 +101,12 @@ async function uploadPCAP(file) {
     if (typeof window.traceDebug === "function") {
       window.traceDebug("upload.error", { message: String(err?.message || err) });
     }
+    resetUploadButton(uploadBtn, origLabel ?? "Upload PCAP");
     alert("❌ Upload failed: " + err.message);
   } finally {
     /* FIX [4]: always restore the button regardless of success/failure */
     if (uploadBtn && !uploadInProgress) {
-      uploadBtn.disabled  = false;
-      uploadBtn.innerText = origLabel ?? "Upload PCAP";
+      resetUploadButton(uploadBtn, origLabel ?? "Upload PCAP");
     }
   }
 }
@@ -206,10 +212,7 @@ async function pollUploadJob(jobId, uploadBtn) {
         window.clearInterval(uploadStatusTimer);
         uploadStatusTimer = null;
       }
-      if (uploadBtn) {
-        uploadBtn.disabled = false;
-        uploadBtn.innerText = "Upload PCAP";
-      }
+      resetUploadButton(uploadBtn, "Upload PCAP");
       hydrateUploadResult(data.result || {});
       alert("✅ PCAP processed successfully");
       return true;
@@ -236,11 +239,7 @@ async function pollUploadJob(jobId, uploadBtn) {
         uploadStatusTimer = null;
       }
       alert("❌ Upload failed: " + err.message);
-      const uploadBtnEl = document.getElementById("uploadBtn");
-      if (uploadBtnEl) {
-        uploadBtnEl.disabled = false;
-        uploadBtnEl.innerText = "Upload PCAP";
-      }
+      resetUploadButton(document.getElementById("uploadBtn"), "Upload PCAP");
     });
   }, 1500);
 }

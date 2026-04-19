@@ -57,6 +57,23 @@ class DiameterParserTests(unittest.TestCase):
         self.assertEqual(packet["imsi"], "001010123456789")
         self.assertEqual(packet["msisdn"], "15551230000")
 
+    def test_interprets_diameter_experimental_absent_user(self):
+        packet = parse_diameter_packet(
+            {
+                "diameter.Session-Id": "sess-2",
+                "diameter.cmd.code": "302",
+                "diameter.Experimental-Result-Code": "5550",
+                "diameter.flags.request": "False",
+            }
+        )
+
+        self.assertEqual(packet["experimental_result_code"], "5550")
+        self.assertEqual(packet["effective_result_code"], "5550")
+        self.assertEqual(packet["semantic_label"], "DIAMETER_ERROR_ABSENT_USER")
+        self.assertEqual(packet["semantic_family"], "subscriber_absent")
+        self.assertEqual(packet["recommended_rca"], "SUBSCRIBER_UNREACHABLE")
+        self.assertTrue(packet["is_subscriber_absent"])
+
 
 if __name__ == "__main__":
     unittest.main()

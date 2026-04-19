@@ -3,6 +3,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 import re
 
+from src.intelligence.protocol_intelligence import (
+    build_analyst_brief,
+    build_protocol_recommendations,
+    collect_session_protocol_findings,
+)
+
 
 PLMN_NETWORKS = {
     "262001": "Deutsche Telekom Germany",
@@ -148,6 +154,10 @@ def classify_node(ip: str) -> str:
 def session_summary(session: dict) -> dict:
     rca = session.get("hybrid_rca") or session.get("rca", {})
     autonomous = session.get("autonomous_rca") or {}
+    protocol_findings = collect_session_protocol_findings(session)
+    analyst_brief = build_analyst_brief(session)
+    protocol_recommendations = build_protocol_recommendations(session)
+    recommendations = protocol_recommendations or rca.get("recommendations", [])
     packet_count = sum(
         len(value)
         for key, value in session.items()
@@ -171,6 +181,8 @@ def session_summary(session: dict) -> dict:
         "rca_title": rca.get("rca_title", rca.get("rca_label", "Unknown")),
         "rca_summary": rca.get("rca_summary", ""),
         "rca_detail": rca.get("rca_detail", ""),
+        "analyst_brief": analyst_brief,
+        "protocol_findings": protocol_findings,
         "confidence": rca.get("confidence_pct", 0),
         "raw_confidence": rca.get("raw_confidence_pct", rca.get("confidence_pct", 0)),
         "confidence_band": rca.get("confidence_band", ""),
@@ -181,7 +193,7 @@ def session_summary(session: dict) -> dict:
         "priority_band": rca.get("priority_band", session.get("priority_band", "low")),
         "priority_reason": rca.get("priority_reason", session.get("priority_reason", "baseline inspection")),
         "evidence": rca.get("evidence", []),
-        "recommendations": rca.get("recommendations", []),
+        "recommendations": recommendations,
         "decision_sources": rca.get("decision_sources", {}),
         "llm_explanation": rca.get("llm_explanation", ""),
         "pattern_match": rca.get("pattern_match"),
@@ -210,7 +222,7 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
         "Transport": len(parsed.get("tcp", [])) + len(parsed.get("udp", [])) + len(parsed.get("sctp", [])),
         "SCTP": len(parsed.get("sctp", [])),
         "Core Services": len(parsed.get("dns", [])) + len(parsed.get("icmp", [])),
-        "HTTPS": len([p for p in parsed.get("http", []) if p.get("tls_type") or p.get("protocol") == "HTTP"]),
+        "HTTPS": len([p for p in parsed.get("http", []) if p.get("tls_type")]),
     }
     protocol_counts = {
         key.upper(): len(value)
@@ -307,6 +319,11 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
         p for p in parsed.get("diameter", [])
         if p.get("is_failure") and str(p.get("result_code")) not in {"1001"}
     ]
+    diameter_semantic_counts = Counter(
+        p.get("semantic_label") or p.get("result_text") or str(p.get("effective_result_code") or p.get("result_code") or "")
+        for p in diameter_non_success
+    )
+    dominant_diameter_issue = diameter_semantic_counts.most_common(1)[0][0] if diameter_semantic_counts else None
     diameter_notable = [
         p for p in parsed.get("diameter", [])
         if p.get("is_failure") and str(p.get("result_code")) in {"1001"}
@@ -326,7 +343,12 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
         _error_category("GTPv2 Context Not Found", len(gtp_context_not_found), "medium" if gtp_context_not_found else "none", "Bearer deletion or session cleanup issue"),
         _error_category("NGAP UE Context Release", len(ngap_release), "none", "Normal 5G mobility or idle-mode control"),
         _error_category("S1AP UE Context Release", len(s1ap_release), "none", "Normal 4G mobility or context management"),
-        _error_category("Diameter Errors", len(diameter_non_success), "none" if not diameter_non_success else "medium", "AAA or policy transaction issue"),
+        _error_category(
+            "Diameter Errors",
+            len(diameter_non_success),
+            "none" if not diameter_non_success else "medium",
+            dominant_diameter_issue or "AAA or policy transaction issue",
+        ),
         _error_category("Diameter Informational Non-Success", len(diameter_notable), "low" if diameter_notable else "none", "Reviewable but not necessarily a service failure"),
         _error_category("RADIUS Errors", len(radius_failures), "none" if not radius_failures else "medium", "Access control or accounting reject / NAK"),
         _error_category("TCP RST", len(tcp_resets), "none" if not tcp_resets else "medium", "Abrupt transport termination"),
@@ -399,6 +421,23 @@ def _build_error_analysis(parsed: dict, sessions: list, capture_window: dict, de
                     f"{len(radius_challenges)} challenge event(s)." if radius_failures or radius_challenges else ""
                 ),
                 "examples": _packet_examples(radius_failures or radius_challenges, fields=("frame_number", "time_label", "message", "src_ip", "dst_ip", "radius_user_name")),
+            }
+        )
+    if diameter_non_success:
+        sections.append(
+            {
+                "title": f"Diameter — {dominant_diameter_issue or 'Non-success responses'}",
+                "severity": "medium",
+                "verdict": "Protocol-semantic review required",
+                "analysis": (
+                    f"Observed {len(diameter_non_success)} non-success Diameter response(s). "
+                    f"The dominant semantic finding is {dominant_diameter_issue or 'an unspecified non-success response'}, "
+                    "which should drive RCA before falling back to generic policy or charging buckets."
+                ),
+                "examples": _packet_examples(
+                    diameter_non_success,
+                    fields=("frame_number", "time_label", "command_name", "effective_result_code", "semantic_label", "src_ip", "dst_ip"),
+                ),
             }
         )
 
@@ -967,11 +1006,16 @@ def _build_error_recommendations(gtp_context_not_found: list, tcp_issue_packets:
             }
         )
     if diameter_non_success:
+        dominant = next((packet.get("protocol_intelligence") for packet in diameter_non_success if packet.get("protocol_intelligence")), None)
         recommendations.append(
             {
                 "priority": "Medium",
-                "title": "Inspect Diameter failures",
-                "body": "Check whether non-success Diameter responses align with subscriber, policy, or charging problems rather than harmless informational exchanges.",
+                "title": "Inspect Diameter semantic failures",
+                "body": (
+                    "Check whether non-success Diameter responses align with subscriber, policy, routing, or charging problems rather than harmless informational exchanges."
+                    if not dominant else
+                    f"Start from {dominant.get('name')} ({dominant.get('code')}) and validate whether the failure matches subscriber state, routing, or service-policy context."
+                ),
             }
         )
     if not recommendations:

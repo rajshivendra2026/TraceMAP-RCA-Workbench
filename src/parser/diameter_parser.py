@@ -4,6 +4,8 @@ from typing import Optional
 
 from loguru import logger
 
+from src.intelligence.protocol_intelligence import interpret_protocol_message
+
 
 SUCCESS_RESULT_CODES = {"2001", "2002"}
 AUTH_FAILURE_CODES = {"4001", "5003"}
@@ -30,6 +32,7 @@ DIAMETER_RESULT_CODE_MAP = {
     "5001": "USER_UNKNOWN",
     "5003": "AUTHORIZATION_REJECTED",
     "5004": "ROAMING_NOT_ALLOWED",
+    "5550": "DIAMETER_ERROR_ABSENT_USER",
 }
 
 CC_REQUEST_TYPE_MAP = {
@@ -46,9 +49,9 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
     if not session_id or not cmd_code:
         return None
 
-    result_code = _clean_text(
-        _get(raw, "diameter.Result-Code", "diameter.Experimental-Result-Code")
-    )
+    result_code = _clean_text(_get(raw, "diameter.Result-Code"))
+    experimental_result_code = _clean_text(_get(raw, "diameter.Experimental-Result-Code"))
+    effective_result_code = experimental_result_code or result_code
     timestamp = _to_float(_get(raw, "frame.time_epoch"))
     frame_num = _to_int(_get(raw, "frame.number"))
 
@@ -61,6 +64,8 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
     origin_realm = _clean_text(_get(raw, "diameter.Origin-Realm"))
     destination_host = _clean_text(_get(raw, "diameter.Destination-Host"))
     destination_realm = _clean_text(_get(raw, "diameter.Destination-Realm"))
+    vendor_id = _clean_text(_get(raw, "diameter.Vendor-Id"))
+    auth_application_id = _clean_text(_get(raw, "diameter.Auth-Application-Id"))
     request_flag = _as_bool(_get(raw, "diameter.flags.request"))
     cc_request_type = _clean_text(_get(raw, "diameter.CC-Request-Type"))
     cc_request_number = _to_int(_get(raw, "diameter.CC-Request-Number"))
@@ -71,24 +76,39 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
 
     imsi, msisdn = _extract_subscription_ids(raw)
     command_meta = DIAMETER_COMMAND_MAP.get(cmd_code, {})
-    result_text = DIAMETER_RESULT_CODE_MAP.get(result_code, result_code)
+    result_text = DIAMETER_RESULT_CODE_MAP.get(effective_result_code, effective_result_code)
     cc_request_type_name = CC_REQUEST_TYPE_MAP.get(cc_request_type, cc_request_type)
     request_name = command_meta.get("request", f"{cmd_code}R")
     answer_name = command_meta.get("answer", f"{cmd_code}A")
     command_name = request_name if request_flag else answer_name
     command_long_name = command_meta.get("name", "Diameter")
-    is_failure = bool(result_code and result_code not in SUCCESS_RESULT_CODES)
-    is_auth_failure = result_code in AUTH_FAILURE_CODES
-    is_sub_unreachable = result_code in SUBSCRIBER_UNREACHABLE_CODES
-    is_roaming_failure = result_code in ROAMING_FAILURE_CODES
+    is_failure = bool(effective_result_code and effective_result_code not in SUCCESS_RESULT_CODES)
+    is_auth_failure = effective_result_code in AUTH_FAILURE_CODES
+    is_sub_unreachable = effective_result_code in SUBSCRIBER_UNREACHABLE_CODES
+    is_roaming_failure = effective_result_code in ROAMING_FAILURE_CODES
     is_charging_failure = cmd_code == "272" and is_failure
     is_policy_reject = cmd_code in ("272", "258") and is_failure
 
     summary = command_name
-    if not request_flag and result_code:
-        summary = f"{command_name} {result_code}"
+    if not request_flag and effective_result_code:
+        summary = f"{command_name} {effective_result_code}"
     if request_flag and cmd_code == "272" and cc_request_type_name:
         summary = f"{command_name} {cc_request_type_name}"
+
+    protocol_intelligence = interpret_protocol_message(
+        "DIAMETER",
+        {
+            "command_code": cmd_code,
+            "command_name": command_name,
+            "command_long_name": command_long_name,
+            "result_code": result_code,
+            "experimental_result_code": experimental_result_code,
+        },
+    )
+    semantic_family = protocol_intelligence.get("semantic_family") if protocol_intelligence else None
+    recommended_rca = protocol_intelligence.get("recommended_rca") if protocol_intelligence else None
+    semantic_label = protocol_intelligence.get("name") if protocol_intelligence else None
+    is_subscriber_absent = semantic_family == "subscriber_absent"
 
     return {
         "session_id": session_id,
@@ -100,7 +120,10 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
         "command_long_name": command_long_name,
         "diameter_interface": command_meta.get("interface"),
         "result_code": result_code,
+        "experimental_result_code": experimental_result_code,
+        "effective_result_code": effective_result_code,
         "result_text": result_text,
+        "result_source": "experimental_result_code" if experimental_result_code else "result_code",
         "is_request": request_flag,
         "cc_request_type": cc_request_type,
         "cc_request_type_name": cc_request_type_name,
@@ -111,6 +134,8 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
         "origin_realm": origin_realm,
         "destination_host": destination_host,
         "destination_realm": destination_realm,
+        "vendor_id": vendor_id,
+        "auth_application_id": auth_application_id,
         "framed_ip": framed_ip,
         "apn": apn.lower() if apn else None,
         "imsi": imsi,
@@ -124,9 +149,14 @@ def parse_diameter_packet(raw: dict) -> Optional[dict]:
         "is_auth_failure": is_auth_failure,
         "is_auth_reject": is_auth_failure,
         "is_sub_unreachable": is_sub_unreachable,
+        "is_subscriber_absent": is_subscriber_absent,
         "is_roaming_failure": is_roaming_failure,
         "is_charging_failure": is_charging_failure,
         "is_policy_reject": is_policy_reject,
+        "semantic_family": semantic_family,
+        "semantic_label": semantic_label,
+        "recommended_rca": recommended_rca,
+        "protocol_intelligence": protocol_intelligence,
     }
 
 

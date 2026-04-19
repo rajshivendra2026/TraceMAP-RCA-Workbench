@@ -96,6 +96,8 @@ DIAMETER_FIELDS = [
     # Result
     "diameter.Result-Code",       # 2001 = SUCCESS, 5003 = AUTH_REJECTED etc
     "diameter.Experimental-Result-Code",  # vendor-specific result codes
+    "diameter.Vendor-Id",
+    "diameter.Auth-Application-Id",
 
     # Credit-Control specific (Ro interface — online charging)
     "diameter.CC-Request-Type",   # 1=INITIAL, 2=UPDATE, 3=TERMINATION, 4=EVENT

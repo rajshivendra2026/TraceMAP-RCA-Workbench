@@ -116,6 +116,49 @@ class DiameterRcaTests(unittest.TestCase):
         self.assertEqual(result["rca_label"], "NORMAL_CALL")
         self.assertEqual(result["rule_id"], "R0AA_DIAMETER_HOUSEKEEPING")
 
+    def test_absent_user_experimental_code_maps_to_subscriber_unreachable(self):
+        result = classify_session(
+            {
+                "sip_msgs": [],
+                "dia_msgs": [
+                    {
+                        "command_code": "302",
+                        "command_name": "LIA",
+                        "result_code": None,
+                        "experimental_result_code": "5550",
+                        "effective_result_code": "5550",
+                        "result_text": "DIAMETER_ERROR_ABSENT_USER",
+                        "is_failure": True,
+                        "is_auth_failure": False,
+                        "is_auth_reject": False,
+                        "is_roaming_failure": False,
+                        "is_charging_failure": False,
+                        "is_policy_reject": False,
+                        "is_subscriber_absent": True,
+                        "semantic_family": "subscriber_absent",
+                        "semantic_label": "DIAMETER_ERROR_ABSENT_USER",
+                        "protocol_intelligence": {
+                            "description": "The subscriber is absent, not currently registered, or not present in the queried service domain."
+                        },
+                    }
+                ],
+                "inap_msgs": [],
+                "gtp_msgs": [],
+                "http_msgs": [],
+                "tcp_msgs": [],
+                "dns_msgs": [],
+                "icmp_msgs": [],
+                "nas_eps_msgs": [],
+                "nas_5gs_msgs": [],
+                "final_sip_code": "",
+            }
+        )
+
+        self.assertEqual(result["rca_label"], "SUBSCRIBER_UNREACHABLE")
+        self.assertEqual(result["rule_id"], "R0_SUBSCRIBER_ABSENT")
+        self.assertTrue(any("5550" in item for item in result["evidence"]))
+        self.assertTrue(any("ABSENT_USER" in item for item in result["evidence"]))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -17,6 +17,12 @@ class _FakeFlaskApp:
             return fn
         return decorator
 
+    def before_request(self, fn):
+        return fn
+
+    def after_request(self, fn):
+        return fn
+
 
 class _FakePandasDataFrame:
     pass
@@ -266,6 +272,81 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertIn("SIP — 401 Unauthorized", titles)
         self.assertIn("TCP Transport Issues", titles)
         self.assertIn("GTPv2 — Context Not Found", titles)
+
+    def test_session_summary_builds_analyst_brief_from_known_diameter_semantics(self):
+        session = {
+            "protocols": ["DIAMETER", "SCTP"],
+            "technologies": ["IMS", "Transport"],
+            "dia_msgs": [
+                {
+                    "is_failure": True,
+                    "experimental_result_code": "5550",
+                    "effective_result_code": "5550",
+                    "semantic_family": "subscriber_absent",
+                    "semantic_label": "DIAMETER_ERROR_ABSENT_USER",
+                    "command_name": "LIA",
+                    "origin_host": "hss01.epc.mnc001.mcc262.3gppnetwork.org",
+                    "destination_host": "icscf01.ims.mnc001.mcc262.3gppnetwork.org",
+                    "protocol_intelligence": {
+                        "name": "DIAMETER_ERROR_ABSENT_USER",
+                        "code": "5550",
+                        "semantic_family": "subscriber_absent",
+                        "description": "The subscriber is absent, not currently registered, or not present in the queried service domain.",
+                        "recommendations": [
+                            "Check whether the subscriber is registered in IMS/HSS for the requested service.",
+                            "Inspect subscriber reachability, service registration, and network attach state.",
+                        ],
+                    },
+                }
+            ],
+            "hybrid_rca": {
+                "rca_label": "SUBSCRIBER_UNREACHABLE",
+                "rca_title": "Subscriber Unreachable",
+                "rca_summary": "Diameter lookup failed",
+                "rca_detail": "Generic detail",
+                "recommendations": ["Generic check"],
+            },
+        }
+
+        payload = session_summary(session)
+
+        self.assertIn("DIAMETER_ERROR_ABSENT_USER (5550)", payload["analyst_brief"])
+        self.assertIn("subscriber state / registration / HSS-IMS data", payload["analyst_brief"])
+        self.assertEqual(
+            payload["recommendations"][0],
+            "Check whether the subscriber is registered in IMS/HSS for the requested service.",
+        )
+
+    def test_session_summary_builds_context_brief_for_unknown_diameter_code(self):
+        session = {
+            "protocols": ["DIAMETER", "SCTP"],
+            "technologies": ["IMS", "Transport"],
+            "dia_msgs": [
+                {
+                    "is_failure": True,
+                    "experimental_result_code": "5555",
+                    "effective_result_code": "5555",
+                    "command_name": "8388646A",
+                    "origin_host": "mmecFB.mmegiFF29.mme.epc.mnc410.mcc310.3gppnetwork.org",
+                    "origin_realm": "epc.mnc410.mcc310.3gppnetwork.org",
+                    "destination_host": "phxsmsc01.smsc.epc.mnc170.mcc310.3gppnetwork.org",
+                    "destination_realm": "epc.mnc170.mcc310.3gppnetwork.org",
+                }
+            ],
+            "hybrid_rca": {
+                "rca_label": "UNKNOWN",
+                "rca_title": "Unknown",
+                "rca_summary": "Generic unknown",
+                "rca_detail": "Generic detail",
+                "recommendations": ["Generic check"],
+            },
+        }
+
+        payload = session_summary(session)
+
+        self.assertIn("Diameter non-success 5555", payload["analyst_brief"])
+        self.assertIn("different EPC realms or PLMNs", payload["analyst_brief"])
+        self.assertIn("Diameter routing / DSR / interconnect / subscriber lookup", payload["analyst_brief"])
 
 
 if __name__ == "__main__":

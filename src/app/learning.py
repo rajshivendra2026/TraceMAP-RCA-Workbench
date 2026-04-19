@@ -8,7 +8,7 @@ from loguru import logger
 
 from src.config import cfg_path
 
-from .state import get_learning_status, update_learning_status
+from .state import get_learning_status, update_job, update_learning_status
 
 
 APP_VERSION = "v1.1.0"
@@ -97,14 +97,25 @@ def discover_pcaps(root_path: str) -> list[dict]:
     return files
 
 
-def run_learning_job(learn_path: str, pending_files: list[dict]) -> None:
+def run_learning_job(learn_path: str, pending_files: list[dict], job_id: str | None = None) -> None:
     from src.pipeline import process_pcap
 
     manifest = load_learning_manifest()
     processed = 0
+    total = len(pending_files)
 
     try:
         for item in pending_files:
+            if job_id:
+                update_job(
+                    job_id,
+                    status="running",
+                    message=f"Learning in progress: {processed}/{total} PCAPs processed",
+                    progress=round((processed / max(total, 1)) * 100, 1),
+                    processed_pcaps=processed,
+                    total_pcaps=total,
+                    path=learn_path,
+                )
             process_pcap(item["path"])
             manifest[item["signature"]] = {
                 "path": item["path"],
@@ -123,6 +134,18 @@ def run_learning_job(learn_path: str, pending_files: list[dict]) -> None:
                 new_pcaps=len(pending_files),
             )
 
+        result = {"processed_pcaps": processed, "path": learn_path}
+        if job_id:
+            update_job(
+                job_id,
+                status="completed",
+                message=f"Learning complete. Processed {processed} new PCAP(s).",
+                progress=100,
+                processed_pcaps=processed,
+                total_pcaps=total,
+                path=learn_path,
+                result=result,
+            )
         update_learning_status(
             running=False,
             message=f"Learning complete. Processed {processed} new PCAP(s).",
@@ -130,10 +153,22 @@ def run_learning_job(learn_path: str, pending_files: list[dict]) -> None:
             finished_at=time.time(),
             processed_pcaps=processed,
             new_pcaps=len(pending_files),
-            last_result={"processed_pcaps": processed},
+            last_result=result,
+            learning_job_id=job_id,
         )
     except Exception as exc:
         logger.exception(f"Learning job failed: {exc}")
+        if job_id:
+            update_job(
+                job_id,
+                status="failed",
+                message=f"Learning failed: {exc}",
+                error=str(exc),
+                progress=round((processed / max(total, 1)) * 100, 1),
+                processed_pcaps=processed,
+                total_pcaps=total,
+                path=learn_path,
+            )
         update_learning_status(
             running=False,
             message=f"Learning failed: {exc}",
@@ -141,6 +176,7 @@ def run_learning_job(learn_path: str, pending_files: list[dict]) -> None:
             finished_at=time.time(),
             processed_pcaps=processed,
             new_pcaps=len(pending_files),
+            learning_job_id=job_id,
         )
 
 

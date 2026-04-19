@@ -24,3 +24,8 @@ data/parsed/
 data/features/
 data/models/
 logs/
+data/knowledge_base/*.sqlite
+data/knowledge_base/*.sqlite-shm
+data/knowledge_base/*.sqlite-wal
+data/knowledge_base/feedback_dataset.jsonl
+data/knowledge_base/learning_settings.json

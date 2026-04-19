@@ -47,6 +47,9 @@ data:
   # Persistent self-learning knowledge base
   knowledge_base: "data/knowledge_base"
 
+  # Persistent background job store
+  jobs_db: "data/knowledge_base/jobs.sqlite"
+
   # Portable distilled intelligence exports
   skill_files: "data/skill_files"
 

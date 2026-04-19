@@ -257,6 +257,7 @@ def classify_session(session: dict) -> dict:
         m.get("is_auth_reject") or m.get("is_auth_failure")
         for m in dia_msgs
     )
+    subscriber_absent = [m for m in dia_msgs if m.get("is_subscriber_absent") or m.get("semantic_family") == "subscriber_absent"]
     policy_failed   = any(m.get("is_policy_reject") for m in dia_msgs)
     diameter_successes = [m for m in dia_msgs if str(m.get("result_code") or "") in DIAMETER_SUCCESS_CODES]
     diameter_housekeeping = _diameter_housekeeping_profile(session)
@@ -301,6 +302,17 @@ def classify_session(session: dict) -> dict:
         return _result("SUBSCRIBER_BARRED", HIGH, 90,
                        ["Authentication rejected"],
                        "R0_AUTH")
+
+    if subscriber_absent:
+        top = subscriber_absent[0]
+        code = top.get("experimental_result_code") or top.get("result_code") or top.get("effective_result_code") or "unknown"
+        semantic = top.get("semantic_label") or top.get("result_text") or "subscriber absent"
+        evidence = [
+            f"Diameter returned {semantic} ({code})",
+            top.get("protocol_intelligence", {}).get("description")
+            or "The subscriber was not present or registered in the queried service domain.",
+        ]
+        return _result("SUBSCRIBER_UNREACHABLE", HIGH, 93, evidence, "R0_SUBSCRIBER_ABSENT")
 
     if charging_failed:
         return _result("CHARGING_FAILURE", HIGH, 92,

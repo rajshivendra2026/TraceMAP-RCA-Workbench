@@ -226,7 +226,8 @@ def create_app() -> Flask:
             retraining = None
             retraining_started = False
             if bool(cfg("learning.feedback_retrain_enabled", True)):
-                retraining_started = _start_feedback_retraining(knowledge)
+                retraining = _start_feedback_retraining(knowledge)
+                retraining_started = bool(retraining)
             return jsonify(
                 {
                     "updated": result,
@@ -265,6 +266,7 @@ def create_app() -> Flask:
                 new_pcaps=0,
                 processed_pcaps=0,
                 last_result={"processed_pcaps": 0},
+                learning_job_id=None,
             )
             return jsonify(
                 {
@@ -286,17 +288,29 @@ def create_app() -> Flask:
             new_pcaps=len(pending),
             processed_pcaps=0,
             last_result=None,
+            learning_job_id=None,
         )
 
+        job = create_job(
+            "learning",
+            path=learn_path,
+            progress=0,
+            processed_pcaps=0,
+            total_pcaps=len(pending),
+            pending_pcaps=len(pending),
+        )
+        update_learning_status(learning_job_id=job["job_id"])
         Thread(
             target=run_learning_job,
-            args=(learn_path, pending),
+            args=(learn_path, pending, job["job_id"]),
             daemon=True,
         ).start()
 
         return jsonify(
             {
                 "started": True,
+                "job_id": job["job_id"],
+                "job": job,
                 "status": get_learning_status(),
                 "knowledge": load_learning_metrics(),
             }
@@ -357,6 +371,13 @@ def create_app() -> Flask:
         job = get_job(job_id)
         if not job or job.get("kind") != "upload":
             return jsonify({"error": "Upload job not found"}), 404
+        return jsonify(job)
+
+    @app.route("/api/job-status/<job_id>")
+    def job_status(job_id: str):
+        job = get_job(job_id)
+        if not job:
+            return jsonify({"error": "Job not found"}), 404
         return jsonify(job)
 
     @app.route("/api/analyze-call", methods=["POST"])
@@ -503,38 +524,68 @@ def _run_upload_job(job_id: str, save_path: Path, original_name: str) -> None:
         update_job(job_id, status="failed", message="Failed to process uploaded PCAP", error=str(exc))
 
 
-def _start_feedback_retraining(knowledge: KnowledgeEngine) -> bool:
+def _start_feedback_retraining(knowledge: KnowledgeEngine) -> dict | None:
     status = get_learning_status()
     if status.get("retraining_running"):
-        return False
+        job_id = status.get("retraining_job_id")
+        return get_job(job_id) if job_id else None
 
+    dataset_path = str((knowledge.base_dir / "feedback_dataset.jsonl").resolve())
+    job = create_job(
+        "retraining",
+        dataset_path=dataset_path,
+        progress=0,
+        message="Queued retraining candidate models from analyst feedback",
+    )
     update_learning_status(
         retraining_running=True,
         retraining_message="Retraining candidate models from analyst feedback…",
+        retraining_job_id=job["job_id"],
     )
     Thread(
         target=_run_feedback_retraining,
-        args=(str((knowledge.base_dir / "feedback_dataset.jsonl").resolve()),),
+        args=(dataset_path, job["job_id"]),
         daemon=True,
     ).start()
-    return True
+    return job
 
 
-def _run_feedback_retraining(dataset_path: str) -> None:
+def _run_feedback_retraining(dataset_path: str, job_id: str) -> None:
     try:
+        update_job(
+            job_id,
+            status="running",
+            message="Retraining candidate models from analyst feedback…",
+            progress=15,
+        )
         retraining = retrain_from_feedback(
             dataset_path=dataset_path,
             min_samples=int(cfg("learning.feedback_min_samples", 3)),
+        )
+        update_job(
+            job_id,
+            status="completed",
+            message=(retraining or {}).get("message", "Retraining complete"),
+            progress=100,
+            result=retraining,
         )
         update_learning_status(
             last_retraining=retraining,
             last_retraining_at=time.time(),
             retraining_running=False,
             retraining_message="Retraining complete",
+            retraining_job_id=job_id,
         )
     except Exception as exc:
         logger.exception(f"Feedback retraining failed: {exc}")
+        update_job(
+            job_id,
+            status="failed",
+            message=f"Retraining failed: {exc}",
+            error=str(exc),
+        )
         update_learning_status(
             retraining_running=False,
             retraining_message=f"Retraining failed: {exc}",
+            retraining_job_id=job_id,
         )
