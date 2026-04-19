@@ -69,7 +69,12 @@ class AutonomousWatcherTests(unittest.TestCase):
                     watch_paths=[str(input_dir)],
                     base_dir=knowledge,
                     manifest_path=knowledge / "processed_sources.json",
-                    policy=SeedRefreshPolicy(max_unknown_ratio=0.6, max_validation_queue_growth=2, max_pattern_drop=0),
+                    policy=SeedRefreshPolicy(
+                        max_unknown_ratio=0.6,
+                        max_validation_queue_growth=2,
+                        max_pattern_drop=0,
+                        benchmark_enabled=False,
+                    ),
                 )
                 report = watcher.run_cycle()
 
@@ -102,7 +107,7 @@ class AutonomousWatcherTests(unittest.TestCase):
                 return [{"session_id": "sess-1", "rca": {"rca_label": "NORMAL_CALL"}}]
 
             class RaisingPublisher:
-                def publish(self, paths, message, push=False):
+                def publish(self, paths, message, push=False, branch=None):
                     raise RuntimeError("git publish failed")
 
             with patch("src.autonomous.watcher.process_pcap", side_effect=fake_process_pcap), patch(
@@ -152,6 +157,42 @@ class AutonomousWatcherTests(unittest.TestCase):
             ).stdout
             self.assertIn(" M validation_queue.json", status)
             self.assertNotIn("patterns.json", status)
+
+    def test_git_publisher_pushes_to_review_branch(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo = Path(tmpdir)
+            subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+            subprocess.run(["git", "config", "user.email", "watcher@example.com"], cwd=repo, check=True)
+            subprocess.run(["git", "config", "user.name", "Watcher"], cwd=repo, check=True)
+            tracked = repo / "patterns.json"
+            tracked.write_text("[]\n", encoding="utf-8")
+            subprocess.run(["git", "add", "patterns.json"], cwd=repo, check=True)
+            subprocess.run(["git", "commit", "-m", "seed"], cwd=repo, check=True, capture_output=True, text=True)
+
+            tracked.write_text('[{"pattern_id":"pat-1"}]\n', encoding="utf-8")
+
+            publisher = GitPublisher(repo_root=repo)
+            commands: list[list[str]] = []
+            original_run = publisher._run
+
+            def capture_run(cmd, check=True):
+                commands.append(list(cmd))
+                if cmd[:3] == ["git", "push", "origin"]:
+                    return subprocess.CompletedProcess(cmd, 0, "", "")
+                return original_run(cmd, check=check)
+
+            with patch.object(publisher, "_run", side_effect=capture_run):
+                result = publisher.publish(
+                    paths=[str(tracked)],
+                    message="Refresh autonomous seed learning from trace-1.pcap",
+                    push=True,
+                    branch="learning-updates",
+                )
+
+            self.assertTrue(result["committed"])
+            self.assertTrue(result["pushed"])
+            self.assertEqual(result["branch"], "learning-updates")
+            self.assertIn(["git", "push", "origin", "HEAD:learning-updates"], commands)
 
     def test_snapshot_seed_state_counts_pending_validation(self):
         with tempfile.TemporaryDirectory() as tmpdir:

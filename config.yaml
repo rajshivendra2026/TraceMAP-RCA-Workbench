@@ -162,7 +162,6 @@ benchmarks:
     - "data/raw_pcaps"
   # Add local-only benchmark roots via environment override when needed:
   # TC_RCA__BENCHMARKS__ROOTS="/abs/path/one,/abs/path/two"
-    - "/Users/shivendraraj/Documents/Test Cases"
 
 
 # ============================================================
@@ -204,6 +203,7 @@ autonomous:
   poll_interval_sec: 60
   auto_commit: true
   auto_push: false
+  push_branch: "learning-updates"
   max_unknown_ratio: 0.35
   max_validation_queue_growth: 25
   max_pattern_drop: 0

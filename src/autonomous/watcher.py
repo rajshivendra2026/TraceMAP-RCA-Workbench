@@ -191,6 +191,7 @@ class GitPublisher:
         paths: list[str],
         message: str,
         push: bool = False,
+        branch: str | None = None,
     ) -> dict[str, Any]:
         unique_paths = [str(path) for path in dict.fromkeys(paths) if path]
         if not unique_paths:
@@ -214,8 +215,9 @@ class GitPublisher:
 
         pushed = False
         push_error = None
+        push_branch = branch or "main"
         if push:
-            push_result = self._run(["git", "push", "origin", "main"], check=False)
+            push_result = self._run(["git", "push", "origin", f"HEAD:{push_branch}"], check=False)
             pushed = push_result.returncode == 0
             if not pushed:
                 push_error = push_result.stderr or push_result.stdout
@@ -223,6 +225,7 @@ class GitPublisher:
         return {
             "committed": True,
             "pushed": pushed,
+            "branch": push_branch if push else None,
             "paths": rel_changed,
             "commit_message": message,
             "push_error": push_error,
@@ -374,6 +377,7 @@ class AutonomousLearningWatcher:
                 paths=commit_paths,
                 message=commit_message,
                 push=bool(cfg("autonomous.auto_push", False)),
+                branch=str(cfg("autonomous.push_branch", "learning-updates")),
             )
         else:
             report["git"] = {
