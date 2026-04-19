@@ -344,33 +344,25 @@ _DIALOG_MESSAGES = frozenset({
 
 def _group_sip_dialog(flow: list) -> list:
     """
-    Group SIP events into dialogs. A new INVITE starts a new dialog segment.
-    Non-SIP events are interleaved at their natural position.
-    Re-INVITEs are preserved as distinct segments rather than flushed.
+    Annotate SIP events with dialog segments without reordering mixed traffic.
+    A new INVITE starts a new segment, while interleaved non-SIP events remain
+    in their natural position so dialogs are not micro-flushed by other traffic.
     """
     grouped = []
-    dialog: list = []
+    dialog_index = 0
 
     for f in flow:
         if f["protocol"] != "SIP":
-            # Flush any open dialog before a non-SIP event so ordering is preserved
-            if dialog:
-                grouped.extend(dialog)
-                dialog = []
             grouped.append(f)
             continue
 
         msg = f["message"]
         if msg == "INVITE":
-            # Start a fresh dialog segment; keep prior dialog in output
-            if dialog:
-                grouped.extend(dialog)
-            dialog = [f]
-        else:
-            dialog.append(f)
-
-    if dialog:
-        grouped.extend(dialog)
+            dialog_index += 1
+        annotated = dict(f)
+        if dialog_index:
+            annotated["dialog_segment"] = dialog_index
+        grouped.append(annotated)
 
     return grouped
 
@@ -539,7 +531,7 @@ def _build_non_sip_seed_sessions(
 
     for session_id, packets in _group_packets(
         dia_pkts,
-        lambda packet: packet.get("session_id") or packet.get("imsi") or packet.get("msisdn") or _packet_peer_key(packet),
+        lambda packet: packet.get("session_id") or packet.get("imsi") or packet.get("msisdn") or _seed_fallback_key(packet),
         "DIAMETER",
     ).items():
         sessions.append(
@@ -556,7 +548,7 @@ def _build_non_sip_seed_sessions(
 
     for session_id, packets in _group_packets(
         inap_pkts,
-        lambda packet: packet.get("tcap_tid") or packet.get("calling_number") or _packet_peer_key(packet),
+        lambda packet: packet.get("tcap_tid") or packet.get("calling_number") or _seed_fallback_key(packet),
         "INAP",
     ).items():
         sessions.append(
@@ -573,7 +565,7 @@ def _build_non_sip_seed_sessions(
 
     for session_id, packets in _group_packets(
         gtp_pkts,
-        lambda packet: packet.get("gtp.tid") or packet.get("gtpv2.imsi") or _packet_peer_key(packet),
+        lambda packet: packet.get("gtp.tid") or packet.get("gtpv2.imsi") or _seed_fallback_key(packet),
         "GTP",
     ).items():
         sessions.append(
@@ -597,7 +589,7 @@ def _build_non_sip_seed_sessions(
             or packet.get("imsi")
             or packet.get("msisdn")
             or packet.get("stream_id")
-            or _packet_peer_key(packet)
+            or _seed_fallback_key(packet)
         ),
         None,
     ).items():
@@ -1421,6 +1413,18 @@ def _packet_peer_key(packet: dict) -> str:
     src_port = packet.get("src_port") or "-"
     dst_port = packet.get("dst_port") or "-"
     return f"{src}:{src_port}->{dst}:{dst_port}"
+
+
+def _seed_fallback_key(packet: dict) -> str:
+    """
+    Use a conservative fallback for seed sessions when no subscriber/session
+    identity is present. Frame-number scoping avoids merging unrelated
+    subscribers that happen to share the same NATed peer tuple.
+    """
+    frame_number = packet.get("frame_number")
+    if frame_number is not None:
+        return f"{_packet_peer_key(packet)}#f{frame_number}"
+    return _packet_peer_key(packet)
 
 
 def _select_in_window(pkts: list, start_time: Optional[float], end_time: Optional[float], window_sec: int) -> list:

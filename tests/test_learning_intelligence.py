@@ -70,6 +70,33 @@ class LearningIntelligenceTests(unittest.TestCase):
         self.assertGreaterEqual(hybrid["confidence_pct"], 50)
         self.assertTrue(any("historical pattern" in item for item in hybrid["evidence"]))
 
+    def test_hybrid_blend_uses_winning_label_recommendations_only(self):
+        rule_rca = {
+            **sample_session()["rca"],
+            "rca_label": "CHARGING_FAILURE",
+            "recommendations": ["Check OCS latency"],
+        }
+        hybrid = blend_hybrid_rca(
+            rule_rca=rule_rca,
+            pattern_match={
+                "pattern_id": "p-2",
+                "root_cause": "POLICY_FAILURE",
+                "scenario": "Policy reject",
+                "similarity": 1.0,
+                "historical_success": 1.0,
+            },
+            confidence_result={"final_label": "POLICY_FAILURE", "confidence_pct": 88, "confidence_score": 0.88},
+        )
+        self.assertEqual(hybrid["rca_label"], "POLICY_FAILURE")
+        self.assertEqual(
+            hybrid["recommendations"],
+            [
+                "Review PCRF/PCF logs for rejected transactions.",
+                "Validate APN/DNN and policy binding configuration.",
+                "Inspect subscription profile consistency across control-plane systems.",
+            ],
+        )
+
     def test_learning_loop_creates_and_reuses_patterns(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             knowledge = KnowledgeEngine(base_dir=tmpdir)

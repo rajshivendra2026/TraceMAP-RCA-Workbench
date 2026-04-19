@@ -136,6 +136,6 @@ def _get(d: dict, *keys) -> Optional[str]:
                 values = [str(v).strip() for v in val if str(v).strip()]
                 if not values:
                     continue
-                return values[0] if len(values) == 1 else ", ".join(values)
+                return values[0]
             return str(val).strip()
     return None

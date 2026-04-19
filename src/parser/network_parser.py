@@ -747,6 +747,6 @@ def _get(d: dict, *keys):
             values = [str(v).strip() for v in value if str(v).strip()]
             if not values:
                 continue
-            return values[0] if len(values) == 1 else ", ".join(values)
+            return values[0]
         return value
     return None

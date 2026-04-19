@@ -158,6 +158,19 @@ class NetworkParserTests(unittest.TestCase):
         self.assertIn("Access-Reject", packet["message"])
         self.assertTrue(packet["is_failure"])
 
+    def test_tcap_transaction_list_uses_first_value(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "16",
+                "frame.time_epoch": "129.0",
+                "tcap.tid": ["69070000", "69070001"],
+                "_ws.col.info": "invoke continue",
+            },
+            "MAP",
+        )
+
+        self.assertEqual(packet["transaction_id"], "69070000")
+
 
 if __name__ == "__main__":
     unittest.main()

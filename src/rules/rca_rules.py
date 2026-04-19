@@ -915,10 +915,7 @@ def blend_hybrid_rca(
             f"{top.get('agent', 'Protocol')} agent proposed {top.get('label', 'UNKNOWN')} with {round(float(top.get('confidence', 0)) * 100)}% confidence"
         )
 
-    recommendations = list(dict.fromkeys([
-        *rule_rca.get("recommendations", []),
-        *meta.get("recommendations", []),
-    ]))
+    recommendations = list(meta.get("recommendations", []))
 
     return {
         "rca_label": final_label,

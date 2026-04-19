@@ -151,6 +151,6 @@ def _get(d: dict, *keys):
             values = [str(v).strip() for v in val if str(v).strip()]
             if not values:
                 continue
-            return values[0] if len(values) == 1 else ", ".join(values)
+            return values[0]
         return val
     return None

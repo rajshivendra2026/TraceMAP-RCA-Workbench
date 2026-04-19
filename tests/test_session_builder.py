@@ -17,7 +17,7 @@ sys.modules.setdefault(
 )
 sys.modules.setdefault("yaml", types.SimpleNamespace(safe_load=lambda _: {}))
 
-from src.correlation.session_builder import build_sessions
+from src.correlation.session_builder import _build_non_sip_seed_sessions, _group_sip_dialog, build_sessions
 
 
 class SessionBuilderTests(unittest.TestCase):
@@ -65,6 +65,51 @@ class SessionBuilderTests(unittest.TestCase):
         self.assertTrue(session["has_invite"])
         self.assertTrue(session["has_180"])
         self.assertFalse(session["has_200"])
+
+    def test_group_sip_dialog_preserves_interleaved_non_sip_without_flushing(self):
+        flow = [
+            {"protocol": "SIP", "message": "INVITE", "time": 1.0},
+            {"protocol": "DIAMETER", "message": "CCR", "time": 1.1},
+            {"protocol": "SIP", "message": "180", "time": 1.2},
+            {"protocol": "SIP", "message": "200", "time": 1.3},
+        ]
+
+        grouped = _group_sip_dialog(flow)
+
+        self.assertEqual([item["protocol"] for item in grouped], ["SIP", "DIAMETER", "SIP", "SIP"])
+        self.assertEqual(grouped[0].get("dialog_segment"), 1)
+        self.assertEqual(grouped[2].get("dialog_segment"), 1)
+        self.assertEqual(grouped[3].get("dialog_segment"), 1)
+
+    def test_non_sip_seed_sessions_do_not_merge_nat_packets_without_identity(self):
+        dia_pkts = [
+            {
+                "frame_number": 100,
+                "timestamp": 1.0,
+                "src_ip": "203.0.113.10",
+                "dst_ip": "198.51.100.20",
+                "src_port": 3868,
+                "dst_port": 3868,
+                "session_id": None,
+                "imsi": None,
+                "msisdn": None,
+            },
+            {
+                "frame_number": 101,
+                "timestamp": 1.1,
+                "src_ip": "203.0.113.10",
+                "dst_ip": "198.51.100.20",
+                "src_port": 3868,
+                "dst_port": 3868,
+                "session_id": None,
+                "imsi": None,
+                "msisdn": None,
+            },
+        ]
+
+        sessions = _build_non_sip_seed_sessions(dia_pkts=dia_pkts, inap_pkts=[], gtp_pkts=[], generic_pkts=[])
+        self.assertEqual(len(sessions), 2)
+        self.assertNotEqual(sessions[0]["session_id"], sessions[1]["session_id"])
 
 
 if __name__ == "__main__":
