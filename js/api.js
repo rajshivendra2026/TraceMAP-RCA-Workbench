@@ -11,8 +11,10 @@
 const ALLOWED_EXTENSIONS = [".pcap", ".pcapng", ".cap"];
 const MAX_FILE_BYTES      = 500 * 1024 * 1024; // 500 MB
 let learningStatusTimer = null;
+let uploadStatusTimer = null;
 
 async function uploadPCAP(file) {
+  let uploadInProgress = false;
 
   /* FIX [2]: validate file extension client-side */
   const ext = "." + file.name.split(".").pop().toLowerCase();
@@ -67,55 +69,26 @@ async function uploadPCAP(file) {
 
     const data = await res.json();
     console.log("Server response:", data);
-    if (typeof window.traceDebug === "function") {
-      window.traceDebug("upload.response", {
-        filename: data.filename || "",
-        sessions: Array.isArray(data.sessions) ? data.sessions.length : -1,
-        hasSummary: Boolean(data.summary),
-      });
-    }
-
-    if (typeof STATE !== "undefined") {
-      STATE.token = data.token || null;
-      STATE.filename = data.filename || "";
-      STATE.model = data.model || null;
-      STATE.summary = data.summary || null;
-      STATE.sessions = data.sessions || [];
-      STATE.captureGraph = data.graph || null;
-      STATE.graph = STATE.captureGraph;
-      STATE.hydrationPending = true;
-    }
-
-    if (typeof window.hydrateFromState === "function") {
+    if (res.status === 202 && data.job_id) {
+      uploadInProgress = true;
       if (typeof window.traceDebug === "function") {
-        window.traceDebug("upload.hydrateFromState", {
-          filename: STATE.filename,
-          sessions: STATE.sessions.length,
+        window.traceDebug("upload.accepted", {
+          filename: data.filename || "",
+          jobId: data.job_id,
         });
       }
-      window.hydrateFromState();
-    } else if (typeof window.loadData === "function") {
+      await pollUploadJob(data.job_id, uploadBtn);
+    } else {
       if (typeof window.traceDebug === "function") {
-        window.traceDebug("upload.loadDataFallback", {
+        window.traceDebug("upload.response", {
           filename: data.filename || "",
           sessions: Array.isArray(data.sessions) ? data.sessions.length : -1,
+          hasSummary: Boolean(data.summary),
         });
       }
-      window.loadData(data);
-    } else {
-      console.error("No render hydrator available after upload completion");
-      window.__TRACE_PENDING_UPLOAD__ = data;
-      if (typeof window.traceDebug === "function") {
-        window.traceDebug("upload.noHydrator", {
-          filename: data.filename || "",
-        });
-      }
+      hydrateUploadResult(data);
+      alert("✅ PCAP processed successfully");
     }
-
-    if (typeof refreshValidationQueue === "function") {
-      refreshValidationQueue();
-    }
-    alert("✅ PCAP processed successfully");
 
   } catch (err) {
     console.error("uploadPCAP error:", err);
@@ -125,7 +98,7 @@ async function uploadPCAP(file) {
     alert("❌ Upload failed: " + err.message);
   } finally {
     /* FIX [4]: always restore the button regardless of success/failure */
-    if (uploadBtn) {
+    if (uploadBtn && !uploadInProgress) {
       uploadBtn.disabled  = false;
       uploadBtn.innerText = origLabel ?? "Upload PCAP";
     }
@@ -164,6 +137,112 @@ async function startLearning() {
       btn.innerText = origLabel ?? "Start Learning";
     }
   }
+}
+
+function hydrateUploadResult(data) {
+  if (typeof STATE !== "undefined") {
+    STATE.token = data.token || null;
+    STATE.filename = data.filename || "";
+    STATE.model = data.model || null;
+    STATE.summary = data.summary || null;
+    STATE.sessions = data.sessions || [];
+    STATE.captureGraph = data.graph || null;
+    STATE.graph = STATE.captureGraph;
+    STATE.hydrationPending = true;
+  }
+
+  if (typeof window.hydrateFromState === "function") {
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.hydrateFromState", {
+        filename: STATE.filename,
+        sessions: STATE.sessions.length,
+      });
+    }
+    window.hydrateFromState();
+  } else if (typeof window.loadData === "function") {
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.loadDataFallback", {
+        filename: data.filename || "",
+        sessions: Array.isArray(data.sessions) ? data.sessions.length : -1,
+      });
+    }
+    window.loadData(data);
+  } else {
+    console.error("No render hydrator available after upload completion");
+    window.__TRACE_PENDING_UPLOAD__ = data;
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.noHydrator", {
+        filename: data.filename || "",
+      });
+    }
+  }
+
+  if (typeof refreshValidationQueue === "function") {
+    refreshValidationQueue();
+  }
+}
+
+async function pollUploadJob(jobId, uploadBtn) {
+  const pollOnce = async () => {
+    const res = await fetch(`/api/upload-status/${encodeURIComponent(jobId)}`);
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `Server returned ${res.status}`);
+    }
+    if (uploadBtn) {
+      uploadBtn.innerText = data.status === "completed"
+        ? "Upload PCAP"
+        : `${data.message || "Processing…"} ${data.progress != null ? `(${Math.round(Number(data.progress || 0))}%)` : ""}`.trim();
+    }
+    if (typeof window.traceDebug === "function") {
+      window.traceDebug("upload.poll", {
+        jobId,
+        status: data.status,
+        progress: data.progress,
+      });
+    }
+    if (data.status === "completed") {
+      if (uploadStatusTimer) {
+        window.clearInterval(uploadStatusTimer);
+        uploadStatusTimer = null;
+      }
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+        uploadBtn.innerText = "Upload PCAP";
+      }
+      hydrateUploadResult(data.result || {});
+      alert("✅ PCAP processed successfully");
+      return true;
+    }
+    if (data.status === "failed") {
+      if (uploadStatusTimer) {
+        window.clearInterval(uploadStatusTimer);
+        uploadStatusTimer = null;
+      }
+      throw new Error(data.error || data.message || "Failed to process uploaded PCAP");
+    }
+    return false;
+  };
+
+  const done = await pollOnce();
+  if (done) return;
+  if (uploadStatusTimer) {
+    window.clearInterval(uploadStatusTimer);
+  }
+  uploadStatusTimer = window.setInterval(() => {
+    pollOnce().catch(err => {
+      if (uploadStatusTimer) {
+        window.clearInterval(uploadStatusTimer);
+        uploadStatusTimer = null;
+      }
+      alert("❌ Upload failed: " + err.message);
+      const uploadBtnEl = document.getElementById("uploadBtn");
+      if (uploadBtnEl) {
+        uploadBtnEl.disabled = false;
+        uploadBtnEl.innerText = "Upload PCAP";
+      }
+    });
+  }, 1500);
 }
 
 async function saveLearningPath() {
@@ -258,6 +337,9 @@ async function submitValidationAction(validationId, action, note = "") {
         knowledge: data.knowledge,
         status: data.status || STATE.learning?.status || {},
       });
+    }
+    if (data.retraining_started) {
+      alert("✅ Validation saved. Candidate retraining started in the background.");
     }
     return data;
   } catch (err) {

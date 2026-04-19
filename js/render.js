@@ -1872,7 +1872,7 @@ function renderLearningStatus(payload) {
     pathInput.value = savedPath;
   }
 
-  const governanceState = _summarizeGovernanceState(retraining);
+  const governanceState = _summarizeGovernanceState(retraining, status);
   const driftState = _summarizeDriftState(retraining?.drift || null);
   _setText("governanceStateLabel", governanceState.label);
   _setText("governanceDetail", governanceState.detail);
@@ -1950,7 +1950,14 @@ function renderVersionInfo(payload) {
   });
 }
 
-function _summarizeGovernanceState(retraining) {
+function _summarizeGovernanceState(retraining, status = {}) {
+  if (status?.retraining_running) {
+    return {
+      label: "Retraining running",
+      detail: status.retraining_message || "Candidate models are being rebuilt in the background.",
+    };
+  }
+
   if (!retraining) {
     return {
       label: "Awaiting feedback",

@@ -7,6 +7,8 @@ from src.config import cfg
 
 _store: dict[str, dict] = {}
 _lock = Lock()
+_job_store: dict[str, dict] = {}
+_job_lock = Lock()
 _learning_lock = RLock()
 _learning_status = {
     "running": False,
@@ -19,6 +21,8 @@ _learning_status = {
     "last_result": None,
     "last_retraining": None,
     "last_retraining_at": None,
+    "retraining_running": False,
+    "retraining_message": "Idle",
 }
 
 
@@ -69,8 +73,65 @@ def purge_expired_sessions(locked: bool = False) -> None:
 def cache_stats() -> dict:
     return {
         "entries": len(_store),
+        "jobs": len(_job_store),
         "ttl_sec": int(cfg("server.session_ttl_sec", 3600)),
     }
+
+
+def create_job(kind: str, **values) -> dict:
+    job_id = str(uuid.uuid4())
+    now = time.time()
+    payload = {
+        "job_id": job_id,
+        "kind": kind,
+        "status": "queued",
+        "message": "Queued",
+        "created_at": now,
+        "updated_at": now,
+    }
+    payload.update(values)
+    ttl_sec = int(cfg("server.session_ttl_sec", 3600))
+    with _job_lock:
+        purge_expired_jobs(locked=True)
+        _job_store[job_id] = payload
+        while len(_job_store) > int(cfg("server.max_cached_uploads", 20)) * 4:
+            oldest = min(_job_store.items(), key=lambda item: item[1]["updated_at"])[0]
+            _job_store.pop(oldest, None)
+    return dict(payload)
+
+
+def update_job(job_id: str, **values) -> dict | None:
+    with _job_lock:
+        entry = _job_store.get(job_id)
+        if not entry:
+            return None
+        entry.update(values)
+        entry["updated_at"] = time.time()
+        return dict(entry)
+
+
+def get_job(job_id: str) -> dict | None:
+    purge_expired_jobs()
+    with _job_lock:
+        entry = _job_store.get(job_id)
+        return dict(entry) if entry else None
+
+
+def purge_expired_jobs(locked: bool = False) -> None:
+    ttl_sec = int(cfg("server.session_ttl_sec", 3600))
+    now = time.time()
+
+    def purge() -> None:
+        expired = [job_id for job_id, entry in _job_store.items() if now - float(entry.get("updated_at", now)) > ttl_sec]
+        for job_id in expired:
+            _job_store.pop(job_id, None)
+
+    if locked:
+        purge()
+        return
+
+    with _job_lock:
+        purge()
 
 
 def update_learning_status(**values) -> None:

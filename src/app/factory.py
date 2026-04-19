@@ -36,7 +36,16 @@ from .learning import (
     save_default_learning_path,
     update_learning_status,
 )
-from .state import cache_stats, find_session, purge_expired_sessions, store_sessions
+from .state import (
+    cache_stats,
+    create_job,
+    find_session,
+    get_job,
+    purge_expired_jobs,
+    purge_expired_sessions,
+    store_sessions,
+    update_job,
+)
 from .summary import build_capture_graph, build_capture_summary, session_summary
 
 
@@ -215,15 +224,9 @@ def create_app() -> Flask:
             if not result:
                 return jsonify({"error": "Validation item not found"}), 404
             retraining = None
+            retraining_started = False
             if bool(cfg("learning.feedback_retrain_enabled", True)):
-                retraining = retrain_from_feedback(
-                    dataset_path=str((knowledge.base_dir / "feedback_dataset.jsonl").resolve()),
-                    min_samples=int(cfg("learning.feedback_min_samples", 3)),
-                )
-                update_learning_status(
-                    last_retraining=retraining,
-                    last_retraining_at=time.time(),
-                )
+                retraining_started = _start_feedback_retraining(knowledge)
             return jsonify(
                 {
                     "updated": result,
@@ -231,6 +234,7 @@ def create_app() -> Flask:
                     "knowledge": load_learning_metrics(),
                     "status": get_learning_status(),
                     "retraining": retraining,
+                    "retraining_started": retraining_started,
                 }
             )
         except ValueError as exc:
@@ -301,6 +305,7 @@ def create_app() -> Flask:
     @app.route("/upload", methods=["POST"])
     def upload():
         purge_expired_sessions()
+        purge_expired_jobs()
         uploaded = request.files.get("file")
 
         if not uploaded or not uploaded.filename:
@@ -314,39 +319,28 @@ def create_app() -> Flask:
         try:
             save_path.parent.mkdir(parents=True, exist_ok=True)
             uploaded.save(save_path)
-            logger.info(f"Loading PCAP: {save_path.name}")
-
-            parsed = load_pcap(str(save_path))
-            sessions = apply_correlation(apply_rca(build_sessions(parsed)))
-            for session in sessions:
-                session["pcap_source"] = save_path.stem
-            learning = run_learning_cycle(
-                sessions,
-                compact=bool(cfg("learning.compact_on_upload", False)),
-                export_skills=bool(cfg("learning.export_skill_on_upload", False)),
+            job = create_job(
+                "upload",
+                filename=save_path.name,
+                original_filename=Path(uploaded.filename or save_path.name).name,
+                path=str(save_path),
+                progress=5,
             )
-            sessions = learning["sessions"]
-            graph = build_capture_graph(parsed)
-
-            token = store_sessions(sessions)
-            return jsonify(
-                {
-                    "token": token,
-                    "filename": save_path.name,
-                    "sessions": [session_summary(s) for s in sessions],
-                    "graph": graph,
-                    "summary": build_capture_summary(
-                        parsed,
-                        sessions,
-                        capture_meta={
-                            "filename": Path(uploaded.filename or save_path.name).name,
-                            "stored_filename": save_path.name,
-                            "size_bytes": save_path.stat().st_size if save_path.exists() else None,
-                        },
-                    ),
-                    "learning": learning["metrics"],
-                    "model": load_model_status(),
-                }
+            Thread(
+                target=_run_upload_job,
+                args=(job["job_id"], save_path, Path(uploaded.filename or save_path.name).name),
+                daemon=True,
+            ).start()
+            return (
+                jsonify(
+                    {
+                        "accepted": True,
+                        "job_id": job["job_id"],
+                        "filename": save_path.name,
+                        "status": job,
+                    }
+                ),
+                202,
             )
         except FileNotFoundError as exc:
             logger.error(f"Upload file error: {exc}")
@@ -357,6 +351,13 @@ def create_app() -> Flask:
         except Exception as exc:
             logger.exception(f"Upload processing failed: {exc}")
             return jsonify({"error": "Failed to process uploaded PCAP"}), 500
+
+    @app.route("/api/upload-status/<job_id>")
+    def upload_status(job_id: str):
+        job = get_job(job_id)
+        if not job or job.get("kind") != "upload":
+            return jsonify({"error": "Upload job not found"}), 404
+        return jsonify(job)
 
     @app.route("/api/analyze-call", methods=["POST"])
     def analyze_call():
@@ -444,3 +445,96 @@ def load_model_status() -> dict:
 
 
 app = create_app()
+
+
+def _run_upload_job(job_id: str, save_path: Path, original_name: str) -> None:
+    try:
+        logger.info(f"Loading PCAP asynchronously: {save_path.name}")
+        update_job(job_id, status="running", message="Extracting and decoding PCAP", progress=15)
+
+        parsed = load_pcap(str(save_path))
+        update_job(job_id, status="running", message="Correlating sessions", progress=45)
+
+        sessions = apply_correlation(apply_rca(build_sessions(parsed)))
+        for session in sessions:
+            session["pcap_source"] = save_path.stem
+
+        update_job(job_id, status="running", message="Running learning and RCA enrichment", progress=70)
+        learning = run_learning_cycle(
+            sessions,
+            compact=bool(cfg("learning.compact_on_upload", False)),
+            export_skills=bool(cfg("learning.export_skill_on_upload", False)),
+        )
+        sessions = learning["sessions"]
+        graph = build_capture_graph(parsed)
+        token = store_sessions(sessions)
+        payload = {
+            "token": token,
+            "filename": save_path.name,
+            "sessions": [session_summary(s) for s in sessions],
+            "graph": graph,
+            "summary": build_capture_summary(
+                parsed,
+                sessions,
+                capture_meta={
+                    "filename": original_name,
+                    "stored_filename": save_path.name,
+                    "size_bytes": save_path.stat().st_size if save_path.exists() else None,
+                },
+            ),
+            "learning": learning["metrics"],
+            "model": load_model_status(),
+        }
+        update_job(
+            job_id,
+            status="completed",
+            message=f"Processed {len(sessions)} session(s)",
+            progress=100,
+            result=payload,
+        )
+    except FileNotFoundError as exc:
+        logger.error(f"Async upload file error: {exc}")
+        update_job(job_id, status="failed", message=str(exc), error=str(exc))
+    except ValueError as exc:
+        logger.error(f"Async upload validation error: {exc}")
+        update_job(job_id, status="failed", message=str(exc), error=str(exc))
+    except Exception as exc:
+        logger.exception(f"Async upload processing failed: {exc}")
+        update_job(job_id, status="failed", message="Failed to process uploaded PCAP", error=str(exc))
+
+
+def _start_feedback_retraining(knowledge: KnowledgeEngine) -> bool:
+    status = get_learning_status()
+    if status.get("retraining_running"):
+        return False
+
+    update_learning_status(
+        retraining_running=True,
+        retraining_message="Retraining candidate models from analyst feedback…",
+    )
+    Thread(
+        target=_run_feedback_retraining,
+        args=(str((knowledge.base_dir / "feedback_dataset.jsonl").resolve()),),
+        daemon=True,
+    ).start()
+    return True
+
+
+def _run_feedback_retraining(dataset_path: str) -> None:
+    try:
+        retraining = retrain_from_feedback(
+            dataset_path=dataset_path,
+            min_samples=int(cfg("learning.feedback_min_samples", 3)),
+        )
+        update_learning_status(
+            last_retraining=retraining,
+            last_retraining_at=time.time(),
+            retraining_running=False,
+            retraining_message="Retraining complete",
+        )
+    except Exception as exc:
+        logger.exception(f"Feedback retraining failed: {exc}")
+        update_learning_status(
+            retraining_running=False,
+            retraining_message=f"Retraining failed: {exc}",
+        )
