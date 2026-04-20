@@ -842,6 +842,94 @@ function _nodeTypeFromLabel(label) {
   return String(label || "NODE").split("\n", 1)[0] || "NODE";
 }
 
+function _parseNodeLabel(nodeLabel) {
+  const raw = String(nodeLabel || "").trim();
+  const parts = raw.split("\n").map(part => part.trim()).filter(Boolean);
+  const first = parts[0] || raw || "NODE";
+  const second = parts[1] || "";
+  const looksLikeAddress = value => /^[0-9a-f:.]+$/i.test(String(value || ""));
+
+  return {
+    raw,
+    type: parts.length > 1 ? first : (looksLikeAddress(first) ? "NODE" : first),
+    address: parts.length > 1 ? second : (looksLikeAddress(first) ? first : ""),
+  };
+}
+
+function _isGenericNodeRole(value) {
+  return ["NODE", "UNKNOWN", "CORE", "EXT", "EXTERNAL", "IMS", "UE"].includes(String(value || "").toUpperCase());
+}
+
+function _buildLadderNodeIntelligence(flow) {
+  const flowNodes = new Set();
+  (flow || []).forEach(item => {
+    if (item?.src) flowNodes.add(item.src);
+    if (item?.dst) flowNodes.add(item.dst);
+  });
+
+  const graphNodes = [
+    ...(Array.isArray(STATE.selected?.graph?.nodes) ? STATE.selected.graph.nodes : []),
+    ...(Array.isArray(STATE.graph?.nodes) ? STATE.graph.nodes : []),
+    ...(Array.isArray(STATE.captureGraph?.nodes) ? STATE.captureGraph.nodes : []),
+  ];
+  const inventoryNodes = [
+    ...(Array.isArray(STATE.selected?.details_summary?.node_inventory) ? STATE.selected.details_summary.node_inventory : []),
+    ...(Array.isArray(STATE.summary?.details?.node_inventory) ? STATE.summary.details.node_inventory : []),
+    ...(Array.isArray(STATE.summary?.details?.topology?.nodes) ? STATE.summary.details.topology.nodes : []),
+  ];
+
+  const inventoryByIp = new Map();
+  inventoryNodes.forEach(item => {
+    const address = String(item.ip || item.address || "").trim();
+    if (!address) return;
+    inventoryByIp.set(address, item);
+  });
+
+  const graphById = new Map();
+  const graphByAddress = new Map();
+  graphNodes.forEach(node => {
+    if (!node?.id) return;
+    graphById.set(node.id, node);
+    const parsed = _parseNodeLabel(node.id);
+    const address = String(node.label || parsed.address || "").trim();
+    if (address) graphByAddress.set(address, node);
+  });
+
+  const inferred = new Map();
+  flowNodes.forEach(nodeLabel => {
+    const parsed = _parseNodeLabel(nodeLabel);
+    const graphNode = graphById.get(nodeLabel) || graphByAddress.get(parsed.address) || null;
+    const inventoryNode = inventoryByIp.get(parsed.address) || null;
+    const graphType = String(graphNode?.type || "").trim();
+    const inventoryRole = String(inventoryNode?.role || inventoryNode?.label || "").trim();
+    const rawType = String(parsed.type || "").trim();
+
+    let role = inventoryRole || "";
+    if (!role && graphType && !_isGenericNodeRole(graphType)) role = graphType;
+    if (!role && rawType && !_isGenericNodeRole(rawType)) role = rawType;
+    if (!role) role = rawType || graphType || "NODE";
+
+    const address = parsed.address || String(graphNode?.label || inventoryNode?.ip || inventoryNode?.address || "").trim();
+    const zone = rawType && role.toUpperCase() !== rawType.toUpperCase() ? rawType : "";
+
+    inferred.set(nodeLabel, {
+      raw: nodeLabel,
+      role,
+      zone,
+      address,
+      confidence: inventoryNode?.confidence || "",
+      evidence: inventoryNode?.evidence || "",
+      protocols: inventoryNode?.protocols || [],
+    });
+  });
+
+  return inferred;
+}
+
+function _resolveLadderNode(nodeLabel) {
+  return _buildLadderNodeIntelligence([{ src: nodeLabel, dst: nodeLabel }]).get(nodeLabel) || _parseNodeLabel(nodeLabel);
+}
+
 /* ════════════════════════════════════════════════════════════════
    LADDER DIAGRAM
    ════════════════════════════════════════════════════════════════ */
@@ -879,15 +967,19 @@ function renderLadder(flow) {
   const nodeSet = new Set();
   filteredFlow.forEach(f => { nodeSet.add(f.src); nodeSet.add(f.dst); });
   const nodes = [...nodeSet];
+  const nodeIntel = _buildLadderNodeIntelligence(filteredFlow);
 
   /* Layout constants */
-  const LEFT_MARGIN = 44;
+  const LEFT_MARGIN = 76;
   const RIGHT_MARGIN = 44;
   const TOP_HEADER  = 74;
   const ROW_HEIGHT  = 52;
   const SELF_RADIUS = 20;
   const containerWidth = Math.max(760, container.clientWidth || 1200);
-  const svgWidth  = Math.max(760, containerWidth - 24);
+  const baseWidth = Math.max(760, containerWidth - 24);
+  const minimumGap = 180;
+  const requiredWidth = LEFT_MARGIN + RIGHT_MARGIN + Math.max(0, nodes.length - 1) * minimumGap + 160;
+  const svgWidth  = Math.max(baseWidth, requiredWidth);
   const svgHeight = TOP_HEADER + filteredFlow.length * ROW_HEIGHT + 56;
 
   const svg = _makeSVGEl("svg");
@@ -914,7 +1006,7 @@ function renderLadder(flow) {
   const nodeX = {};
   const usableWidth = Math.max(220, svgWidth - LEFT_MARGIN - RIGHT_MARGIN);
   const nodeGap = nodes.length > 1
-    ? Math.max(180, Math.min(320, usableWidth / (nodes.length - 1)))
+    ? Math.max(minimumGap, Math.min(320, usableWidth / (nodes.length - 1)))
     : 0;
   const nodeSpan = nodeGap * Math.max(0, nodes.length - 1);
   const startX = LEFT_MARGIN + (usableWidth - nodeSpan) / 2;
@@ -923,9 +1015,10 @@ function renderLadder(flow) {
   /* ── Node headers + lifelines ── */
   nodes.forEach(node => {
     const x     = nodeX[node];
-    const parts = node.split("\n");
-    const type  = parts[0] || node;
-    const ip    = parts[1] || "";
+    const intel = nodeIntel.get(node) || _parseNodeLabel(node);
+    const type  = intel.role || "NODE";
+    const ip    = intel.address || "";
+    const zone  = intel.zone || "";
 
     const typeEl = _makeSVGEl("text");
     typeEl.setAttribute("x",              x);
@@ -944,7 +1037,7 @@ function renderLadder(flow) {
     ipEl.setAttribute("text-anchor", "middle");
     ipEl.setAttribute("font-size",   "11");
     ipEl.setAttribute("fill",        "#94a3b8");
-    ipEl.textContent = ip;
+    ipEl.textContent = zone ? [zone, ip].filter(Boolean).join(" · ") : ip;
     svg.appendChild(ipEl);
 
     /* FIX [11]: lifeline ends at svgHeight — not hardcoded 2000 */
@@ -1158,16 +1251,25 @@ function _ladderLabel(f) {
 }
 
 function _formatLadderDetails(f) {
+  const srcIntel = _resolveLadderNode(f.src);
+  const dstIntel = _resolveLadderNode(f.dst);
   const details = f.details || {};
   const lines = [
     `${f.protocol || "UNKNOWN"}  ${f.short_label || f.message || "Message"}`,
     "────────────────────────────",
-    `Source       ${f.src || "—"}`,
-    `Destination  ${f.dst || "—"}`,
+    `Source       ${srcIntel.role || f.src || "—"}${srcIntel.address ? ` (${srcIntel.address})` : ""}`,
+    `Destination  ${dstIntel.role || f.dst || "—"}${dstIntel.address ? ` (${dstIntel.address})` : ""}`,
     `Time         ${f.time ?? "—"}`,
     `Frame        ${f.frame_number ?? "—"}`,
     `Session      ${f.call_id || "—"}`,
   ];
+
+  if (srcIntel.zone || dstIntel.zone) {
+    lines.push(`Node Class    ${srcIntel.zone || srcIntel.role || "—"} → ${dstIntel.zone || dstIntel.role || "—"}`);
+  }
+  if (srcIntel.confidence || dstIntel.confidence) {
+    lines.push(`Inference     ${String(srcIntel.confidence || "low").toUpperCase()} / ${String(dstIntel.confidence || "low").toUpperCase()}`);
+  }
 
   if (f.protocol === "DIAMETER") {
     lines.push(`Command      ${details.command_name || "—"} (${details.command_code || "—"})`);

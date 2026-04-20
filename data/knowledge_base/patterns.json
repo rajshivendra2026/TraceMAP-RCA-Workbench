@@ -1984,8 +1984,8 @@
     ],
     "root_cause": "CORE_NETWORK_FAILURE",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:48:52.827998+00:00",
+    "occurrence_count": 2,
+    "last_seen": "2026-04-16T00:13:50.009546+00:00",
     "evidence_template": "Core-control cause code failure; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 87%; Causal inference points to GTP:GTPv2 67 (Context Not Found)",
     "embedding_vector": [
       0.308671,
@@ -2219,8 +2219,8 @@
     ],
     "root_cause": "CORE_NETWORK_FAILURE",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:50:13.190361+00:00",
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T23:44:20.969212+00:00",
     "evidence_template": "Core-control cause code failure; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 86%; Causal inference points to GTP:GTPv2 70 (UE Not Responding)",
     "embedding_vector": [
       0.214632,
@@ -2309,7 +2309,7 @@
       "DNS:DNS gvebixwvsvkngz.www.chencw.com rcode=3"
     ],
     "root_cause": "DNS_FAILURE",
-    "confidence": 0.9271,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:02.719786+00:00",
     "evidence_template": "DNS resolution error observed; Causal inference points to DNS:DNS gvebixwvsvkngz.www.chencw.com rcode=3; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
@@ -2400,7 +2400,7 @@
       "DNS:DNS 6.137.16.172.in-addr.arpa rcode=2"
     ],
     "root_cause": "DNS_FAILURE",
-    "confidence": 0.8662,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:09.181904+00:00",
     "evidence_template": "DNS resolution error observed; Causal inference points to DNS:DNS 6.137.16.172.in-addr.arpa rcode=2; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
@@ -2532,8 +2532,8 @@
     ],
     "root_cause": "ICMP_NETWORK_FAILURE",
     "confidence": 0.995,
-    "occurrence_count": 5,
-    "last_seen": "2026-04-14T17:50:48.809708+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-16T00:01:16.742357+00:00",
     "evidence_template": "ICMP unreachable or path error observed; Causal inference points to GTP:Create Bearer Response (UE Not Responding); GTP agent proposed CORE_NETWORK_FAILURE with 78% confidence",
     "embedding_vector": [
       0.169546,
@@ -2767,8 +2767,8 @@
     ],
     "root_cause": "ICMP_NETWORK_FAILURE",
     "confidence": 0.995,
-    "occurrence_count": 5,
-    "last_seen": "2026-04-14T21:41:10.765344+00:00",
+    "occurrence_count": 20,
+    "last_seen": "2026-04-18T19:40:34.748521+00:00",
     "evidence_template": "ICMP unreachable or path error observed; Causal inference points to ICMP:ICMP type 1 code 0; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       4.4e-05,
@@ -2895,8 +2895,8 @@
     ],
     "root_cause": "NAS_REJECTION",
     "confidence": 0.995,
-    "occurrence_count": 7,
-    "last_seen": "2026-04-14T13:34:05.819431+00:00",
+    "occurrence_count": 10,
+    "last_seen": "2026-04-18T16:40:18.133284+00:00",
     "evidence_template": "NAS reject or mobility cause observed",
     "embedding_vector": [
       0.031611,
@@ -2965,7 +2965,8 @@
     "historical_success": 0.47,
     "validation_status": "auto_validated",
     "source_sessions": [
-      "0"
+      "0",
+      "172.17.36.20:-->172.18.18.8:-"
     ],
     "anomaly_profile": {
       "score": 0.385,
@@ -3224,6 +3225,558 @@
     }
   },
   {
+    "pattern_id": "pat-46bc5dc4ff8d",
+    "protocols": [
+      "INAP",
+      "MAP",
+      "NAS_EPS",
+      "RANAP",
+      "S1AP",
+      "SCTP"
+    ],
+    "scenario": "MAP mobility or subscriber transaction - NAS Registration Rejection",
+    "signature": [
+      "S1AP:Handover Resource Allocation",
+      "SCTP:DATA",
+      "S1AP:Handover Resource Allocation",
+      "SCTP:DATA",
+      "S1AP:S1AP procedure 25",
+      "SCTP:DATA",
+      "S1AP:Handover Notification",
+      "SCTP:DATA",
+      "S1AP:Uplink NAS Transport",
+      "SCTP:DATA",
+      "NAS_EPS:NAS_EPS Tracking Area Update Request",
+      "INAP:UNKNOWN",
+      "MAP:MAP updateLocation",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP insertSubscriberData",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP result",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP insertSubscriberData",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP result",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP result updateLocation",
+      "SCTP:DATA",
+      "INAP:UNKNOWN",
+      "MAP:MAP sendAuthenticationInfo",
+      "SCTP:DATA",
+      "S1AP:Downlink NAS Transport",
+      "SCTP:DATA",
+      "NAS_EPS:NAS_EPS Tracking Area Update Accept",
+      "S1AP:Uplink NAS Transport",
+      "SCTP:DATA",
+      "NAS_EPS:NAS_EPS Tracking Area Update Complete",
+      "S1AP:Downlink NAS Transport",
+      "S1AP:UE Context Release"
+    ],
+    "root_cause": "NAS_REJECTION",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T23:46:45.673865+00:00",
+    "evidence_template": "NAS reject or mobility cause observed; Causal inference points to NAS_EPS:NAS_EPS Bearer Resource Command cause=36; NAS agent proposed NETWORK_REJECTION with 84% confidence",
+    "embedding_vector": [
+      0.309943,
+      -6.3e-05,
+      0.072071,
+      0.008141,
+      0.00535,
+      0.942362,
+      0.101237,
+      0.0017,
+      -0.003595,
+      -0.001152,
+      0.000157,
+      0.000154,
+      0.0,
+      0.003339,
+      -0.000738,
+      0.003322,
+      -0.00249,
+      -0.002025,
+      -0.002788,
+      -0.000675,
+      -0.00811,
+      0.002105,
+      0.005918,
+      0.000149,
+      0.000953,
+      -0.003389,
+      -0.00165,
+      -0.002416,
+      0.003325,
+      0.003923,
+      0.002372,
+      -0.003548,
+      0.000689,
+      -0.003953,
+      -0.003066,
+      0.006053,
+      0.000364,
+      0.0,
+      -0.004234,
+      -0.00135,
+      0.001862,
+      0.0,
+      -0.000926,
+      -0.00416,
+      -0.00105,
+      -0.00113,
+      0.000667,
+      -0.003962
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "INAP",
+        "MAP",
+        "NAS_EPS",
+        "RANAP",
+        "S1AP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "2G/3G",
+        "3G",
+        "IMS",
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "MAP mobility or subscriber transaction"
+    },
+    "historical_success": 0.45,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "03009a02"
+    ],
+    "anomaly_profile": {
+      "score": 0.385,
+      "is_anomalous": false,
+      "suggested_root_cause": "NAS_REJECTION",
+      "signals": [
+        "inter-message gap 4480 ms",
+        "inter-message gap 34537 ms",
+        "inter-message gap 2482 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-3c2df570fb39",
+    "protocols": [
+      "NAS_5GS",
+      "NGAP",
+      "SCTP"
+    ],
+    "scenario": "5G control-plane procedure - NAS Registration Rejection",
+    "signature": [
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:DATA",
+      "NGAP:Initial UE Message",
+      "NAS_5GS:NAS_5GS Registration Request",
+      "SCTP:SACK",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS Registration Reject cause=7",
+      "SCTP:DATA",
+      "NGAP:UE Context Release",
+      "SCTP:SACK",
+      "SCTP:DATA",
+      "NGAP:UE Context Release",
+      "SCTP:SACK"
+    ],
+    "root_cause": "NAS_REJECTION",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T23:46:47.213815+00:00",
+    "evidence_template": "NAS reject or mobility cause observed; Matched historical pattern '5G control-plane procedure - Normal Session' with similarity 90%; Causal inference points to NAS_5GS:NAS_5GS Registration Reject cause=7",
+    "embedding_vector": [
+      0.285989,
+      0.0,
+      -0.073478,
+      0.078429,
+      0.132886,
+      0.664431,
+      0.066443,
+      -0.101879,
+      0.0,
+      0.0,
+      0.364264,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.147738,
+      0.0,
+      -0.077126,
+      0.0,
+      -0.375208,
+      0.081295,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.243885,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.093541,
+      0.099534,
+      -0.136534,
+      -0.098492,
+      0.0,
+      0.109957,
+      0.0,
+      0.0,
+      0.0,
+      -0.079471
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_5GS",
+        "NGAP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "5G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "5G control-plane procedure"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.30.22.200:-->10.30.22.2:-"
+    ],
+    "anomaly_profile": {
+      "score": 0.3093,
+      "is_anomalous": false,
+      "suggested_root_cause": "NAS_REJECTION",
+      "signals": [
+        "inter-message gap 12268 ms"
+      ],
+      "component_scores": {
+        "transport": 0.2,
+        "charging": 0.0,
+        "signaling": 0.6133,
+        "mobility": 0.62
+      },
+      "dominant_signal": "mobility",
+      "model_score": 0.3402,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-fcf161eb1b05",
+    "protocols": [
+      "NAS_5GS",
+      "NGAP",
+      "SCTP"
+    ],
+    "scenario": "5G control-plane procedure - NAS Registration Rejection",
+    "signature": [
+      "NGAP:Initial UE Message",
+      "NAS_5GS:NAS_5GS Registration Request",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS Identity Request",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "NAS_5GS:NAS_5GS Identity Response",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Uplink NAS Transport",
+      "SCTP:DATA",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS Authentication Request",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NAS_5GS:NAS_5GS Authentication Response",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Uplink NAS Transport",
+      "SCTP:DATA",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS Security Mode Command",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "NAS_5GS:NAS_5GS",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Uplink NAS Transport",
+      "SCTP:DATA",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS Security Mode Command",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK"
+    ],
+    "root_cause": "NAS_REJECTION",
+    "confidence": 0.995,
+    "occurrence_count": 9,
+    "last_seen": "2026-04-19T17:23:56.976069+00:00",
+    "evidence_template": "NAS reject or mobility cause observed; Causal inference points to NGAP:UE Context Release; NAS agent proposed NETWORK_REJECTION with 84% confidence",
+    "embedding_vector": [
+      0.406634,
+      -0.004964,
+      -0.003562,
+      0.004042,
+      0.006442,
+      0.906445,
+      0.100855,
+      0.000493,
+      -0.004396,
+      -0.001187,
+      0.010194,
+      0.005078,
+      0.0,
+      0.0,
+      0.009537,
+      0.0,
+      0.005583,
+      -0.00475,
+      -0.003739,
+      -0.003966,
+      -0.043467,
+      0.0,
+      0.005962,
+      0.0,
+      0.0,
+      -0.001832,
+      0.0,
+      0.0,
+      0.0,
+      -0.004522,
+      0.0,
+      -0.005457,
+      -0.000872,
+      0.0,
+      -0.004358,
+      0.0,
+      0.004699,
+      0.0,
+      0.004535,
+      0.01526,
+      0.006215,
+      -0.004775,
+      0.0,
+      0.005331,
+      0.0,
+      -0.003537,
+      0.0,
+      -0.006228
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_5GS",
+        "NGAP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "5G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "5G control-plane procedure"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "10.114.0.6:-->10.69.230.79:-"
+    ],
+    "anomaly_profile": {
+      "score": 0.4281,
+      "is_anomalous": false,
+      "suggested_root_cause": "NETWORK_CONGESTION",
+      "signals": [
+        "inter-message gap 7075 ms",
+        "inter-message gap 32641 ms",
+        "inter-message gap 10858 ms"
+      ],
+      "component_scores": {
+        "transport": 0.56,
+        "charging": 0.0,
+        "signaling": 0.68,
+        "mobility": 0.8
+      },
+      "dominant_signal": "mobility",
+      "model_score": 0.3265,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-7e0fb2a15191",
+    "protocols": [
+      "HTTP",
+      "ICMP",
+      "TCP"
+    ],
+    "scenario": "Generic telecom session - Transport Congestion",
+    "signature": [
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0",
+      "ICMP:ICMP type 8 code 0",
+      "ICMP:ICMP type 0 code 0"
+    ],
+    "root_cause": "NETWORK_CONGESTION",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-18T16:40:18.319698+00:00",
+    "evidence_template": "TCP retransmissions detected; TCP retransmissions observed; TCP retransmissions observed",
+    "embedding_vector": [
+      0.030576,
+      0.0,
+      0.00481,
+      0.000977,
+      0.001756,
+      0.999195,
+      0.013227,
+      0.0,
+      0.0,
+      -0.001428,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.001454,
+      0.0,
+      -0.001233,
+      0.002512,
+      -1e-05,
+      0.0,
+      -0.000149,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.014509,
+      0.0,
+      0.0,
+      0.0,
+      0.001444,
+      0.00111,
+      0.00196,
+      0.0,
+      0.015385,
+      -0.001029,
+      0.001749,
+      0.00099,
+      0.0,
+      0.0,
+      0.00088,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "HTTP",
+        "ICMP",
+        "TCP"
+      ],
+      "technology_family": [
+        "Core",
+        "HTTP",
+        "HTTPS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.92,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "0"
+    ],
+    "anomaly_profile": {
+      "score": 0.4102,
+      "is_anomalous": false,
+      "suggested_root_cause": "NETWORK_CONGESTION",
+      "signals": [
+        "inter-message gap 55540 ms",
+        "inter-message gap 4801 ms",
+        "inter-message gap 18769 ms"
+      ],
+      "component_scores": {
+        "transport": 0.56,
+        "charging": 0.0,
+        "signaling": 0.68,
+        "mobility": 0.68
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3253,
+      "model_type": "ensemble"
+    }
+  },
+  {
     "pattern_id": "pat-21dc467ef9f8",
     "protocols": [
       "SIP",
@@ -3415,103 +3968,6 @@
     }
   },
   {
-    "pattern_id": "pat-2278994ff32a",
-    "protocols": [
-      "NAS_EPS",
-      "S1AP",
-      "SCTP"
-    ],
-    "scenario": "LTE control-plane procedure - Unknown or Incomplete Session",
-    "signature": [
-      "S1AP:Downlink NAS Transport",
-      "NAS_EPS:NAS_EPS PDN Connectivity Reject",
-      "SCTP:DATA",
-      "S1AP:Uplink NAS Transport",
-      "NAS_EPS:NAS_EPS 0xc6",
-      "SCTP:DATA"
-    ],
-    "root_cause": "NETWORK_REJECTION",
-    "confidence": 0.995,
-    "occurrence_count": 20,
-    "last_seen": "2026-04-14T17:51:22.536986+00:00",
-    "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 88%; Causal inference points to NAS_EPS:NAS_EPS PDN Connectivity Reject",
-    "embedding_vector": [
-      -0.351437,
-      0.0,
-      -0.249859,
-      0.307881,
-      0.266586,
-      0.419742,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      -0.501809,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      -0.236791,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.215882,
-      0.0,
-      0.0,
-      0.0,
-      0.142179,
-      0.0,
-      0.0,
-      0.0,
-      0.220587,
-      0.0,
-      0.220587,
-      0.0,
-      0.0
-    ],
-    "context": {
-      "network_scope": "HOME",
-      "protocol_stack": [
-        "NAS_EPS",
-        "S1AP",
-        "SCTP"
-      ],
-      "technology_family": [
-        "LTE/4G",
-        "Transport"
-      ],
-      "vendor": "UNKNOWN",
-      "call_type": "LTE control-plane procedure"
-    },
-    "historical_success": 0.45,
-    "validation_status": "auto_validated",
-    "source_sessions": [
-      "10.0.0.0:-->20.0.0.0:-:seg2"
-    ],
-    "anomaly_profile": {
-      "score": 0.3967,
-      "is_anomalous": false,
-      "suggested_root_cause": "UNKNOWN",
-      "signals": []
-    }
-  },
-  {
     "pattern_id": "pat-a94ce0b7672e",
     "protocols": [
       "NAS_EPS",
@@ -3541,8 +3997,8 @@
     ],
     "root_cause": "NETWORK_REJECTION",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:48:52.765569+00:00",
+    "occurrence_count": 2,
+    "last_seen": "2026-04-16T00:13:49.932920+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - NAS Registration Rejection' with similarity 92%; Causal inference points to NAS_EPS:NAS_EPS PDN Connectivity Reject",
     "embedding_vector": [
       0.061109,
@@ -3621,6 +4077,103 @@
         "inter-message gap 34148 ms",
         "inter-message gap 5300 ms"
       ]
+    }
+  },
+  {
+    "pattern_id": "pat-2278994ff32a",
+    "protocols": [
+      "NAS_EPS",
+      "S1AP",
+      "SCTP"
+    ],
+    "scenario": "LTE control-plane procedure - Unknown or Incomplete Session",
+    "signature": [
+      "S1AP:Downlink NAS Transport",
+      "NAS_EPS:NAS_EPS PDN Connectivity Reject",
+      "SCTP:DATA",
+      "S1AP:Uplink NAS Transport",
+      "NAS_EPS:NAS_EPS 0xc6",
+      "SCTP:DATA"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 90,
+    "last_seen": "2026-04-19T10:20:36.243173+00:00",
+    "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 88%; Causal inference points to NAS_EPS:NAS_EPS PDN Connectivity Reject",
+    "embedding_vector": [
+      -0.351437,
+      0.0,
+      -0.249859,
+      0.307881,
+      0.266586,
+      0.419742,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.501809,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.236791,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.215882,
+      0.0,
+      0.0,
+      0.0,
+      0.142179,
+      0.0,
+      0.0,
+      0.0,
+      0.220587,
+      0.0,
+      0.220587,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_EPS",
+        "S1AP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "LTE control-plane procedure"
+    },
+    "historical_success": 0.45,
+    "validation_status": "validated",
+    "source_sessions": [
+      "10.0.0.0:-->20.0.0.0:-:seg2"
+    ],
+    "anomaly_profile": {
+      "score": 0.3967,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": []
     }
   },
   {
@@ -3806,8 +4359,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 59,
-    "last_seen": "2026-04-15T05:40:33.226957+00:00",
+    "occurrence_count": 87,
+    "last_seen": "2026-04-18T19:40:38.269256+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to GTP:Forward Relocation Request; GTP agent proposed NORMAL_CALL with 74% confidence",
     "embedding_vector": [
       0.16786,
@@ -3917,8 +4470,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 12,
-    "last_seen": "2026-04-14T17:51:09.726152+00:00",
+    "occurrence_count": 14,
+    "last_seen": "2026-04-15T23:46:45.923270+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 86%; Causal inference points to NAS_EPS:NAS_EPS Tracking Area Update Request",
     "embedding_vector": [
       0.00065,
@@ -4050,8 +4603,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 16,
-    "last_seen": "2026-04-14T17:51:09.937397+00:00",
+    "occurrence_count": 25,
+    "last_seen": "2026-04-18T17:11:13.026833+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 91%; Causal inference points to GTP:Create Session Request",
     "embedding_vector": [
       0.88256,
@@ -4412,8 +4965,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 11,
-    "last_seen": "2026-04-14T17:46:41.087321+00:00",
+    "occurrence_count": 12,
+    "last_seen": "2026-04-15T22:07:00.199927+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to RANAP:1; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       0.453023,
@@ -4742,8 +5295,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 15,
-    "last_seen": "2026-04-14T21:41:23.213057+00:00",
+    "occurrence_count": 31,
+    "last_seen": "2026-04-18T19:40:38.025719+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to RANAP:RANAP procedure 1; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       0.021675,
@@ -4877,8 +5430,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 10,
-    "last_seen": "2026-04-14T17:51:09.607970+00:00",
+    "occurrence_count": 12,
+    "last_seen": "2026-04-15T22:08:38.935320+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to RANAP:RANAP procedure 1; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       0.595104,
@@ -5075,8 +5628,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 13,
-    "last_seen": "2026-04-14T21:41:27.228947+00:00",
+    "occurrence_count": 43,
+    "last_seen": "2026-04-18T19:40:42.601019+00:00",
     "evidence_template": "1 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 82%",
     "embedding_vector": [
       0.001338,
@@ -5203,8 +5756,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:43:15.136163+00:00",
+    "occurrence_count": 16,
+    "last_seen": "2026-04-18T19:40:46.000440+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern '5G control-plane procedure - Normal Session' with similarity 91%; Causal inference points to NGAP:0x41",
     "embedding_vector": [
       0.119241,
@@ -5271,7 +5824,7 @@
       "call_type": "5G control-plane procedure"
     },
     "historical_success": 0.72,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "10.97.60.59:-->172.17.0.9:-"
     ],
@@ -5650,8 +6203,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:43:15.085071+00:00",
+    "occurrence_count": 16,
+    "last_seen": "2026-04-18T19:40:45.927118+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NGAP:41; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.042064,
@@ -5718,7 +6271,7 @@
       "call_type": "5G control-plane procedure"
     },
     "historical_success": 0.67,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "15"
     ],
@@ -5872,8 +6425,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 22,
-    "last_seen": "2026-04-14T17:50:51.995631+00:00",
+    "occurrence_count": 28,
+    "last_seen": "2026-04-16T00:01:16.822142+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NAS_EPS:NAS_EPS Authentication Failure; NAS agent proposed NORMAL_CALL with 70% confidence",
     "embedding_vector": [
       0.064689,
@@ -6066,8 +6619,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T17:50:42.131753+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-15T23:20:48.053882+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to GTP:Create Session Response (Request Accepted); GTP agent proposed NORMAL_CALL with 74% confidence",
     "embedding_vector": [
       0.786888,
@@ -6197,8 +6750,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 6,
-    "last_seen": "2026-04-14T21:41:23.330369+00:00",
+    "occurrence_count": 21,
+    "last_seen": "2026-04-18T19:40:38.189820+00:00",
     "evidence_template": "TCP retransmissions detected; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 91%; Causal inference points to TCP:TCP",
     "embedding_vector": [
       0.173173,
@@ -6304,8 +6857,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T17:50:42.189886+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-15T23:20:48.125925+00:00",
     "evidence_template": "PFCP session establishment request/response observed; PFCP session modification request/response observed; PFCP session report exchange observed",
     "embedding_vector": [
       0.787034,
@@ -6619,8 +7172,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 3,
-    "last_seen": "2026-04-14T17:47:18.420130+00:00",
+    "occurrence_count": 5,
+    "last_seen": "2026-04-15T23:20:51.991034+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'MAP mobility or subscriber transaction - Unknown or Incomplete Session' with similarity 90%; Causal inference points to MAP:MAP",
     "embedding_vector": [
       0.88294,
@@ -6718,8 +7271,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:44:26.916656+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T23:48:06.024952+00:00",
     "evidence_template": "1 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 87%",
     "embedding_vector": [
       0.001104,
@@ -6785,7 +7338,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.69,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "10.59.234.120:3868->109.39.176.56:4000"
     ],
@@ -6959,8 +7512,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 5,
-    "last_seen": "2026-04-14T21:41:10.704931+00:00",
+    "occurrence_count": 20,
+    "last_seen": "2026-04-18T19:40:34.664111+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NGAP:15; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.272505,
@@ -7073,8 +7626,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:44:26.805076+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T23:48:05.878361+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Transport Congestion' with similarity 87%; Causal inference points to GTP:Modify Bearer Response (Request Accepted)",
     "embedding_vector": [
       0.123491,
@@ -7140,7 +7693,7 @@
       "call_type": "LTE control-plane procedure"
     },
     "historical_success": 0.67,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "0"
     ],
@@ -7716,8 +8269,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 8,
-    "last_seen": "2026-04-14T17:51:10.861191+00:00",
+    "occurrence_count": 17,
+    "last_seen": "2026-04-19T18:14:53.464027+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to GTP:GTP; GTP agent proposed NORMAL_CALL with 40% confidence",
     "embedding_vector": [
       0.999379,
@@ -7782,9 +8335,10 @@
       "vendor": "UNKNOWN",
       "call_type": "LTE control-plane procedure"
     },
-    "historical_success": 0.45,
+    "historical_success": 1.0,
     "validation_status": "auto_validated",
     "source_sessions": [
+      "0",
       "10"
     ],
     "anomaly_profile": {
@@ -7909,8 +8463,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T17:48:52.969810+00:00",
+    "occurrence_count": 6,
+    "last_seen": "2026-04-15T23:20:52.139429+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 65%; Causal inference points to GTP:GTP",
     "embedding_vector": [
       -0.236629,
@@ -8038,8 +8592,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T17:50:45.719509+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T16:18:15.928768+00:00",
     "evidence_template": "PFCP session establishment request/response observed; PFCP session modification request/response observed; PFCP session report exchange observed",
     "embedding_vector": [
       0.709863,
@@ -8105,7 +8659,7 @@
       "call_type": "5G control-plane procedure"
     },
     "historical_success": 0.6,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "0x0000000000000000"
     ],
@@ -8267,8 +8821,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:47:14.058380+00:00",
+    "occurrence_count": 2,
+    "last_seen": "2026-04-16T16:25:47.745000+00:00",
     "evidence_template": "MAP authentication exchange observed; Legacy location update procedure observed; Subscriber data insertion observed",
     "embedding_vector": [
       -0.026034,
@@ -8684,8 +9238,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:47:22.147367+00:00",
+    "occurrence_count": 2,
+    "last_seen": "2026-04-16T09:02:36.411844+00:00",
     "evidence_template": "MAP authentication exchange observed; Legacy location update procedure observed; Subscriber data insertion observed",
     "embedding_vector": [
       0.999938,
@@ -9124,8 +9678,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 6,
-    "last_seen": "2026-04-14T21:41:23.270176+00:00",
+    "occurrence_count": 21,
+    "last_seen": "2026-04-18T19:40:38.103555+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to MAP:MAP sendAuthenticationInfo; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       0.235231,
@@ -9222,8 +9776,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 3,
-    "last_seen": "2026-04-14T17:51:18.492411+00:00",
+    "occurrence_count": 4,
+    "last_seen": "2026-04-15T16:09:28.618014+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 72%; Causal inference points to GTP:Create Session Response (Request Accepted)",
     "embedding_vector": [
       0.002089,
@@ -9566,8 +10120,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T17:48:03.170991+00:00",
+    "occurrence_count": 4,
+    "last_seen": "2026-04-15T16:44:20.113805+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NAS_EPS:NAS_EPS Authentication Failure; NAS agent proposed NORMAL_CALL with 42% confidence",
     "embedding_vector": [
       0.007674,
@@ -9634,7 +10188,7 @@
       "call_type": "LTE control-plane procedure"
     },
     "historical_success": 0.45,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "10.58.7.232:-->10.59.233.246:-"
     ],
@@ -9882,8 +10436,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T17:49:14.220187+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-16T00:13:50.083958+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 85%; Causal inference points to GTP:GTPv2 26 (Request Accepted)",
     "embedding_vector": [
       0.014536,
@@ -9949,7 +10503,7 @@
       "call_type": "LTE control-plane procedure"
     },
     "historical_success": 0.74,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "1"
     ],
@@ -9979,8 +10533,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:48:03.354114+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T16:44:20.295510+00:00",
     "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to GTP:Create Session Response (New PDN Type Due To Network Preference); GTP agent proposed NORMAL_CALL with 74% confidence",
     "embedding_vector": [
       0.021424,
@@ -10046,7 +10600,7 @@
       "call_type": "LTE control-plane procedure"
     },
     "historical_success": 0.64,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "1"
     ],
@@ -10108,8 +10662,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 3,
-    "last_seen": "2026-04-14T17:50:16.770764+00:00",
+    "occurrence_count": 4,
+    "last_seen": "2026-04-15T23:44:21.047740+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 88%; Causal inference points to SCTP:DATA",
     "embedding_vector": [
       0.032768,
@@ -10448,8 +11002,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 7,
-    "last_seen": "2026-04-15T05:40:33.696701+00:00",
+    "occurrence_count": 10,
+    "last_seen": "2026-04-15T16:09:28.498599+00:00",
     "evidence_template": "3 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 88%",
     "embedding_vector": [
       0.155163,
@@ -10852,8 +11406,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 4,
-    "last_seen": "2026-04-14T20:49:09.109274+00:00",
+    "occurrence_count": 5,
+    "last_seen": "2026-04-16T00:13:50.159563+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 90%; Causal inference points to GTP:GTP",
     "embedding_vector": [
       -0.087595,
@@ -11510,8 +12064,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:48:03.291281+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T16:44:20.235446+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to DNS:DNS web.vodafone.de.apn.epc.mnc002.mcc262.3gppnetwork.org; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       -0.0768,
@@ -11577,7 +12131,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.45,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "0"
     ],
@@ -11639,8 +12193,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 2,
-    "last_seen": "2026-04-14T21:41:16.154250+00:00",
+    "occurrence_count": 17,
+    "last_seen": "2026-04-18T19:40:11.528988+00:00",
     "evidence_template": "Handover request observed; UE context release observed after procedure progression; Inter-RAT handover cleanup slice observed without reject markers",
     "embedding_vector": [
       0.358431,
@@ -11706,7 +12260,7 @@
       "call_type": "5G control-plane procedure"
     },
     "historical_success": 0.7,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "10.0.160.121:38412->10.45.168.115:38412:seg23"
     ],
@@ -11745,7 +12299,7 @@
       "UDP:UDP"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.9755,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:49:14.280325+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 92%; Causal inference points to GTP:GTP",
@@ -11840,7 +12394,7 @@
       "UDP:UDP"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.9744,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:09.635947+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Normal Session' with similarity 80%; Causal inference points to GTP:GTPv2 2",
@@ -11968,7 +12522,7 @@
       "DNS:DNS topon.s5.spgw1.lab1.mnc640.mcc302.3gppnetwork.org -> 207.61.140.73"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.8835,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:02.306525+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to DNS:DNS ims2.apn.epc.mnc640.mcc302.3gppnetwork.org -> 207.61.140.73; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
@@ -12070,7 +12624,7 @@
       "GTP:GTPv2 2"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.8835,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:02.372467+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to GTP:GTPv2 2; GTP agent proposed NORMAL_CALL with 40% confidence",
@@ -12200,7 +12754,7 @@
       "GTP:GTP"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.8835,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:02.441997+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 80%; Causal inference points to GTP:GTP",
@@ -12295,7 +12849,7 @@
       "GTP:GTPv2 2"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.8662,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:09.307301+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 89%; Causal inference points to GTP:GTPv2 2",
@@ -12373,6 +12927,855 @@
         "inter-message gap 11689 ms",
         "inter-message gap 59847 ms"
       ]
+    }
+  },
+  {
+    "pattern_id": "pat-1e83ff430757",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 2001",
+      "SCTP:DATA"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T16:44:41.260486+00:00",
+    "evidence_template": "1 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 88%",
+    "embedding_vector": [
+      8.1e-05,
+      0.0,
+      0.0,
+      -0.220245,
+      0.340379,
+      0.22425,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.640714,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.102114,
+      0.0,
+      -0.533928,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.281647,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.69,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.1.168.10:51554->10.58.38.117:3868"
+    ],
+    "anomaly_profile": {
+      "score": 0.3967,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": []
+    }
+  },
+  {
+    "pattern_id": "pat-64d6fc9da3ac",
+    "protocols": [
+      "NAS_5GS",
+      "NAS_EPS",
+      "NGAP",
+      "S1AP",
+      "SCTP"
+    ],
+    "scenario": "5G control-plane procedure - Normal Session",
+    "signature": [
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Initial UE Message",
+      "NAS_5GS:NAS_5GS Registration Request",
+      "SCTP:SACK",
+      "NGAP:NGAP procedure 9",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "SCTP:HEARTBEAT_ACK",
+      "NAS_5GS:NAS_5GS Registration Request",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "SCTP:DATA",
+      "NGAP:Initial UE Message",
+      "NGAP:NGAP procedure 9",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "SCTP:SACK"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T17:27:14.429780+00:00",
+    "evidence_template": "Successful control-plane procedure responses observed; Causal inference points to NGAP:NGAP procedure 9; NAS agent proposed NORMAL_CALL with 42% confidence",
+    "embedding_vector": [
+      0.70599,
+      0.00345,
+      0.002528,
+      0.000798,
+      0.01604,
+      0.4647,
+      0.525697,
+      -0.003642,
+      -0.003815,
+      -0.004969,
+      0.014848,
+      0.003296,
+      0.009015,
+      -0.048263,
+      -0.010216,
+      -0.003373,
+      0.013137,
+      -0.003796,
+      0.007871,
+      -0.006622,
+      -0.008697,
+      -0.010802,
+      0.003152,
+      -0.006612,
+      0.015761,
+      0.00172,
+      -1e-05,
+      -0.009053,
+      -0.000663,
+      -0.022805,
+      -0.002998,
+      0.006535,
+      0.038057,
+      0.001317,
+      -0.007477,
+      0.003229,
+      0.002845,
+      0.009976,
+      -0.043064,
+      0.001403,
+      -0.015108,
+      0.010629,
+      0.000471,
+      -0.024583,
+      0.00445,
+      0.009082,
+      0.007938,
+      -0.012301
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_5GS",
+        "NAS_EPS",
+        "NGAP",
+        "S1AP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "5G",
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "5G control-plane procedure"
+    },
+    "historical_success": 0.67,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.120.13.10:-->10.120.13.26:-"
+    ],
+    "anomaly_profile": {
+      "score": 0.385,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [
+        "inter-message gap 9657 ms",
+        "inter-message gap 9984 ms",
+        "inter-message gap 20470 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-ea31cd2b2e7b",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:CLR",
+      "SCTP:DATA",
+      "SCTP:DATA"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 30,
+    "last_seen": "2026-04-18T19:40:42.674390+00:00",
+    "evidence_template": "Diameter Cancel Location housekeeping observed; Session is limited to Diameter/SCTP mobility cleanup traffic; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 92%",
+    "embedding_vector": [
+      2.7e-05,
+      0.0,
+      0.0,
+      0.034498,
+      0.382476,
+      -0.130492,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.719954,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.362977,
+      0.0,
+      0.0,
+      0.0,
+      -0.114743,
+      0.0,
+      -0.268483,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.31648,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.63,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "10.15.187.68:42825->10.15.194.129:10251"
+    ],
+    "anomaly_profile": {
+      "score": 0.3967,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": []
+    }
+  },
+  {
+    "pattern_id": "pat-b1e22c7f1c91",
+    "protocols": [
+      "NAS_5GS",
+      "NGAP",
+      "SCTP"
+    ],
+    "scenario": "5G control-plane procedure - Normal Session",
+    "signature": [
+      "NGAP:Initial UE Message",
+      "NAS_5GS:NAS_5GS Registration Request",
+      "SCTP:DATA",
+      "NGAP:UE Context Release",
+      "SCTP:SACK",
+      "SCTP:SACK",
+      "NGAP:NGAP procedure 9",
+      "SCTP:SACK",
+      "NGAP:Downlink NAS Transport",
+      "NAS_5GS:NAS_5GS",
+      "NAS_5GS:NAS_5GS",
+      "SCTP:SACK",
+      "NGAP:Uplink NAS Transport",
+      "SCTP:SACK",
+      "NGAP:UE Context Release",
+      "SCTP:SACK",
+      "NGAP:UE Context Release",
+      "SCTP:SACK"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-15T18:36:02.613379+00:00",
+    "evidence_template": "Successful control-plane procedure responses observed; Matched historical pattern '5G control-plane procedure - Normal Session' with similarity 87%; Causal inference points to NGAP:UE Context Release",
+    "embedding_vector": [
+      0.229006,
+      0.0,
+      0.0,
+      0.059156,
+      0.100231,
+      0.66742,
+      0.0,
+      -0.076844,
+      0.0,
+      0.0,
+      0.641085,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.111433,
+      0.0,
+      -0.058173,
+      0.0,
+      -0.094335,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.161156,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.068786,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.070555,
+      0.075075,
+      0.0,
+      -0.074289,
+      0.0,
+      -0.011399,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "NAS_5GS",
+        "NGAP",
+        "SCTP"
+      ],
+      "technology_family": [
+        "5G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "5G control-plane procedure"
+    },
+    "historical_success": 0.78,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.110.2.1:-->10.110.2.201:-"
+    ],
+    "anomaly_profile": {
+      "score": 0.3967,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": []
+    }
+  },
+  {
+    "pattern_id": "pat-85961ac6420e",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 2001",
+      "SCTP:DATA",
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 2001",
+      "SCTP:DATA"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-15T16:44:40.951075+00:00",
+    "evidence_template": "2 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 81%",
+    "embedding_vector": [
+      0.471877,
+      0.0,
+      0.0,
+      -0.216737,
+      0.156567,
+      0.416283,
+      0.078283,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.120955,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.589427,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.04697,
+      0.0,
+      -0.381286,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.129551,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.68,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.1.169.10:57628->10.48.39.117:3868"
+    ],
+    "anomaly_profile": {
+      "score": 0.385,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [
+        "inter-message gap 60236 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-9832139bc600",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:RAR",
+      "DIAMETER:RAA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCR",
+      "DIAMETER:CCR",
+      "DIAMETER:CCR",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCA 2001",
+      "DIAMETER:CCA 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-15T16:18:15.863018+00:00",
+    "evidence_template": "13 successful Diameter answers observed; No Diameter rejection codes present; Causal inference points to DIAMETER:CCA 2001",
+    "embedding_vector": [
+      0.987654,
+      0.0,
+      0.0,
+      0.007012,
+      0.007012,
+      -0.011797,
+      0.049087,
+      -0.011082,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.010615,
+      -0.119789,
+      0.0,
+      -0.010697,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.009432,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.016857,
+      0.0,
+      0.0,
+      0.0,
+      -0.004207,
+      0.0,
+      0.0,
+      -0.01166,
+      0.002145,
+      0.0,
+      0.01232,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.080684,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.62,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "DIAMETER:0003-diamproxy.pblud.cupsvspg01.ims.gx;280020011;4153;61f013c7-3902"
+    ],
+    "anomaly_profile": {
+      "score": 0.3908,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [
+        "inter-message gap 4710 ms",
+        "inter-message gap 329716 ms",
+        "inter-message gap 311548 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-5020a75758b9",
+    "protocols": [
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "SCTP:HEARTBEAT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT",
+      "SCTP:INIT"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T23:20:44.213674+00:00",
+    "evidence_template": "Insufficient signalling; Causal inference points to SCTP:INIT; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
+    "embedding_vector": [
+      0.999717,
+      0.0,
+      0.0,
+      -0.001747,
+      0.002131,
+      0.0,
+      0.004262,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.002883,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.005916,
+      0.0,
+      0.0,
+      0.0,
+      -0.002189,
+      0.0,
+      0.0,
+      0.003526,
+      0.0,
+      -0.021894,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "SCTP"
+      ],
+      "technology_family": [
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.45,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.120.13.25:36412->10.120.13.11:36412"
+    ],
+    "anomaly_profile": {
+      "score": 0.3908,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [
+        "inter-message gap 531363 ms",
+        "inter-message gap 4173678 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-ef15958a82b8",
+    "protocols": [
+      "GTP",
+      "UDP"
+    ],
+    "scenario": "LTE control-plane procedure - Unknown or Incomplete Session",
+    "signature": [
+      "GTP:GTP",
+      "UDP:UDP"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-18T16:40:49.936774+00:00",
+    "evidence_template": "Insufficient signalling; Matched historical pattern 'LTE control-plane procedure - Unknown or Incomplete Session' with similarity 87%; Causal inference points to UDP:UDP",
+    "embedding_vector": [
+      -0.330334,
+      0.0,
+      0.0,
+      0.043791,
+      0.485506,
+      -0.170403,
+      0.0,
+      0.0,
+      0.0,
+      -0.371269,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.34271,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.358893,
+      0.0,
+      0.0,
+      0.0,
+      0.258936,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.416012,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "GTP",
+        "UDP"
+      ],
+      "technology_family": [
+        "LTE/4G",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "LTE control-plane procedure"
+    },
+    "historical_success": 0.88,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "29"
+    ],
+    "anomaly_profile": {
+      "score": 0.1681,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.08,
+        "charging": 0.0,
+        "signaling": 0.2767,
+        "mobility": 0.26
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3415,
+      "model_type": "ensemble"
     }
   },
   {
@@ -12528,7 +13931,7 @@
       "SCTP:SACK"
     ],
     "root_cause": "POLICY_FAILURE",
-    "confidence": 0.8835,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:02.240266+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 75%; Causal inference points to DIAMETER:324A 3002",
@@ -12605,6 +14008,522 @@
       "is_anomalous": false,
       "suggested_root_cause": "UNKNOWN",
       "signals": []
+    }
+  },
+  {
+    "pattern_id": "pat-b07de94c17a7",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DIAMETER:8388646R",
+      "SCTP:DATA",
+      "DIAMETER:8388646A 5550",
+      "SCTP:DATA"
+    ],
+    "root_cause": "POLICY_FAILURE",
+    "confidence": 0.995,
+    "occurrence_count": 4,
+    "last_seen": "2026-04-15T16:44:41.324646+00:00",
+    "evidence_template": "Insufficient signalling; Online charging system rejected CCR; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 89%",
+    "embedding_vector": [
+      -0.216742,
+      0.160474,
+      0.0,
+      0.028948,
+      0.320949,
+      0.481423,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.245431,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.189423,
+      0.0,
+      0.0,
+      -0.604139,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.096285,
+      0.0,
+      -0.225293,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.265569,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.45,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "166.147.85.132:3868->204.16.71.251:49151"
+    ],
+    "anomaly_profile": {
+      "score": 0.3879,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": []
+    }
+  },
+  {
+    "pattern_id": "pat-d09ecbf28842",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DIAMETER:8388646R",
+      "SCTP:DATA",
+      "DIAMETER:8388646A 5555",
+      "SCTP:DATA"
+    ],
+    "root_cause": "POLICY_FAILURE",
+    "confidence": 0.995,
+    "occurrence_count": 3,
+    "last_seen": "2026-04-19T02:30:16.668147+00:00",
+    "evidence_template": "Insufficient signalling; Online charging system rejected CCR; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 78%",
+    "embedding_vector": [
+      0.256136,
+      0.146591,
+      0.0,
+      0.026444,
+      0.293182,
+      0.439773,
+      0.146591,
+      0.0,
+      0.0,
+      0.0,
+      0.224198,
+      0.0,
+      0.252941,
+      0.0,
+      0.0,
+      0.289158,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.551872,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.087955,
+      0.0,
+      -0.205802,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.242594,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "166.147.85.132:3868->204.16.71.253:49151"
+    ],
+    "anomaly_profile": {
+      "score": 0.2844,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [
+        "inter-message gap 31080 ms"
+      ],
+      "component_scores": {
+        "transport": 0.2,
+        "charging": 0.2,
+        "signaling": 0.4533,
+        "mobility": 0.28
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3493,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-6667a18ab20e",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 5550",
+      "SCTP:DATA"
+    ],
+    "root_cause": "POLICY_FAILURE",
+    "confidence": 0.995,
+    "occurrence_count": 23,
+    "last_seen": "2026-04-19T11:23:16.466745+00:00",
+    "evidence_template": "Insufficient signalling; Online charging system rejected CCR; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 90%",
+    "embedding_vector": [
+      -0.219454,
+      0.161327,
+      0.0,
+      -0.208777,
+      0.322655,
+      0.483982,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.207511,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.60735,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.096796,
+      0.0,
+      -0.226491,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.266981,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "10.3.160.10:43028->10.48.38.112:3868"
+    ],
+    "anomaly_profile": {
+      "score": 0.2468,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.08,
+        "charging": 0.2,
+        "signaling": 0.4533,
+        "mobility": 0.22
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3428,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-93a09e8dce30",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 5550",
+      "SCTP:DATA",
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 5550",
+      "SCTP:DATA",
+      "DIAMETER:8388647R",
+      "SCTP:DATA",
+      "DIAMETER:8388647A 5550",
+      "SCTP:DATA"
+    ],
+    "root_cause": "POLICY_FAILURE",
+    "confidence": 0.8528,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-19T08:00:48.391775+00:00",
+    "evidence_template": "Insufficient signalling; Online charging system rejected CCR; Online charging system rejected CCR",
+    "embedding_vector": [
+      0.997804,
+      0.011387,
+      0.0,
+      -0.016106,
+      0.007592,
+      0.041754,
+      0.007592,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.014647,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.006445,
+      0.0,
+      0.0,
+      -0.04287,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.002277,
+      0.0,
+      0.000119,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.006282,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "10.3.161.11:57172->10.48.39.118:3868"
+    ],
+    "anomaly_profile": {
+      "score": 0.5053,
+      "is_anomalous": false,
+      "suggested_root_cause": "CHARGING_FAILURE",
+      "signals": [
+        "inter-message gap 2042147 ms",
+        "inter-message gap 600137 ms"
+      ],
+      "component_scores": {
+        "transport": 0.32,
+        "charging": 0.6,
+        "signaling": 0.76,
+        "mobility": 0.52
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3364,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-901f47edf2a1",
+    "protocols": [
+      "DIAMETER",
+      "SCTP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DIAMETER:8388646R",
+      "SCTP:DATA",
+      "DIAMETER:8388646A",
+      "SCTP:DATA"
+    ],
+    "root_cause": "POLICY_FAILURE",
+    "confidence": 0.8728,
+    "occurrence_count": 3,
+    "last_seen": "2026-04-19T12:33:37.126962+00:00",
+    "evidence_template": "Insufficient signalling; Online charging system rejected CCR; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 92%",
+    "embedding_vector": [
+      0.256768,
+      0.146952,
+      0.0,
+      0.026509,
+      0.293905,
+      0.440857,
+      0.146952,
+      0.0,
+      -0.281226,
+      0.0,
+      0.224751,
+      0.0,
+      0.253565,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.553232,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.088171,
+      0.0,
+      -0.20631,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.243192,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER",
+        "SCTP"
+      ],
+      "technology_family": [
+        "IMS",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "166.147.85.132:3868->204.16.71.253:49151#f2"
+    ],
+    "anomaly_profile": {
+      "score": 0.2844,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [
+        "inter-message gap 31080 ms"
+      ],
+      "component_scores": {
+        "transport": 0.2,
+        "charging": 0.2,
+        "signaling": 0.4533,
+        "mobility": 0.28
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3493,
+      "model_type": "ensemble"
     }
   },
   {
@@ -12763,8 +14682,8 @@
     ],
     "root_cause": "SUBSCRIBER_BARRED",
     "confidence": 0.995,
-    "occurrence_count": 3,
-    "last_seen": "2026-04-14T17:51:09.539714+00:00",
+    "occurrence_count": 5,
+    "last_seen": "2026-04-15T23:46:45.761315+00:00",
     "evidence_template": "Roaming not allowed; Diameter location update rejected; Causal inference points to DIAMETER:ULA 5004",
     "embedding_vector": [
       0.960547,
@@ -13583,8 +15502,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 453,
-    "last_seen": "2026-04-14T15:32:41.934962+00:00",
+    "occurrence_count": 454,
+    "last_seen": "2026-04-18T16:40:49.847722+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 15%",
     "embedding_vector": [
       0.999849,
@@ -22438,8 +24357,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 9,
-    "last_seen": "2026-04-14T12:32:09.353532+00:00",
+    "occurrence_count": 21,
+    "last_seen": "2026-04-19T17:23:57.511251+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 89%",
     "embedding_vector": [
       -0.057108,
@@ -28020,8 +29939,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 37,
-    "last_seen": "2026-04-14T17:51:11.166379+00:00",
+    "occurrence_count": 47,
+    "last_seen": "2026-04-15T23:46:46.681277+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 91%; Causal inference points to SCTP:DATA",
     "embedding_vector": [
       -0.039024,
@@ -34311,8 +36230,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 3,
-    "last_seen": "2026-04-14T17:51:18.435423+00:00",
+    "occurrence_count": 4,
+    "last_seen": "2026-04-15T16:09:28.560042+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 67%; Causal inference points to DNS:DNS tac-lb2a.tac-hb09.tac.epc.mnc456.mcc123.3gppnetwork.org -> 192.168.20.2",
     "embedding_vector": [
       -0.476697,
@@ -35245,8 +37164,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T17:44:26.861851+00:00",
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T23:48:05.956039+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 81%; Causal inference points to DNS:DNS sos.apn.epc.mnc004.mcc204.3gppnetwork.org",
     "embedding_vector": [
       -0.086138,
@@ -35312,7 +37231,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.45,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "0x9077"
     ],
@@ -35925,7 +37844,7 @@
       "SCTP:SACK"
     ],
     "root_cause": "UNKNOWN",
-    "confidence": 0.8835,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:03.375028+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 83%; Causal inference points to SCTP:SACK",
@@ -36017,7 +37936,7 @@
       "SCTP:DATA"
     ],
     "root_cause": "UNKNOWN",
-    "confidence": 0.8662,
+    "confidence": 0.995,
     "occurrence_count": 1,
     "last_seen": "2026-04-14T17:50:10.033639+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 90%; Causal inference points to SCTP:SACK",
@@ -36116,9 +38035,9 @@
       "SCTP:DATA"
     ],
     "root_cause": "UNKNOWN",
-    "confidence": 0.5602,
-    "occurrence_count": 1,
-    "last_seen": "2026-04-14T20:36:51.363855+00:00",
+    "confidence": 0.995,
+    "occurrence_count": 3,
+    "last_seen": "2026-04-15T23:46:46.759580+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 90%; Causal inference points to SCTP:DATA",
     "embedding_vector": [
       0.03128,
@@ -36184,7 +38103,7 @@
       "call_type": "Generic telecom session"
     },
     "historical_success": 0.45,
-    "validation_status": "candidate",
+    "validation_status": "auto_validated",
     "source_sessions": [
       "10.40.255.174:-->10.8.228.119:-"
     ],
@@ -36195,6 +38114,207 @@
       "signals": [
         "inter-message gap 17995 ms"
       ]
+    }
+  },
+  {
+    "pattern_id": "pat-2540a6623f72",
+    "protocols": [
+      "DNS",
+      "UDP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org",
+      "UDP:UDP",
+      "DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org",
+      "UDP:UDP",
+      "DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org -> 199.19.57.1",
+      "UDP:UDP",
+      "UDP:UDP",
+      "DNS:DNS tac-lb0a.tac-hb00.tac.epc.mnc670.mcc311.3gppnetwork.org",
+      "UDP:UDP",
+      "DNS:DNS tac-lb0a.tac-hb00.tac.epc.mnc670.mcc311.3gppnetwork.org -> 10.22.4.39",
+      "DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org",
+      "UDP:UDP",
+      "DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org -> 199.19.57.1",
+      "UDP:UDP",
+      "UDP:UDP",
+      "DNS:DNS tac-lb0a.tac-hb00.tac.epc.mnc670.mcc311.3gppnetwork.org",
+      "UDP:UDP",
+      "DNS:DNS tac-lb0a.tac-hb00.tac.epc.mnc670.mcc311.3gppnetwork.org -> 10.22.4.39"
+    ],
+    "root_cause": "UNKNOWN",
+    "confidence": 0.995,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-15T15:29:47.867596+00:00",
+    "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 90%; Causal inference points to DNS:DNS 213x.m2m.com.attz.apn.epc.mnc170.mcc310.3gppnetwork.org -> 199.19.57.1",
+    "embedding_vector": [
+      0.06025,
+      -0.03567,
+      0.081661,
+      0.080574,
+      0.092343,
+      0.646404,
+      0.092343,
+      0.0,
+      0.0,
+      -0.63554,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.2515,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.179617,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.1836,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.087455,
+      0.079126,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DNS",
+        "UDP"
+      ],
+      "technology_family": [
+        "Core",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.45,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "0"
+    ],
+    "anomaly_profile": {
+      "score": 0.385,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [
+        "inter-message gap 15387 ms",
+        "inter-message gap 11264 ms"
+      ]
+    }
+  },
+  {
+    "pattern_id": "pat-360349e11012",
+    "protocols": [
+      "DNS",
+      "UDP"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DNS:DNS proteus-api.prd.usw2.vn.cloud.tesla.com",
+      "UDP:UDP"
+    ],
+    "root_cause": "UNKNOWN",
+    "confidence": 0.995,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-15T20:23:55.280085+00:00",
+    "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 85%; Causal inference points to UDP:UDP",
+    "embedding_vector": [
+      -0.297708,
+      0.356049,
+      0.386935,
+      0.039466,
+      0.437554,
+      0.218777,
+      0.0,
+      0.0,
+      0.0,
+      -0.3346,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.302856,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.223067,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.374924,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DNS",
+        "UDP"
+      ],
+      "technology_family": [
+        "Core",
+        "Transport"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 0.45,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "0xcd63"
+    ],
+    "anomaly_profile": {
+      "score": 0.4027,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": []
     }
   },
   {
@@ -36300,6 +38420,735 @@
       "signals": [
         "inter-message gap 4231 ms"
       ]
+    }
+  },
+  {
+    "pattern_id": "pat-19ad44d363e0",
+    "protocols": [
+      "RADIUS"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "RADIUS:Access-Request (Framed)",
+      "RADIUS:Access-Accept"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.8,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-19T18:16:05.335596+00:00",
+    "evidence_template": "1 successful RADIUS response(s) observed; No RADIUS reject or NAK codes present; Causal inference points to RADIUS:Access-Accept",
+    "embedding_vector": [
+      4.7e-05,
+      0.0,
+      0.0,
+      0.218305,
+      0.218305,
+      -0.367267,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.345864,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.43233,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.434042,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.404935,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.333023
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "RADIUS"
+      ],
+      "technology_family": [
+        "AAA"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "35"
+    ],
+    "anomaly_profile": {
+      "score": 0.0847,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.0167,
+        "mobility": 0.02
+      },
+      "dominant_signal": "mobility",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-19360f93a946",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.995,
+    "occurrence_count": 13,
+    "last_seen": "2026-04-20T05:39:55.610976+00:00",
+    "evidence_template": "2 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 52%",
+    "embedding_vector": [
+      0.000911,
+      0.0,
+      0.0,
+      0.215596,
+      0.215596,
+      -0.362709,
+      0.0,
+      0.0,
+      0.0,
+      -0.610434,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.549559,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.289998,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.129358,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "DIAMETER:08.mmecba.mmegid6d8.mme.epc.mnc610.mcc302.3gppnetwork.org;1125097347;82935010;6909b639-e202"
+    ],
+    "anomaly_profile": {
+      "score": 0.0877,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.0333,
+        "mobility": 0.02
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-bf74ba4eeaf6",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:AIR",
+      "DIAMETER:AIR",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:ULR",
+      "DIAMETER:ULR",
+      "DIAMETER:CLR",
+      "DIAMETER:CLR",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:CLA 2001",
+      "DIAMETER:CLA 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.84,
+    "occurrence_count": 3,
+    "last_seen": "2026-04-20T05:39:54.615930+00:00",
+    "evidence_template": "6 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 40%",
+    "embedding_vector": [
+      0.007115,
+      -0.323088,
+      0.0,
+      0.132883,
+      0.132883,
+      -0.223556,
+      0.0,
+      0.0,
+      0.403339,
+      -0.334552,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.364777,
+      0.331426,
+      0.0,
+      0.0,
+      0.178741,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.504434,
+      0.0,
+      0.0,
+      0.0,
+      -0.07973,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "DIAMETER:mmecDA.mmegiFF29.mme.epc.mnc410.mcc310.3gppnetwork.org;1822655336;9460126;2.16;2985261016"
+    ],
+    "anomaly_profile": {
+      "score": 0.0998,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.1,
+        "mobility": 0.02
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-e9313b703b9a",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:8388647R",
+      "DIAMETER:8388647A 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.82,
+    "occurrence_count": 2,
+    "last_seen": "2026-04-20T05:39:55.148932+00:00",
+    "evidence_template": "1 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 64%",
+    "embedding_vector": [
+      0.000148,
+      0.0,
+      0.0,
+      -0.156194,
+      0.329168,
+      -0.553777,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.442763,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.197501,
+      0.0,
+      -0.570558,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "DIAMETER:smsc-site2-a.smsc.cisco.com.smsc.cisco.com;3381601740;1736918151;6.0.6668.379693748"
+    ],
+    "anomaly_profile": {
+      "score": 0.0847,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.0167,
+        "mobility": 0.02
+      },
+      "dominant_signal": "mobility",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-d4e37766b10d",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:8388646R",
+      "DIAMETER:8388646A 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.8,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-20T05:39:54.161152+00:00",
+    "evidence_template": "1 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 68%",
+    "embedding_vector": [
+      0.007421,
+      0.0,
+      0.0,
+      0.286033,
+      0.286033,
+      -0.481209,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.437462,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.384743,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.17162,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.485695,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "DIAMETER:smsc-site2-a.smsc.cisco.com.smsc.cisco.com;199945800;1756876546;6.0.17170.852166119"
+    ],
+    "anomaly_profile": {
+      "score": 0.0847,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.0167,
+        "mobility": 0.02
+      },
+      "dominant_signal": "mobility",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-5067c3468cc1",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:AIR",
+      "DIAMETER:AIR",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:ULR",
+      "DIAMETER:ULR",
+      "DIAMETER:CLR",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:CLR",
+      "DIAMETER:CLA 2001",
+      "DIAMETER:CLA 2001",
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.92,
+    "occurrence_count": 7,
+    "last_seen": "2026-04-20T05:39:55.461972+00:00",
+    "evidence_template": "12 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 78%",
+    "embedding_vector": [
+      0.033444,
+      -0.200125,
+      0.0,
+      0.08231,
+      0.08231,
+      -0.138474,
+      0.08231,
+      0.148157,
+      0.249834,
+      -0.673324,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.419617,
+      0.0,
+      0.0,
+      0.225948,
+      0.20529,
+      0.0,
+      0.0,
+      0.110714,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.312453,
+      0.0,
+      0.0,
+      0.0,
+      -0.049386,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "DIAMETER:08.mmecb3.mmegid6d8.mme.epc.mnc610.mcc302.3gppnetwork.org;660971612;1729422981;690a0878-8502"
+    ],
+    "anomaly_profile": {
+      "score": 0.1385,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [
+        "inter-message gap 2387 ms"
+      ],
+      "component_scores": {
+        "transport": 0.12,
+        "charging": 0.0,
+        "signaling": 0.2,
+        "mobility": 0.08
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.3506,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-14e48128624a",
+    "protocols": [
+      "DIAMETER"
+    ],
+    "scenario": "Generic telecom session - Normal Session",
+    "signature": [
+      "DIAMETER:AIR",
+      "DIAMETER:AIR",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:AIA 2001",
+      "DIAMETER:ULR",
+      "DIAMETER:ULR",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:ULA 2001",
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323R",
+      "DIAMETER:323R",
+      "DIAMETER:323A 2001",
+      "DIAMETER:323A 2001"
+    ],
+    "root_cause": "NORMAL_CALL",
+    "confidence": 0.8,
+    "occurrence_count": 1,
+    "last_seen": "2026-04-20T05:39:55.686380+00:00",
+    "evidence_template": "8 successful Diameter answers observed; No Diameter rejection codes present; Matched historical pattern 'Generic telecom session - Normal Session' with similarity 91%",
+    "embedding_vector": [
+      0.012988,
+      -0.220784,
+      0.0,
+      0.090806,
+      0.090806,
+      -0.152768,
+      0.0,
+      0.0,
+      0.275624,
+      -0.742831,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.462934,
+      0.0,
+      0.0,
+      0.0,
+      0.226482,
+      0.0,
+      0.0,
+      0.122143,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.054484,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DIAMETER"
+      ],
+      "technology_family": [
+        "IMS"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "candidate",
+    "source_sessions": [
+      "DIAMETER:02.mmecb1.mmegid6d8.mme.epc.mnc610.mcc302.3gppnetwork.org;845440265;1907197098;690ade04-aa02"
+    ],
+    "anomaly_profile": {
+      "score": 0.1058,
+      "is_anomalous": false,
+      "suggested_root_cause": "NORMAL_CALL",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.1333,
+        "mobility": 0.02
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.4377,
+      "model_type": "ensemble"
     }
   }
 ]

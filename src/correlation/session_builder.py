@@ -110,12 +110,20 @@ def build_sessions(parsed: dict) -> list:
     )
 
     sessions.extend(non_sip_sessions)
+    sessions = _suppress_low_value_sessions(sessions)
 
-    if sessions:
+    max_compaction_sessions = int(cfg("correlation.max_compaction_sessions", 1200))
+    if sessions and len(sessions) <= max_compaction_sessions:
         sessions = _compact_correlated_sessions(sessions, window_sec)
+    elif sessions:
+        logger.warning(
+            "Skipping session compaction for oversized seed set: {} sessions exceeds limit {}",
+            len(sessions),
+            max_compaction_sessions,
+        )
     elif generic_pkts:
         sessions = _build_generic_sessions(generic_pkts)
-    sessions = _suppress_low_value_sessions(sessions)
+        sessions = _suppress_low_value_sessions(sessions)
 
     logger.info(f"Sessions built: {len(sessions)} | strategies: {dict(strategy_counts)}")
     return sessions

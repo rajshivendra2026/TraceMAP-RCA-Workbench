@@ -39,6 +39,7 @@ from .learning import (
 from .state import (
     cache_stats,
     create_job,
+    fail_incomplete_jobs,
     find_session,
     get_job,
     purge_expired_jobs,
@@ -86,6 +87,9 @@ def configure_logging() -> None:
 
 def create_app() -> Flask:
     configure_logging()
+    recovered_jobs = fail_incomplete_jobs()
+    if recovered_jobs:
+        logger.warning(f"Marked {recovered_jobs} interrupted background job(s) as failed on startup")
 
     app = Flask(__name__, static_folder=None)
     app.config["MAX_CONTENT_LENGTH"] = int(

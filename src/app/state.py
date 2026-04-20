@@ -151,6 +151,41 @@ def get_job(job_id: str) -> dict | None:
         return dict(entry) if entry else None
 
 
+def fail_incomplete_jobs(reason: str = "Job interrupted by app restart") -> int:
+    with _job_lock:
+        _init_job_store()
+        with _job_conn() as conn:
+            rows = conn.execute(
+                "SELECT job_id, payload FROM jobs WHERE status IN ('queued', 'running')"
+            ).fetchall()
+            updated = 0
+            now = time.time()
+            for row in rows:
+                try:
+                    entry = json.loads(row["payload"])
+                except Exception:
+                    continue
+                entry.update(
+                    {
+                        "status": "failed",
+                        "message": reason,
+                        "error": reason,
+                        "updated_at": now,
+                    }
+                )
+                conn.execute(
+                    """
+                    UPDATE jobs
+                    SET status = ?, updated_at = ?, payload = ?
+                    WHERE job_id = ?
+                    """,
+                    ("failed", now, json.dumps(entry), row["job_id"]),
+                )
+                updated += 1
+            conn.commit()
+        return updated
+
+
 def purge_expired_jobs(locked: bool = False) -> None:
     ttl_sec = int(cfg("server.session_ttl_sec", 3600))
     now = time.time()

@@ -1,6 +1,7 @@
 import sys
 import types
 import unittest
+from unittest.mock import patch
 
 
 sys.modules.setdefault(
@@ -110,6 +111,40 @@ class SessionBuilderTests(unittest.TestCase):
         sessions = _build_non_sip_seed_sessions(dia_pkts=dia_pkts, inap_pkts=[], gtp_pkts=[], generic_pkts=[])
         self.assertEqual(len(sessions), 2)
         self.assertNotEqual(sessions[0]["session_id"], sessions[1]["session_id"])
+
+    def test_build_sessions_skips_compaction_for_oversized_seed_sets(self):
+        parsed = {
+            "sip": [],
+            "diameter": [
+                {
+                    "frame_number": index,
+                    "timestamp": float(index),
+                    "src_ip": "203.0.113.10",
+                    "dst_ip": "198.51.100.20",
+                    "src_port": 3868,
+                    "dst_port": 3868,
+                    "session_id": None,
+                    "imsi": None,
+                    "msisdn": None,
+                    "command_name": "CCR",
+                }
+                for index in range(1, 7)
+            ],
+            "inap": [],
+            "gtp": [],
+        }
+
+        def fake_cfg(key, default=None):
+            if key == "correlation.max_compaction_sessions":
+                return 5
+            return default
+
+        with patch("src.correlation.session_builder.cfg", side_effect=fake_cfg):
+            with patch("src.correlation.session_builder._compact_correlated_sessions") as compact:
+                sessions = build_sessions(parsed)
+
+        compact.assert_not_called()
+        self.assertEqual(len(sessions), 6)
 
 
 if __name__ == "__main__":
