@@ -16,6 +16,7 @@ Changes from v10:
   - Structured logging with correlation outcome stats
 """
 
+import ipaddress
 import re
 from collections import defaultdict
 from loguru import logger
@@ -41,12 +42,7 @@ def build_sessions(parsed: dict) -> list:
 
     logger.info(f"Correlating: {len(sip_pkts)} SIP | {len(dia_pkts)} Diameter")
 
-    # Group SIP by Call-ID
-    sip_by_callid: dict[str, list] = defaultdict(list)
-    for pkt in sip_pkts:
-        cid = pkt.get("call_id")
-        if cid:
-            sip_by_callid[cid].append(pkt)
+    sip_seed_groups = _group_sip_seed_sessions(sip_pkts)
 
     # Build indexes ONCE — not per Call-ID
     dia_index = _build_dia_index(dia_pkts)
@@ -55,7 +51,7 @@ def build_sessions(parsed: dict) -> list:
     sessions = []
     strategy_counts: dict[str, int] = defaultdict(int)
 
-    for call_id, sip_msgs in sip_by_callid.items():
+    for session_id, sip_msgs, sip_dialog_key in sip_seed_groups:
 
         sip_msgs = _sort_ts(sip_msgs)
 
@@ -100,7 +96,7 @@ def build_sessions(parsed: dict) -> list:
 
         sessions.append(
             _make_session_record(
-                session_id=call_id,
+                session_id=session_id,
                 sip_msgs=sip_msgs,
                 dia_msgs=dia_msgs,
                 inap_msgs=inap_msgs,
@@ -110,6 +106,7 @@ def build_sessions(parsed: dict) -> list:
                 gtp_correlation=gtp_strategy,
                 calling=calling,
                 called=called,
+                sip_dialog_key=sip_dialog_key,
             )
         )
 
@@ -375,10 +372,13 @@ def _make_session_record(
     gtp_correlation: str = "none",
     calling: Optional[str] = None,
     called: Optional[str] = None,
+    sip_dialog_key: Optional[str] = None,
 ) -> dict:
+    sip_call_id = next((message.get("call_id") for message in sip_msgs if message.get("call_id")), None)
     session = {
         "session_id": session_id,
-        "call_id": session_id,
+        "call_id": sip_call_id or session_id,
+        "sip_dialog_key": sip_dialog_key,
         "calling": calling,
         "called": called,
         "sip_msgs": _dedup(_sort_ts(sip_msgs)),
@@ -653,6 +653,62 @@ def _extract_priority_ips(sip_msgs: list) -> list:
     return result
 
 
+def _group_sip_seed_sessions(sip_pkts: list) -> list[tuple[str, list, Optional[str]]]:
+    """
+    Build SIP seed groups without collapsing forked dialogs.
+
+    Call-ID remains the high-confidence call anchor for normal SIP dialogs. When
+    multiple To-tags appear under the same Call-ID, each To-tag is treated as a
+    separate dialog branch and the shared pre-dialog messages are copied into
+    each branch for context.
+    """
+    sip_by_callid: dict[str, list] = defaultdict(list)
+    for pkt in sip_pkts:
+        cid = pkt.get("call_id")
+        if cid:
+            sip_by_callid[str(cid)].append(pkt)
+
+    groups: list[tuple[str, list, Optional[str]]] = []
+    for call_id, messages in sip_by_callid.items():
+        ordered = _sort_ts(messages)
+        to_tags = sorted(
+            {
+                str(message.get("to_tag"))
+                for message in ordered
+                if message.get("to_tag") and _is_dialog_specific_sip_message(message)
+            }
+        )
+        if len(to_tags) <= 1:
+            groups.append((call_id, ordered, None))
+            continue
+
+        for to_tag in to_tags:
+            dialog_key = f"to-tag:{to_tag}"
+            dialog_messages = []
+            for message in ordered:
+                message_to_tag = message.get("to_tag")
+                if message_to_tag and str(message_to_tag) != to_tag:
+                    continue
+                annotated = dict(message)
+                annotated["sip_dialog_key"] = dialog_key
+                annotated["forked_dialog"] = True
+                dialog_messages.append(annotated)
+            groups.append((f"{call_id}#dlg:{_safe_dialog_value(to_tag)}", _sort_ts(dialog_messages), dialog_key))
+
+    return groups
+
+
+def _is_dialog_specific_sip_message(message: dict) -> bool:
+    status_code = str(message.get("status_code") or "")
+    if status_code and status_code != "100":
+        return True
+    return str(message.get("method") or "").upper() in {"ACK", "BYE", "CANCEL", "PRACK", "UPDATE", "REFER", "NOTIFY"}
+
+
+def _safe_dialog_value(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.:-]+", "_", str(value)).strip("_") or "unknown"
+
+
 def _build_non_sip_seed_sessions(
     dia_pkts: list,
     inap_pkts: list,
@@ -809,6 +865,7 @@ def _merge_two_sessions(
     merged = {
         "session_id": min(str(base.get("session_id")), str(incoming.get("session_id"))),
         "call_id": base.get("call_id") if _has_sip(base) else incoming.get("call_id") or base.get("call_id"),
+        "sip_dialog_key": base.get("sip_dialog_key") or incoming.get("sip_dialog_key"),
         "calling": base.get("calling") or incoming.get("calling"),
         "called": base.get("called") or incoming.get("called"),
         "sip_msgs": _merge_message_lists(base.get("sip_msgs", []), incoming.get("sip_msgs", [])),
@@ -930,6 +987,8 @@ def _session_merge_score(
     right_desc = _session_descriptor(right)
     time_gap = _time_gap_seconds(left_desc["start"], left_desc["end"], right_desc["start"], right_desc["end"])
     within_window = time_gap <= max(2, window_sec * 2)
+    if _has_conflicting_sip_dialog_keys(left, right):
+        return 0
     if _is_segmented_variant(left, right):
         if _has_procedure_restart_boundary(left, right):
             return 0
@@ -975,6 +1034,12 @@ def _session_merge_score(
         score += 15
 
     return score
+
+
+def _has_conflicting_sip_dialog_keys(left: dict, right: dict) -> bool:
+    left_key = left.get("sip_dialog_key")
+    right_key = right.get("sip_dialog_key")
+    return bool(left_key and right_key and left_key != right_key)
 
 
 def _empty_relationship_registry() -> dict:
@@ -1165,7 +1230,10 @@ def _session_descriptor(session: dict) -> dict:
     protocols = set(session.get("protocols", []))
 
     call_id = session.get("call_id")
-    if call_id:
+    sip_dialog_key = session.get("sip_dialog_key")
+    if sip_dialog_key:
+        ids.add(f"sip-dialog:{call_id}:{sip_dialog_key}")
+    elif call_id:
         ids.add(f"call:{call_id}")
 
     for message in _all_session_messages(session):
@@ -1351,10 +1419,15 @@ def _refresh_session_record(session: dict, relationship_registry: Optional[dict]
     protocols = _protocols_present(sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
     technologies = _technologies_present(sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
     session_id = _derive_session_id(session, sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
+    sip_dialog_key = session.get("sip_dialog_key") or next(
+        (message.get("sip_dialog_key") for message in sip_msgs if message.get("sip_dialog_key")),
+        None,
+    )
     descriptor = _session_descriptor(
         {
             "session_id": session_id,
             "call_id": session.get("call_id") or session_id,
+            "sip_dialog_key": sip_dialog_key,
             "sip_msgs": sip_msgs,
             "dia_msgs": dia_msgs,
             "inap_msgs": inap_msgs,
@@ -1391,6 +1464,7 @@ def _refresh_session_record(session: dict, relationship_registry: Optional[dict]
             "sip_msgs": sip_msgs,
             "dia_msgs": dia_msgs,
             "gtp_msgs": gtp_msgs,
+            "sip_dialog_key": sip_dialog_key,
             "dia_correlation": session.get("dia_correlation", "none"),
             "gtp_correlation": session.get("gtp_correlation", "none"),
         },
@@ -1420,13 +1494,15 @@ def _refresh_session_record(session: dict, relationship_registry: Optional[dict]
             descriptor,
             _extract_imsi(dia_msgs) or _extract_gtp_imsi(gtp_msgs) or _first_generic_identity(generic_msgs, "imsi"),
             _extract_subscriber_ip(dia_msgs, gtp_msgs, generic_msgs),
+            sip_dialog_key,
         ),
         stateful_evidence,
     )
 
     refreshed = {
         "session_id": session_id,
-        "call_id": session_id,
+        "call_id": session.get("call_id") or session_id,
+        "sip_dialog_key": sip_dialog_key,
         "calling": calling,
         "called": called,
         "sip_msgs": sip_msgs,
@@ -1475,6 +1551,8 @@ def _build_correlation_methods(session: dict, stateful_methods: list[str]) -> li
     methods: list[str] = []
     if session.get("sip_msgs"):
         methods.append("identity:sip:call_id")
+    if session.get("sip_dialog_key"):
+        methods.append("identity:sip:dialog_tag")
     if session.get("dia_msgs") and any(message.get("session_id") for message in session.get("dia_msgs", [])):
         methods.append("identity:diameter:session_id")
     dia_correlation = session.get("dia_correlation")
@@ -1494,8 +1572,11 @@ def _identity_correlation_evidence(
     descriptor: dict,
     imsi: Optional[str],
     subscriber_ip: Optional[str],
+    sip_dialog_key: Optional[str] = None,
 ) -> list[str]:
     evidence: list[str] = []
+    if sip_dialog_key:
+        evidence.append(f"SIP fork/dialog separated by {sip_dialog_key}")
     if dia_correlation and dia_correlation not in {"none", "unmatched", "generic_seed"}:
         evidence.append(f"Diameter correlation strategy: {dia_correlation}")
     if gtp_correlation and gtp_correlation not in {"none", "unmatched", "generic_seed"}:
@@ -2030,15 +2111,31 @@ def _select_in_window(pkts: list, start_time: Optional[float], end_time: Optiona
 
 def _ip_similarity(ip1: str, ip2: str) -> bool:
     """
-    Returns True only if the last TWO octets match — avoids single-octet
-    collisions which are extremely common in /24 NAT pools.
+    IPv4 NAT fallback: return True only if the last TWO octets match, avoiding
+    single-octet collisions common in /24 NAT pools.
+
+    IPv6 UE-prefix fallback: match addresses inside the same configured prefix
+    (default /64) because the interface identifier can legitimately change.
     """
     try:
-        a = ip1.split(".")
-        b = ip2.split(".")
-        return len(a) == 4 and len(b) == 4 and a[2] == b[2] and a[3] == b[3]
-    except (AttributeError, IndexError):
+        first = ipaddress.ip_address(str(ip1))
+        second = ipaddress.ip_address(str(ip2))
+    except (TypeError, ValueError):
         return False
+
+    if first.version != second.version:
+        return False
+
+    if first.version == 6:
+        prefix_len = int(cfg("correlation.ipv6_prefix_len", 64))
+        prefix_len = min(128, max(1, prefix_len))
+        first_network = ipaddress.ip_network((first, prefix_len), strict=False)
+        second_network = ipaddress.ip_network((second, prefix_len), strict=False)
+        return first_network == second_network
+
+    a = str(first).split(".")
+    b = str(second).split(".")
+    return len(a) == 4 and len(b) == 4 and a[2] == b[2] and a[3] == b[3]
 
 
 _SIP_USER_RE = re.compile(

@@ -13,12 +13,13 @@ class SipParserTests(unittest.TestCase):
             {
                 "sip.Call-ID": "call-1",
                 "sip.Method": "invite",
-                "sip.From": "<sip:+12345@ims.example.com>",
-                "sip.To": "<sip:67890@ims.example.com>",
+                "sip.From": "<sip:+12345@ims.example.com>;tag=from-a",
+                "sip.To": "<sip:67890@ims.example.com>;tag=to-b",
+                "sip.CSeq": "1 INVITE",
                 "ipv6.src": "2001:db8::10",
                 "ipv6.dst": "2001:db8::20",
                 "sip.Contact": "<sip:+12345@[2001:db8::30]>",
-                "sip.Via": 'SIP/2.0/UDP [2001:db8::40]:5060',
+                "sip.Via": 'SIP/2.0/UDP [2001:db8::40]:5060;branch=z9hG4bK-a1',
             }
         )
 
@@ -27,6 +28,10 @@ class SipParserTests(unittest.TestCase):
         self.assertEqual(packet["contact_ip"], "2001:db8::30")
         self.assertEqual(packet["via_ip"], "2001:db8::40")
         self.assertEqual(packet["method"], "INVITE")
+        self.assertEqual(packet["from_tag"], "from-a")
+        self.assertEqual(packet["to_tag"], "to-b")
+        self.assertEqual(packet["via_branch"], "z9hG4bK-a1")
+        self.assertEqual(packet["cseq"], "1 INVITE")
 
 
 class DiameterParserTests(unittest.TestCase):

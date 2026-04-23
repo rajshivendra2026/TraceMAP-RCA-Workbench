@@ -21,6 +21,93 @@ from src.correlation.session_builder import build_sessions
 
 
 class SessionCorrelationTests(unittest.TestCase):
+    def test_sip_forked_dialogs_do_not_collapse_on_shared_call_id(self):
+        sessions = build_sessions(
+            {
+                "sip": [
+                    {
+                        "frame_number": 1,
+                        "call_id": "fork-call",
+                        "method": "INVITE",
+                        "timestamp": 1.0,
+                        "from_uri": "sip:+12345@ims.example.com",
+                        "to_uri": "sip:67890@ims.example.com",
+                        "from_tag": "orig-a",
+                        "src_ip": "172.16.0.10",
+                        "dst_ip": "172.16.0.20",
+                    },
+                    {
+                        "frame_number": 2,
+                        "call_id": "fork-call",
+                        "status_code": "180",
+                        "timestamp": 1.2,
+                        "from_tag": "orig-a",
+                        "to_tag": "branch-a",
+                        "src_ip": "172.16.0.21",
+                        "dst_ip": "172.16.0.10",
+                    },
+                    {
+                        "frame_number": 3,
+                        "call_id": "fork-call",
+                        "status_code": "486",
+                        "timestamp": 1.5,
+                        "from_tag": "orig-a",
+                        "to_tag": "branch-a",
+                        "src_ip": "172.16.0.21",
+                        "dst_ip": "172.16.0.10",
+                    },
+                    {
+                        "frame_number": 4,
+                        "call_id": "fork-call",
+                        "status_code": "180",
+                        "timestamp": 1.3,
+                        "from_tag": "orig-a",
+                        "to_tag": "branch-b",
+                        "src_ip": "172.16.0.22",
+                        "dst_ip": "172.16.0.10",
+                    },
+                    {
+                        "frame_number": 5,
+                        "call_id": "fork-call",
+                        "status_code": "200",
+                        "timestamp": 1.6,
+                        "from_tag": "orig-a",
+                        "to_tag": "branch-b",
+                        "src_ip": "172.16.0.22",
+                        "dst_ip": "172.16.0.10",
+                    },
+                ],
+                "diameter": [],
+                "inap": [],
+                "gtp": [],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 2)
+        self.assertEqual({session["call_id"] for session in sessions}, {"fork-call"})
+        self.assertEqual(
+            {session["sip_dialog_key"] for session in sessions},
+            {"to-tag:branch-a", "to-tag:branch-b"},
+        )
+        self.assertEqual({session["final_sip_code"] for session in sessions}, {"486", "200"})
+        for session in sessions:
+            self.assertIn("identity:sip:dialog_tag", session["correlation_methods"])
+            self.assertTrue(any("SIP fork/dialog separated" in item for item in session["correlation_evidence"]))
+
     def test_transport_only_fragment_is_absorbed_by_lte_control_session(self):
         parsed = {
             "sip": [],
@@ -229,6 +316,64 @@ class SessionCorrelationTests(unittest.TestCase):
         self.assertEqual(len(correlated["gtp_msgs"]), 1)
         self.assertEqual(correlated["gtp_msgs"][0]["gtp.teid"], "1001")
         self.assertEqual(correlated["gtp_correlation"], "subscriber_ip_fusion")
+
+    def test_sip_to_diameter_correlation_matches_ipv6_ue_prefix(self):
+        sessions = build_sessions(
+            {
+                "sip": [
+                    {
+                        "call_id": "ipv6-call",
+                        "method": "INVITE",
+                        "timestamp": 10.0,
+                        "from_uri": "sip:+12345@ims.example.com",
+                        "to_uri": "sip:67890@ims.example.com",
+                        "src_ip": "2001:db8:100:200::abcd",
+                        "dst_ip": "2001:db8:100:300::20",
+                        "contact_ip": "2001:db8:100:200::abcd",
+                    },
+                    {
+                        "call_id": "ipv6-call",
+                        "status_code": "200",
+                        "timestamp": 11.0,
+                        "src_ip": "2001:db8:100:300::20",
+                        "dst_ip": "2001:db8:100:200::abcd",
+                    },
+                ],
+                "diameter": [
+                    {
+                        "session_id": "dia-ipv6",
+                        "command_code": "272",
+                        "command_name": "CCR",
+                        "timestamp": 10.4,
+                        "src_ip": "10.0.0.2",
+                        "dst_ip": "10.0.0.9",
+                        "framed_ip": "2001:db8:100:200::1234",
+                        "imsi": "001010123456789",
+                        "msisdn": "12345",
+                    }
+                ],
+                "inap": [],
+                "gtp": [],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(sessions[0]["dia_correlation"], "framed_ip_nat_similarity")
+        self.assertIn("identity:diameter:framed_ip_nat_similarity", sessions[0]["correlation_methods"])
 
     def test_diameter_and_gtp_seed_sessions_merge_on_shared_subscriber_ip(self):
         sessions = build_sessions(

@@ -10,14 +10,23 @@ from src.eval.metrics import benchmark_case_passed, compute_session_metrics
 class BenchmarkRunnerTests(unittest.TestCase):
     def test_compute_session_metrics_tracks_unknown_ratio(self):
         sessions = [
-            {"rca": {"rca_label": "NORMAL_CALL"}, "priority_score": 12},
-            {"rca": {"rca_label": "UNKNOWN"}, "priority_score": 55},
+            {"rca": {"rca_label": "NORMAL_CALL"}, "priority_score": 12, "correlation_methods": ["identity:sip:call_id"]},
+            {
+                "rca": {"rca_label": "UNKNOWN"},
+                "priority_score": 55,
+                "correlation_methods": ["state:teid_continuation", "identity:diameter:time_cluster"],
+                "dia_correlation": "time_cluster",
+            },
         ]
         metrics = compute_session_metrics(sessions)
         self.assertEqual(metrics["session_count"], 2)
         self.assertEqual(metrics["unknown_count"], 1)
         self.assertEqual(metrics["top_label"], "NORMAL_CALL")
         self.assertEqual(metrics["unknown_ratio"], 0.5)
+        self.assertEqual(metrics["identity_correlated_sessions"], 2)
+        self.assertEqual(metrics["stateful_correlated_sessions"], 1)
+        self.assertEqual(metrics["time_fallback_sessions"], 1)
+        self.assertEqual(metrics["correlation_method_counts"]["state:teid_continuation"], 1)
 
     def test_benchmark_case_passed_checks_expected_constraints(self):
         metrics = {
@@ -36,6 +45,35 @@ class BenchmarkRunnerTests(unittest.TestCase):
                 "dominant_label": "NORMAL_CALL",
             },
         )
+        self.assertTrue(passed)
+        self.assertEqual(reasons, [])
+
+    def test_benchmark_case_passed_checks_correlation_quality_constraints(self):
+        metrics = {
+            "session_count": 3,
+            "unknown_count": 0,
+            "unknown_ratio": 0.0,
+            "label_counts": {"NORMAL_CALL": 2, "NETWORK_CONGESTION": 1},
+            "top_label": "NORMAL_CALL",
+            "identity_correlated_sessions": 2,
+            "stateful_correlated_sessions": 1,
+            "time_fallback_sessions": 0,
+            "correlation_method_counts": {
+                "identity:sip:call_id": 1,
+                "state:teid_continuation": 1,
+            },
+        }
+
+        passed, reasons = benchmark_case_passed(
+            metrics,
+            {
+                "min_identity_correlated_sessions": 2,
+                "min_stateful_correlated_sessions": 1,
+                "max_time_fallback_sessions": 0,
+                "required_correlation_methods": {"state:teid_continuation": 1},
+            },
+        )
+
         self.assertTrue(passed)
         self.assertEqual(reasons, [])
 

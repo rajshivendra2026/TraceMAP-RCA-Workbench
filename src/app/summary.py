@@ -785,6 +785,7 @@ def build_session_details_summary(session: dict) -> dict:
 def _build_session_selected_filter(session: dict, parsed_subset: dict) -> dict:
     candidates = _session_anchor_candidates(session, parsed_subset)
     preferred_labels = (
+        "SIP Dialog",
         "Call-ID",
         "Tunnel ID (TEID)",
         "Diameter Session-ID",
@@ -837,19 +838,20 @@ def _build_session_correlation_anchors(session: dict, parsed_subset: dict, selec
 
     order = {
         "Call-ID": 0,
-        "Diameter Session-ID": 1,
-        "Tunnel ID (TEID)": 2,
-        "GTP F-TEID": 3,
-        "GTP TID": 4,
-        "PFCP SEID": 5,
-        "Access UE ID": 6,
-        "IMSI": 7,
-        "MSISDN": 8,
-        "Subscriber IP": 9,
-        "APN": 10,
-        "Stream ID": 11,
-        "Transaction ID": 12,
-        "Session-ID": 13,
+        "SIP Dialog": 1,
+        "Diameter Session-ID": 2,
+        "Tunnel ID (TEID)": 3,
+        "GTP F-TEID": 4,
+        "GTP TID": 5,
+        "PFCP SEID": 6,
+        "Access UE ID": 7,
+        "IMSI": 8,
+        "MSISDN": 9,
+        "Subscriber IP": 10,
+        "APN": 11,
+        "Stream ID": 12,
+        "Transaction ID": 13,
+        "Session-ID": 14,
     }
     for candidate in sorted(candidates, key=lambda item: order.get(item["label"], 99)):
         add(candidate)
@@ -880,6 +882,7 @@ def _session_anchor_candidates(session: dict, parsed_subset: dict) -> list[dict]
 
     if sip_msgs:
         add("Call-ID", _first_value(sip_msgs, ("call_id",)) or session.get("call_id"), "SIP identity seed")
+    add("SIP Dialog", session.get("sip_dialog_key") or _first_value(sip_msgs, ("sip_dialog_key",)), "SIP fork/dialog branch")
     add("Diameter Session-ID", _first_value(dia_msgs, ("session_id",)), "Diameter subscriber/auth session")
     add("Tunnel ID (TEID)", _first_value(gtp_msgs, ("gtp.teid",)), "GTP tunnel identity")
     add("GTP F-TEID", _first_value(gtp_msgs, ("gtp.f_teid",)), "GTP forwarding tunnel identity")

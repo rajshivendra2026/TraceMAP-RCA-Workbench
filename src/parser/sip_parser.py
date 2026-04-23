@@ -33,6 +33,7 @@ def parse_sip_packet(raw: dict) -> Optional[dict]:
 
     contact = _get(raw, "sip.Contact")
     via = _get(raw, "sip.Via")
+    cseq = _clean_text(_get(raw, "sip.CSeq"))
 
     method = method.upper() if method else None
 
@@ -44,6 +45,10 @@ def parse_sip_packet(raw: dict) -> Optional[dict]:
         "status_code": status_code,
         "from_uri": _clean_uri(from_uri),
         "to_uri": _clean_uri(to_uri),
+        "from_tag": _extract_header_param(from_uri, "tag"),
+        "to_tag": _extract_header_param(to_uri, "tag"),
+        "via_branch": _extract_header_param(via, "branch"),
+        "cseq": cseq,
         "reason": reason_header,
         "reason_header": reason_header,
         "status_line": status_line,
@@ -89,6 +94,16 @@ def _extract_ip(value: Optional[str]) -> Optional[str]:
         return match.group(0)
 
     return None
+
+
+def _extract_header_param(value: Optional[str], name: str) -> Optional[str]:
+    if not value:
+        return None
+    pattern = rf"(?:^|[;,\s]){re.escape(name)}=([^;,\s>]+)"
+    match = re.search(pattern, str(value), flags=re.IGNORECASE)
+    if not match:
+        return None
+    return match.group(1).strip('"') or None
 
 
 def _clean_uri(uri: Optional[str]) -> Optional[str]:
