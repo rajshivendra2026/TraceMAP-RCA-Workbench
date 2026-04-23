@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from loguru import logger
@@ -18,6 +19,7 @@ TECH_BY_PROTOCOL = {
     "NGAP": "5G",
     "NAS_5GS": "5G",
     "HTTP2": "5G",
+    "IKEV2": "VoWiFi/ePDG",
     "PFCP": "5G",
     "RADIUS": "AAA",
     "DNS": "Core",
@@ -306,6 +308,21 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         status_code = radius_code
     host = _clean_text(_get(raw, "http.host", "http2.headers.authority"))
     ws_info = _clean_text(_get(raw, "_ws.col.info"))
+    sbi_context = _extract_sbi_context(raw, uri, host, ws_info) if protocol == "HTTP" else {}
+    ike_inner_ip = _clean_text(
+        _get(
+            raw,
+            "ikev2.cfg.attr.internal_ip4_address",
+            "ikev2.cfg.attr.internal_ip6_address",
+            "isakmp.cfg.attr.internal_ip4_address",
+            "isakmp.cfg.attr.internal_ip6_address",
+            "ikev2.traffic_selector.initiator_ts_ipv4",
+            "ikev2.traffic_selector.initiator_ts_ipv6",
+            "ikev2.traffic_selector.responder_ts_ipv4",
+            "ikev2.traffic_selector.responder_ts_ipv6",
+        )
+    )
+    ike_identity = _clean_text(_get(raw, "ikev2.idi", "ikev2.idr", "isakmp.idir_data"))
     dns_query = _clean_text(_get(raw, "dns.qry.name", "dns.resp.name"))
     dns_rcode = _clean_text(_get(raw, "dns.flags.rcode"))
     dns_answer = _clean_text(_get(raw, "dns.a", "dns.aaaa", "dns.cname"))
@@ -359,7 +376,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
             "gsm_map.tbcd_digits",
         )
     )
-    imsi = _clean_text(_get(raw, "gsm_map.imsi", "e212.imsi", "gtpv2.imsi"))
+    imsi = _clean_text(_get(raw, "gsm_map.imsi", "e212.imsi", "gtpv2.imsi")) or sbi_context.get("imsi")
+    msisdn = msisdn or sbi_context.get("msisdn")
     procedure = _clean_text(
         _get(
             raw,
@@ -418,6 +436,10 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
 
     if protocol == "GTP":
         transaction_id = _first_non_null(transaction_id, gtp_tid, gtp_teid, gtp_f_teid, gtp_subscriber_ip, gtp_imsi)
+    if protocol == "HTTP":
+        transaction_id = _first_non_null(transaction_id, sbi_context.get("supi"), sbi_context.get("gpsi"), stream_id)
+    if protocol == "IKEV2":
+        transaction_id = _first_non_null(transaction_id, ike_identity, ike_inner_ip, stream_id)
 
     message = _first_non_null(
         _format_radius_message(radius_code, radius_acct_status, radius_service_type, radius_reply_message),
@@ -444,7 +466,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "src_port": src_port,
         "dst_port": dst_port,
         "protocol": protocol,
-        "technology": _derive_technology(protocol, tls_type),
+        "technology": _derive_technology(protocol, tls_type, uri, host, sbi_context.get("sbi_service")),
         "transport": transport,
         "stream_id": stream_id,
         "transaction_id": transaction_id,
@@ -472,6 +494,12 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "status_code": status_code,
         "host": host,
         "uri": uri,
+        "sbi_service": sbi_context.get("sbi_service"),
+        "supi": sbi_context.get("supi"),
+        "gpsi": sbi_context.get("gpsi"),
+        "sbi_payload_hint": sbi_context.get("payload_hint"),
+        "ike_inner_ip": ike_inner_ip,
+        "ike_identity": ike_identity,
         "radius_code": radius_code,
         "radius_id": radius_id,
         "radius_user_name": radius_user_name,
@@ -511,7 +539,15 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     return packet
 
 
-def _derive_technology(protocol: str, tls_type: Optional[str]) -> str:
+def _derive_technology(
+    protocol: str,
+    tls_type: Optional[str],
+    uri: Optional[str] = None,
+    host: Optional[str] = None,
+    sbi_service: Optional[str] = None,
+) -> str:
+    if protocol == "HTTP" and (sbi_service or _looks_like_sbi_text(uri) or _looks_like_sbi_text(host)):
+        return "5G"
     if protocol == "HTTP" and tls_type:
         return "HTTPS"
     return TECH_BY_PROTOCOL.get(protocol, "Core")
@@ -525,6 +561,137 @@ def _detect_transport(raw: dict) -> str:
     if _get(raw, "sctp.stream") is not None:
         return "SCTP"
     return "IP"
+
+
+def _extract_sbi_context(
+    raw: dict,
+    uri: Optional[str],
+    host: Optional[str],
+    ws_info: Optional[str],
+) -> dict[str, Optional[str]]:
+    payload = _joined_text(
+        [
+            uri,
+            host,
+            ws_info,
+            *_values(
+                raw,
+                "http.file_data",
+                "http2.data.data",
+                "json.key",
+                "json.value.string",
+                "json.value.number",
+                "json.member_with_value",
+            ),
+        ]
+    )
+    supi = _extract_supi(payload)
+    gpsi = _extract_gpsi(payload)
+    return {
+        "sbi_service": _extract_sbi_service(payload),
+        "supi": supi,
+        "gpsi": gpsi,
+        "imsi": _digits_from_prefixed_identity(supi, "imsi"),
+        "msisdn": _digits_from_prefixed_identity(gpsi, "msisdn"),
+        "payload_hint": _trim_payload_hint(payload),
+    }
+
+
+def _extract_supi(text: str) -> Optional[str]:
+    if not text:
+        return None
+    patterns = (
+        r"\b(?:supi|supiOrSuci|ueId|imsi)[\"'\s:=/-]*(?:imsi-)?(\d{14,16})\b",
+        r"\bimsi-(\d{14,16})\b",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return f"imsi-{match.group(1)}"
+    return None
+
+
+def _extract_gpsi(text: str) -> Optional[str]:
+    if not text:
+        return None
+    patterns = (
+        r"\b(?:gpsi|msisdn)[\"'\s:=/-]*(?:msisdn-)?(\d{6,15})\b",
+        r"\bmsisdn-(\d{6,15})\b",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return f"msisdn-{match.group(1)}"
+    return None
+
+
+def _extract_sbi_service(text: str) -> Optional[str]:
+    if not text:
+        return None
+    match = re.search(r"\b(n[a-z0-9]+(?:-[a-z0-9]+)*)\b", text, flags=re.IGNORECASE)
+    if not match:
+        return None
+    service = match.group(1).lower()
+    if service.startswith(("namf", "nsmf", "nudm", "nrf", "nssf", "ausf", "nausf", "npcf", "nchf", "nef", "nnef", "bsf", "nbsf")):
+        return service
+    return None
+
+
+def _digits_from_prefixed_identity(value: Optional[str], prefix: str) -> Optional[str]:
+    if not value:
+        return None
+    expected = f"{prefix}-"
+    if str(value).lower().startswith(expected):
+        digits = str(value)[len(expected):]
+        return digits if digits.isdigit() else None
+    return None
+
+
+def _trim_payload_hint(text: str) -> Optional[str]:
+    if not text:
+        return None
+    compact = re.sub(r"\s+", " ", text).strip()
+    return compact[:240] if compact else None
+
+
+def _looks_like_sbi_text(value: Optional[str]) -> bool:
+    if not value:
+        return False
+    return _extract_sbi_service(str(value)) is not None
+
+
+def _joined_text(values: list[Optional[str]]) -> str:
+    return " ".join(str(value) for value in values if value)
+
+
+def _values(raw: dict, *keys: str) -> list[str]:
+    values: list[str] = []
+    for key in keys:
+        value = raw.get(key)
+        if value is None or value == "":
+            continue
+        items = value if isinstance(value, list) else [value]
+        for item in items:
+            text = _clean_text(item)
+            if not text:
+                continue
+            values.append(text)
+            decoded = _decode_hex_payload(text)
+            if decoded:
+                values.append(decoded)
+    return values
+
+
+def _decode_hex_payload(value: str) -> Optional[str]:
+    text = str(value or "").strip()
+    if not re.fullmatch(r"(?:[0-9a-fA-F]{2}:?){8,}", text):
+        return None
+    try:
+        raw = bytes.fromhex(text.replace(":", ""))
+        decoded = raw.decode("utf-8", errors="ignore").strip()
+    except ValueError:
+        return None
+    return decoded or None
 
 
 def _format_http_message(method: Optional[str], status_code: Optional[str], uri: Optional[str]) -> Optional[str]:

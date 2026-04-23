@@ -36,6 +36,7 @@ def build_sessions(parsed: dict) -> list:
     inap_pkts = parsed.get("inap", [])
     gtp_pkts = parsed.get("gtp", [])
     generic_pkts = _collect_generic_packets(parsed)
+    epdg_ip_aliases = _build_epdg_ip_aliases(generic_pkts)
 
     window_sec  = cfg("correlation.window_sec", 5)
     min_overlap = max(1, cfg("correlation.min_dia_overlap", 2))
@@ -72,6 +73,7 @@ def build_sessions(parsed: dict) -> list:
             end_time,
             window_sec,
             min_overlap,
+            epdg_ip_aliases,
         )
 
         inap_msgs = _select_in_window(inap_pkts, start_time, end_time, window_sec)
@@ -455,7 +457,7 @@ def _classify_node(ip: str) -> str:
 # FUSION ENGINE  (O(1) lookup, early exit, fixed thresholds)
 # ============================================================
 
-_MAX_SCORE = 110  # framed_ip_fusion score — nothing can beat this
+_MAX_SCORE = 112  # ePDG inner-IP fusion score — nothing can beat this
 
 def _correlate_diameter_fusion(
     dia_pkts: list,
@@ -467,6 +469,7 @@ def _correlate_diameter_fusion(
     end_time: Optional[float],
     window_sec: int,
     min_overlap: int,
+    ip_aliases: Optional[dict[str, set[str]]] = None,
 ) -> tuple[list, str]:
 
     if not dia_pkts or not start_time:
@@ -491,6 +494,14 @@ def _correlate_diameter_fusion(
 
     # ── Strategy 1: Framed-IP fusion (score 110) ─────────────────────────────
     for sip_ip in priority_ips:
+        for alias_ip in sorted((ip_aliases or {}).get(str(sip_ip), set())):
+            pkts = in_window(dia_index["by_framed_ip"].get(alias_ip, []))
+            if pkts:
+                _update(pkts, 112, "epdg_inner_ip_fusion")
+                break
+        if best_score >= 112:
+            break
+
         # Direct hit
         pkts = in_window(dia_index["by_framed_ip"].get(sip_ip, []))
         if pkts:
@@ -651,6 +662,59 @@ def _extract_priority_ips(sip_msgs: list) -> list:
                 seen.add(ip)
                 result.append(ip)
     return result
+
+
+def _build_epdg_ip_aliases(generic_pkts: list) -> dict[str, set[str]]:
+    aliases: dict[str, set[str]] = defaultdict(set)
+
+    configured = cfg("correlation.epdg_ip_mappings", {}) or {}
+    if isinstance(configured, dict):
+        for outer_ip, inner_values in configured.items():
+            for inner_ip in _as_list(inner_values):
+                _add_ip_alias(aliases, outer_ip, inner_ip)
+
+    for packet in generic_pkts:
+        if str(packet.get("protocol") or "").upper() != "IKEV2":
+            continue
+        inner_ip = packet.get("ike_inner_ip")
+        if not inner_ip:
+            continue
+        for outer_ip in (packet.get("src_ip"), packet.get("dst_ip")):
+            if _is_configured_epdg_outer_ip(outer_ip):
+                _add_ip_alias(aliases, outer_ip, inner_ip)
+
+    return {outer: set(inner) for outer, inner in aliases.items() if inner}
+
+
+def _add_ip_alias(aliases: dict[str, set[str]], outer_ip: Optional[str], inner_ip: Optional[str]) -> None:
+    if not outer_ip or not inner_ip:
+        return
+    aliases[str(outer_ip)].add(str(inner_ip))
+
+
+def _as_list(value) -> list:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return list(value)
+    return [value]
+
+
+def _is_configured_epdg_outer_ip(value: Optional[str]) -> bool:
+    if not value:
+        return False
+    ranges = cfg("correlation.epdg_outer_ranges", []) or []
+    try:
+        ip = ipaddress.ip_address(str(value))
+    except ValueError:
+        return False
+    for item in _as_list(ranges):
+        try:
+            if ip in ipaddress.ip_network(str(item), strict=False):
+                return True
+        except ValueError:
+            continue
+    return False
 
 
 def _group_sip_seed_sessions(sip_pkts: list) -> list[tuple[str, list, Optional[str]]]:
@@ -1290,9 +1354,15 @@ def _session_descriptor(session: dict) -> dict:
         for value in (packet.get("imsi"), packet.get("msisdn")):
             if value:
                 subscriber_ids.add(_norm(value))
+        for value in (packet.get("supi"), packet.get("gpsi")):
+            if value:
+                subscriber_ids.add(_norm(str(value).replace("imsi-", "").replace("msisdn-", "")))
         if packet.get("radius_framed_ip"):
             subscriber_ips.add(packet["radius_framed_ip"])
             ips.add(packet["radius_framed_ip"])
+        if packet.get("ike_inner_ip"):
+            subscriber_ips.add(packet["ike_inner_ip"])
+            ips.add(packet["ike_inner_ip"])
         if packet.get("stream_id"):
             stream_ids.add(f"{packet.get('protocol', 'GENERIC')}:{packet.get('stream_id')}")
         if packet.get("technology"):
@@ -1511,6 +1581,7 @@ def _refresh_session_record(session: dict, relationship_registry: Optional[dict]
         "gtp_msgs": gtp_msgs,
         "generic_msgs": generic_msgs,
         "http_msgs": protocol_buckets["HTTP"],
+        "ikev2_msgs": protocol_buckets["IKEV2"],
         "tcp_msgs": protocol_buckets["TCP"],
         "udp_msgs": protocol_buckets["UDP"],
         "sctp_msgs": protocol_buckets["SCTP"],
@@ -1594,6 +1665,8 @@ def _session_stateful_methods(session: dict, descriptor: dict) -> set[str]:
     methods: set[str] = set()
     if descriptor["access_ids"] and (descriptor["subscriber_ids"] or descriptor["subscriber_ips"]):
         methods.add("state:access_subscriber_bridge")
+    if _session_has_sbi_identity(session):
+        methods.add("state:sbi_subscriber_bridge")
     if _session_has_teid_continuity(session):
         methods.add("state:teid_continuation")
     return methods
@@ -1608,9 +1681,29 @@ def _session_stateful_evidence(session: dict, descriptor: dict, stateful_methods
             evidence.append(f"Access IDs bridged to subscriber context via {access_id}")
         else:
             evidence.append("Access IDs bridged to subscriber context")
+    if "state:sbi_subscriber_bridge" in stateful_method_set:
+        service = next(
+            (
+                packet.get("sbi_service")
+                for packet in session.get("generic_msgs", [])
+                if packet.get("sbi_service")
+            ),
+            None,
+        )
+        if service:
+            evidence.append(f"5G SBI identity bridged through {service}")
+        else:
+            evidence.append("5G SBI identity bridged to subscriber context")
     if "state:teid_continuation" in stateful_method_set:
         evidence.append(_teid_chain_summary(session))
     return evidence
+
+
+def _session_has_sbi_identity(session: dict) -> bool:
+    for packet in session.get("generic_msgs", []):
+        if packet.get("sbi_service") and (packet.get("supi") or packet.get("gpsi") or packet.get("imsi") or packet.get("msisdn")):
+            return True
+    return False
 
 
 def _session_has_teid_continuity(session: dict) -> bool:
@@ -1661,6 +1754,7 @@ def _session_has_mobility_signal(session: dict) -> bool:
 def _bucket_generic_messages(generic_msgs: list) -> dict:
     buckets = {
         "HTTP": [],
+        "IKEV2": [],
         "TCP": [],
         "UDP": [],
         "SCTP": [],
@@ -1764,6 +1858,7 @@ def _collect_generic_packets(parsed: dict) -> list:
         "bssap",
         "map",
         "http",
+        "ikev2",
         "dns",
         "icmp",
         "nas_eps",
@@ -2374,6 +2469,8 @@ def _extract_subscriber_ip(dia_msgs: list, gtp_msgs: list, generic_msgs: list) -
     for message in generic_msgs:
         if message.get("radius_framed_ip"):
             return message["radius_framed_ip"]
+        if message.get("ike_inner_ip"):
+            return message["ike_inner_ip"]
     return None
 
 

@@ -1,6 +1,7 @@
 import sys
 import types
 import unittest
+from unittest.mock import patch
 
 
 sys.modules.setdefault(
@@ -374,6 +375,133 @@ class SessionCorrelationTests(unittest.TestCase):
         self.assertEqual(len(sessions), 1)
         self.assertEqual(sessions[0]["dia_correlation"], "framed_ip_nat_similarity")
         self.assertIn("identity:diameter:framed_ip_nat_similarity", sessions[0]["correlation_methods"])
+
+    def test_epdg_ike_inner_ip_alias_links_sip_outer_ip_to_diameter_framed_ip(self):
+        parsed = {
+            "sip": [
+                {
+                    "call_id": "wifi-call",
+                    "method": "INVITE",
+                    "timestamp": 1.0,
+                    "from_uri": "sip:+12345@ims.example.com",
+                    "to_uri": "sip:67890@ims.example.com",
+                    "src_ip": "198.51.100.10",
+                    "dst_ip": "172.16.0.20",
+                    "contact_ip": "198.51.100.10",
+                }
+            ],
+            "diameter": [
+                {
+                    "session_id": "dia-vowifi",
+                    "command_code": "272",
+                    "timestamp": 1.2,
+                    "src_ip": "10.0.0.2",
+                    "dst_ip": "10.0.0.9",
+                    "framed_ip": "10.64.0.8",
+                    "imsi": "001010123456789",
+                    "msisdn": "12345",
+                }
+            ],
+            "ikev2": [
+                {
+                    "frame_number": 3,
+                    "protocol": "IKEV2",
+                    "technology": "VoWiFi/ePDG",
+                    "timestamp": 0.8,
+                    "src_ip": "198.51.100.10",
+                    "dst_ip": "203.0.113.20",
+                    "ike_inner_ip": "10.64.0.8",
+                    "message": "IKE_AUTH",
+                }
+            ],
+            "inap": [],
+            "gtp": [],
+            "s1ap": [],
+            "http": [],
+            "tcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+            "udp": [],
+            "sctp": [],
+            "ngap": [],
+            "ranap": [],
+            "bssap": [],
+            "map": [],
+            "pfcp": [],
+        }
+
+        with patch(
+            "src.correlation.session_builder.cfg",
+            side_effect=lambda key, default=None: ["198.51.100.0/24"] if key == "correlation.epdg_outer_ranges" else default,
+        ):
+            sessions = build_sessions(parsed)
+
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(sessions[0]["dia_correlation"], "epdg_inner_ip_fusion")
+        self.assertEqual(sessions[0]["subscriber_ip"], "10.64.0.8")
+        self.assertIn("identity:diameter:epdg_inner_ip_fusion", sessions[0]["correlation_methods"])
+        self.assertIn("ikev2", sessions[0]["protocols"])
+
+    def test_5g_sbi_supi_stitches_http_and_nas_session_context(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [],
+                "http": [
+                    {
+                        "frame_number": 1,
+                        "protocol": "HTTP",
+                        "technology": "5G",
+                        "timestamp": 10.0,
+                        "src_ip": "10.5.0.10",
+                        "dst_ip": "10.5.0.20",
+                        "message": "POST /nsmf-pdusession/v1/sm-contexts",
+                        "sbi_service": "nsmf-pdusession",
+                        "supi": "imsi-001010123456789",
+                        "gpsi": "msisdn-46766642345",
+                        "imsi": "001010123456789",
+                        "msisdn": "46766642345",
+                        "transaction_id": "sbi-1",
+                    }
+                ],
+                "nas_5gs": [
+                    {
+                        "frame_number": 2,
+                        "protocol": "NAS_5GS",
+                        "technology": "5G",
+                        "timestamp": 10.2,
+                        "src_ip": "10.5.0.20",
+                        "dst_ip": "10.5.0.10",
+                        "message": "PDU Session Establishment Request",
+                        "imsi": "001010123456789",
+                        "transaction_id": "nas-1",
+                    }
+                ],
+                "s1ap": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+                "ikev2": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertIn("http", sessions[0]["protocols"])
+        self.assertIn("nas_5gs", sessions[0]["protocols"])
+        self.assertEqual(sessions[0]["imsi"], "001010123456789")
+        self.assertIn("state:sbi_subscriber_bridge", sessions[0]["correlation_methods"])
 
     def test_diameter_and_gtp_seed_sessions_merge_on_shared_subscriber_ip(self):
         sessions = build_sessions(

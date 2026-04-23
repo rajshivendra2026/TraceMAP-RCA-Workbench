@@ -218,6 +218,19 @@ HTTP_FIELDS = [
     "tcp.srcport", "tcp.dstport", "http.request.method", "http.request.uri",
     "http.response.code", "http.host", "http2.headers.method", "http2.headers.path",
     "http2.headers.status", "http2.headers.authority", "tls.handshake.type",
+    "http.file_data", "http2.data.data", "json.key", "json.value.string",
+    "json.value.number", "json.member_with_value", "_ws.col.info",
+]
+
+IKEV2_FIELDS = [
+    "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "ipv6.src", "ipv6.dst",
+    "udp.stream", "udp.srcport", "udp.dstport", "ikev2.exchange_type",
+    "ikev2.idi", "ikev2.idr", "ikev2.cfg.attr.internal_ip4_address",
+    "ikev2.cfg.attr.internal_ip6_address", "ikev2.traffic_selector.initiator_ts_ipv4",
+    "ikev2.traffic_selector.initiator_ts_ipv6", "ikev2.traffic_selector.responder_ts_ipv4",
+    "ikev2.traffic_selector.responder_ts_ipv6", "isakmp.exchange.type",
+    "isakmp.idir_data", "isakmp.cfg.attr.internal_ip4_address",
+    "isakmp.cfg.attr.internal_ip6_address", "_ws.col.info",
 ]
 
 RADIUS_FIELDS = [
@@ -375,6 +388,7 @@ def load_pcap(pcap_path: str,
         ("bssap", filters.get("bssap", "bssap"), BSSAP_FIELDS, "BSSAP"),
         ("map", filters.get("map", "gsm_map or tcap"), MAP_FIELDS, "MAP"),
         ("http", filters.get("http", "http or http2 or tls"), HTTP_FIELDS, "HTTP"),
+        ("ikev2", filters.get("ikev2", "ikev2 or isakmp"), IKEV2_FIELDS, "IKEV2"),
         ("radius", filters.get("radius", "radius"), RADIUS_FIELDS, "RADIUS"),
         ("dns", filters.get("dns", "dns"), DNS_FIELDS, "DNS"),
         ("icmp", filters.get("icmp", "icmp or icmpv6"), ICMP_FIELDS, "ICMP"),

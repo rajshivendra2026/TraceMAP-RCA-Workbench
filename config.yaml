@@ -101,6 +101,15 @@ correlation:
   # Minimum Diameter packets required to confirm correlation
   min_dia_overlap: 2
 
+  # IPv6 UE address similarity uses the assigned subscriber prefix.
+  ipv6_prefix_len: 64
+
+  # Optional VoWiFi/ePDG aliases. Use static mappings when IKEv2 payloads are
+  # encrypted or unavailable, and ranges to infer outer->inner aliases from
+  # decoded IKEv2 configuration traffic.
+  epdg_outer_ranges: []
+  epdg_ip_mappings: {}
+
 
 # ============================================================
 # TRAINING CONFIG

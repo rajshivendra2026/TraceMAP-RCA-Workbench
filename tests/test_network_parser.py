@@ -29,7 +29,8 @@ class NetworkParserTests(unittest.TestCase):
             "HTTP",
         )
 
-        self.assertEqual(packet["technology"], "HTTP")
+        self.assertEqual(packet["technology"], "5G")
+        self.assertEqual(packet["sbi_service"], "nudm-uecm")
         self.assertEqual(packet["transport"], "TCP")
         self.assertEqual(packet["message"], "POST /nudm-uecm/v1/registrations")
         self.assertEqual(packet["stream_id"], "7")

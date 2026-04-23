@@ -791,6 +791,8 @@ def _build_session_selected_filter(session: dict, parsed_subset: dict) -> dict:
         "Diameter Session-ID",
         "PFCP SEID",
         "Access UE ID",
+        "SUPI",
+        "GPSI",
         "IMSI",
         "MSISDN",
         "Subscriber IP",
@@ -845,13 +847,16 @@ def _build_session_correlation_anchors(session: dict, parsed_subset: dict, selec
         "GTP TID": 5,
         "PFCP SEID": 6,
         "Access UE ID": 7,
-        "IMSI": 8,
-        "MSISDN": 9,
-        "Subscriber IP": 10,
-        "APN": 11,
-        "Stream ID": 12,
-        "Transaction ID": 13,
-        "Session-ID": 14,
+        "SUPI": 8,
+        "GPSI": 9,
+        "IMSI": 10,
+        "MSISDN": 11,
+        "Subscriber IP": 12,
+        "ePDG Inner IP": 13,
+        "APN": 14,
+        "Stream ID": 15,
+        "Transaction ID": 16,
+        "Session-ID": 17,
     }
     for candidate in sorted(candidates, key=lambda item: order.get(item["label"], 99)):
         add(candidate)
@@ -901,6 +906,8 @@ def _session_anchor_candidates(session: dict, parsed_subset: dict) -> list[dict]
         or _first_value(access_msgs + generic_msgs, ("imsi",)),
         "Subscriber identity",
     )
+    add("SUPI", _first_value(generic_msgs, ("supi",)), "5G SBI subscriber identity")
+    add("GPSI", _first_value(generic_msgs, ("gpsi",)), "5G SBI public subscriber identity")
     add(
         "MSISDN",
         session.get("msisdn")
@@ -916,6 +923,7 @@ def _session_anchor_candidates(session: dict, parsed_subset: dict) -> list[dict]
         or _first_value(access_msgs + generic_msgs, ("radius_framed_ip",)),
         "UE IP / framed IP anchor",
     )
+    add("ePDG Inner IP", _first_value(generic_msgs, ("ike_inner_ip",)), "VoWiFi inner tunnel address")
     add("APN", _first_value(gtp_msgs, ("gtp.apn",)), "Packet data network context")
     add("Stream ID", _first_value(access_msgs + generic_msgs, ("stream_id",)), "Transport stream fallback")
     add("Transaction ID", _first_value(access_msgs + generic_msgs, ("transaction_id",)), "Generic transaction fallback")

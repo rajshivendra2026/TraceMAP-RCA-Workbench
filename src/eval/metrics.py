@@ -94,10 +94,108 @@ def compute_case_metrics(
     expected: dict[str, Any],
 ) -> dict[str, Any]:
     metrics = compute_session_metrics(sessions)
+    match_metrics = compute_expected_session_match_metrics(sessions, expected.get("expected_sessions") or [])
     return {
         **metrics,
+        **match_metrics,
         "expected": expected,
     }
+
+
+def compute_expected_session_match_metrics(
+    sessions: list[dict[str, Any]],
+    expected_sessions: list[dict[str, Any]],
+) -> dict[str, Any]:
+    if not expected_sessions:
+        return {
+            "expected_session_count": 0,
+            "matched_expected_sessions": 0,
+            "unexpected_session_count": 0,
+            "session_precision": 0.0,
+            "session_recall": 0.0,
+            "session_f1": 0.0,
+            "unmatched_expected_sessions": [],
+        }
+
+    unmatched_session_indexes = set(range(len(sessions)))
+    matched_expected = 0
+    unmatched_expected: list[str] = []
+
+    for expected in expected_sessions:
+        match_index = next(
+            (
+                index
+                for index in list(unmatched_session_indexes)
+                if _session_matches_expected(sessions[index], expected)
+            ),
+            None,
+        )
+        if match_index is None:
+            unmatched_expected.append(str(expected.get("name") or expected.get("label") or expected.get("rca_label") or "expected_session"))
+            continue
+        matched_expected += 1
+        unmatched_session_indexes.remove(match_index)
+
+    expected_count = len(expected_sessions)
+    predicted_count = len(sessions)
+    precision = (matched_expected / predicted_count) if predicted_count else 0.0
+    recall = (matched_expected / expected_count) if expected_count else 0.0
+    f1 = (2 * precision * recall / (precision + recall)) if precision + recall else 0.0
+    return {
+        "expected_session_count": expected_count,
+        "matched_expected_sessions": matched_expected,
+        "unexpected_session_count": max(0, predicted_count - matched_expected),
+        "session_precision": round(precision, 4),
+        "session_recall": round(recall, 4),
+        "session_f1": round(f1, 4),
+        "unmatched_expected_sessions": unmatched_expected,
+    }
+
+
+def _session_matches_expected(session: dict[str, Any], expected: dict[str, Any]) -> bool:
+    label = expected.get("label") or expected.get("rca_label")
+    if label and _session_label(session) != str(label).upper():
+        return False
+
+    required_protocols = {str(item).lower() for item in expected.get("required_protocols") or []}
+    if required_protocols:
+        protocols = {str(item).lower() for item in session.get("protocols", [])}
+        if not required_protocols <= protocols:
+            return False
+
+    required_technologies = {str(item) for item in expected.get("required_technologies") or []}
+    if required_technologies:
+        technologies = {str(item) for item in session.get("technologies", [])}
+        if not required_technologies <= technologies:
+            return False
+
+    required_methods = {str(item) for item in expected.get("required_correlation_methods") or []}
+    if required_methods:
+        methods = {str(item) for item in session.get("correlation_methods", [])}
+        if not required_methods <= methods:
+            return False
+
+    anchors = expected.get("anchors") or {}
+    for key, value in anchors.items():
+        expected_value = str(value)
+        if not _session_has_anchor(session, str(key), expected_value):
+            return False
+
+    return True
+
+
+def _session_has_anchor(session: dict[str, Any], key: str, value: str) -> bool:
+    candidates = {
+        str(session.get(key) or ""),
+        str(session.get(key.lower()) or ""),
+    }
+    for bucket in ("sip_msgs", "dia_msgs", "gtp_msgs", "generic_msgs", "pfcp_msgs", "http_msgs", "ikev2_msgs"):
+        for message in session.get(bucket, []) or []:
+            if not isinstance(message, dict):
+                continue
+            candidates.add(str(message.get(key) or ""))
+            candidates.add(str(message.get(key.lower()) or ""))
+    return value in candidates
 
 
 def benchmark_case_passed(
@@ -146,5 +244,21 @@ def benchmark_case_passed(
         actual = int(method_counts.get(str(method), 0))
         if actual < int(minimum):
             reasons.append(f"correlation method {method} count {actual} < {minimum}")
+
+    min_precision = expected.get("min_session_precision")
+    if min_precision is not None and float(metrics.get("session_precision", 0.0)) < float(min_precision):
+        reasons.append(f"session_precision {metrics.get('session_precision', 0.0):.4f} < {float(min_precision):.4f}")
+
+    min_recall = expected.get("min_session_recall")
+    if min_recall is not None and float(metrics.get("session_recall", 0.0)) < float(min_recall):
+        reasons.append(f"session_recall {metrics.get('session_recall', 0.0):.4f} < {float(min_recall):.4f}")
+
+    min_f1 = expected.get("min_session_f1")
+    if min_f1 is not None and float(metrics.get("session_f1", 0.0)) < float(min_f1):
+        reasons.append(f"session_f1 {metrics.get('session_f1', 0.0):.4f} < {float(min_f1):.4f}")
+
+    max_unexpected = expected.get("max_unexpected_sessions")
+    if max_unexpected is not None and int(metrics.get("unexpected_session_count", 0)) > int(max_unexpected):
+        reasons.append(f"unexpected_session_count {metrics.get('unexpected_session_count', 0)} > {max_unexpected}")
 
     return (not reasons), reasons

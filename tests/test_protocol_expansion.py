@@ -134,6 +134,48 @@ class ProtocolExpansionTests(unittest.TestCase):
 
         self.assertIn("Identity Request", packet["message"])
 
+    def test_extracts_5g_sbi_supi_and_gpsi_from_http2_payload(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "16",
+                "frame.time_epoch": "105.0",
+                "ip.src": "10.5.0.10",
+                "ip.dst": "10.5.0.20",
+                "http2.headers.method": "POST",
+                "http2.headers.path": "/nsmf-pdusession/v1/sm-contexts/imsi-001010123456789",
+                "http2.headers.authority": "smf.5gc.example.net",
+                "http.file_data": '{"supi":"imsi-001010123456789","gpsi":"msisdn-46766642345"}',
+            },
+            "HTTP",
+        )
+
+        self.assertEqual(packet["technology"], "5G")
+        self.assertEqual(packet["sbi_service"], "nsmf-pdusession")
+        self.assertEqual(packet["supi"], "imsi-001010123456789")
+        self.assertEqual(packet["gpsi"], "msisdn-46766642345")
+        self.assertEqual(packet["imsi"], "001010123456789")
+        self.assertEqual(packet["msisdn"], "46766642345")
+        self.assertEqual(packet["transaction_id"], "imsi-001010123456789")
+
+    def test_parses_ikev2_inner_ip_for_epdg_mapping(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "17",
+                "frame.time_epoch": "105.5",
+                "ip.src": "198.51.100.10",
+                "ip.dst": "203.0.113.20",
+                "udp.stream": "9",
+                "ikev2.cfg.attr.internal_ip4_address": "10.64.0.8",
+                "ikev2.idi": "alice@example.net",
+            },
+            "IKEV2",
+        )
+
+        self.assertEqual(packet["protocol"], "IKEV2")
+        self.assertEqual(packet["technology"], "VoWiFi/ePDG")
+        self.assertEqual(packet["ike_inner_ip"], "10.64.0.8")
+        self.assertEqual(packet["transaction_id"], "alice@example.net")
+
     def test_prefers_ngap_ws_info_over_numeric_procedure(self):
         packet = parse_network_packet(
             {

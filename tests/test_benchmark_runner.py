@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from src.eval.benchmark_runner import load_expected_results, resolve_case_pcap, run_benchmark_suite
-from src.eval.metrics import benchmark_case_passed, compute_session_metrics
+from src.eval.metrics import benchmark_case_passed, compute_case_metrics, compute_session_metrics
 
 
 class BenchmarkRunnerTests(unittest.TestCase):
@@ -76,6 +76,73 @@ class BenchmarkRunnerTests(unittest.TestCase):
 
         self.assertTrue(passed)
         self.assertEqual(reasons, [])
+
+    def test_compute_case_metrics_reports_expected_session_precision_and_recall(self):
+        sessions = [
+            {
+                "rca": {"rca_label": "NORMAL_CALL"},
+                "protocols": ["http", "nas_5gs"],
+                "technologies": ["5G"],
+                "imsi": "001010123456789",
+                "correlation_methods": ["state:sbi_subscriber_bridge"],
+            },
+            {
+                "rca": {"rca_label": "UNKNOWN"},
+                "protocols": ["tcp"],
+                "correlation_methods": [],
+            },
+        ]
+
+        metrics = compute_case_metrics(
+            sessions,
+            {
+                "expected_sessions": [
+                    {
+                        "name": "5G SBI session",
+                        "label": "NORMAL_CALL",
+                        "required_protocols": ["http", "nas_5gs"],
+                        "required_correlation_methods": ["state:sbi_subscriber_bridge"],
+                        "anchors": {"imsi": "001010123456789"},
+                    }
+                ],
+            },
+        )
+
+        self.assertEqual(metrics["expected_session_count"], 1)
+        self.assertEqual(metrics["matched_expected_sessions"], 1)
+        self.assertEqual(metrics["unexpected_session_count"], 1)
+        self.assertEqual(metrics["session_precision"], 0.5)
+        self.assertEqual(metrics["session_recall"], 1.0)
+
+    def test_benchmark_case_passed_checks_precision_recall_style_gates(self):
+        metrics = {
+            "session_count": 2,
+            "unknown_count": 0,
+            "unknown_ratio": 0.0,
+            "label_counts": {"NORMAL_CALL": 1},
+            "top_label": "NORMAL_CALL",
+            "identity_correlated_sessions": 1,
+            "stateful_correlated_sessions": 1,
+            "time_fallback_sessions": 0,
+            "correlation_method_counts": {"state:sbi_subscriber_bridge": 1},
+            "session_precision": 0.5,
+            "session_recall": 1.0,
+            "session_f1": 0.6667,
+            "unexpected_session_count": 1,
+        }
+
+        passed, reasons = benchmark_case_passed(
+            metrics,
+            {
+                "min_session_precision": 0.8,
+                "min_session_recall": 1.0,
+                "max_unexpected_sessions": 0,
+            },
+        )
+
+        self.assertFalse(passed)
+        self.assertTrue(any("session_precision" in reason for reason in reasons))
+        self.assertTrue(any("unexpected_session_count" in reason for reason in reasons))
 
     def test_run_benchmark_suite_reports_pass_fail_and_missing(self):
         with TemporaryDirectory() as tmpdir:
