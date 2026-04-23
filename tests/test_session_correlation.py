@@ -444,6 +444,91 @@ class SessionCorrelationTests(unittest.TestCase):
         self.assertIn("identity:diameter:epdg_inner_ip_fusion", sessions[0]["correlation_methods"])
         self.assertIn("ikev2", sessions[0]["protocols"])
 
+    def test_epdg_auto_alias_uses_unique_outer_ip_without_gateway_false_merge(self):
+        parsed = {
+            "sip": [
+                {
+                    "call_id": "wifi-auto",
+                    "method": "INVITE",
+                    "timestamp": 1.0,
+                    "from_uri": "sip:+12345@ims.example.com",
+                    "to_uri": "sip:67890@ims.example.com",
+                    "src_ip": "198.51.100.10",
+                    "dst_ip": "172.16.0.20",
+                    "contact_ip": "198.51.100.10",
+                }
+            ],
+            "diameter": [
+                {
+                    "session_id": "dia-vowifi-a",
+                    "command_code": "272",
+                    "timestamp": 1.1,
+                    "src_ip": "10.0.0.2",
+                    "dst_ip": "10.0.0.9",
+                    "framed_ip": "10.64.0.8",
+                    "imsi": "001010123456789",
+                    "msisdn": "12345",
+                },
+                {
+                    "session_id": "dia-vowifi-b",
+                    "command_code": "272",
+                    "timestamp": 1.1,
+                    "src_ip": "10.0.0.2",
+                    "dst_ip": "10.0.0.9",
+                    "framed_ip": "10.64.0.9",
+                    "imsi": "001010987654321",
+                    "msisdn": "99999",
+                },
+            ],
+            "ikev2": [
+                {
+                    "frame_number": 3,
+                    "protocol": "IKEV2",
+                    "technology": "VoWiFi/ePDG",
+                    "timestamp": 0.8,
+                    "src_ip": "198.51.100.10",
+                    "dst_ip": "203.0.113.20",
+                    "ike_inner_ip": "10.64.0.8",
+                    "ike_inner_ips": ["10.64.0.8"],
+                    "message": "IKE_AUTH",
+                },
+                {
+                    "frame_number": 4,
+                    "protocol": "IKEV2",
+                    "technology": "VoWiFi/ePDG",
+                    "timestamp": 0.9,
+                    "src_ip": "198.51.100.11",
+                    "dst_ip": "203.0.113.20",
+                    "ike_inner_ip": "10.64.0.9",
+                    "ike_inner_ips": ["10.64.0.9"],
+                    "message": "IKE_AUTH",
+                },
+            ],
+            "inap": [],
+            "gtp": [],
+            "s1ap": [],
+            "http": [],
+            "tcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+            "udp": [],
+            "sctp": [],
+            "ngap": [],
+            "ranap": [],
+            "bssap": [],
+            "map": [],
+            "pfcp": [],
+        }
+
+        sessions = build_sessions(parsed)
+        wifi_session = next(session for session in sessions if session["call_id"] == "wifi-auto")
+
+        self.assertEqual(wifi_session["dia_correlation"], "epdg_inner_ip_fusion")
+        self.assertEqual(wifi_session["subscriber_ip"], "10.64.0.8")
+        self.assertEqual({message["framed_ip"] for message in wifi_session["dia_msgs"]}, {"10.64.0.8"})
+
     def test_5g_sbi_supi_stitches_http_and_nas_session_context(self):
         sessions = build_sessions(
             {

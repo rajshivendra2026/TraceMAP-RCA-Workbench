@@ -1,12 +1,14 @@
 # macOS / filesystem noise
 .DS_Store
 Thumbs.db
+~$*
 
 # Python caches
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
+.cache/
 .coverage
 htmlcov/
 *.pyo

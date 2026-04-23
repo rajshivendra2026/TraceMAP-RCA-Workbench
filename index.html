@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=1.0.8">
+  <link rel="stylesheet" href="/css/styles.css?v=1.4.0">
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 
@@ -317,6 +317,40 @@
               </div>
             </div>
           </div>
+
+          <details class="panel release-health-panel bento-card" id="releaseHealthCard">
+            <summary class="release-health-toggle">
+              <div class="release-health-toggle-main">
+                <span class="release-health-kicker">Ops Readiness</span>
+                <strong>Release Health</strong>
+                <span id="releaseHealthCompactMeta">Version, environment, and production preflight. Click to open.</span>
+              </div>
+              <div class="release-health-toggle-side">
+                <span id="releaseHealthCompactScore" class="release-health-mini-score">--</span>
+                <span id="releaseHealthCompactStatus" class="release-health-status unknown">Checking</span>
+                <span class="release-health-open-label">Open</span>
+              </div>
+            </summary>
+            <div class="release-health-content">
+              <div class="release-health-grid">
+                <div class="release-health-score">
+                  <div id="releaseHealthScore" class="release-health-score-value">--</div>
+                  <span id="releaseHealthStatus" class="release-health-status unknown">Checking</span>
+                </div>
+                <div class="release-health-summary">
+                  <div class="release-health-title" id="releaseHealthTitle">Validating runtime health...</div>
+                  <div class="release-health-meta" id="releaseHealthMeta">Branch, commit, Python, and tshark compatibility will appear here.</div>
+                  <div id="releaseHealthChecks" class="release-health-checks"></div>
+                </div>
+                <div class="release-health-actions">
+                  <div class="mini-title">Operator Actions</div>
+                  <ul id="releaseHealthActions" class="bullet-list">
+                    <li>Waiting for preflight results.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -500,7 +534,7 @@
 </div>
 
 <div class="footer-bar">
-  <button id="versionButton" class="version-button">Version <span id="appVersion">v0.0.0</span></button>
+  <button id="versionButton" class="version-button">Release <span id="appVersion">v0.0.0</span></button>
 </div>
 
 <div id="versionHistoryModal" class="modal-backdrop" style="display:none;">
@@ -509,14 +543,15 @@
       <h3>Improvement History</h3>
       <button id="closeVersionModal">Close</button>
     </div>
+    <div id="versionHealthSummary" class="version-health-summary"></div>
     <div id="versionHistoryContent" class="history-list"></div>
   </div>
 </div>
 
-<script src="js/state.js?v=1.0.8"></script>
-<script src="js/render.js?v=1.0.8"></script>
-<script src="js/api.js?v=1.0.8"></script>
-<script src="js/events.js?v=1.0.8"></script>
+<script src="js/state.js?v=1.4.0"></script>
+<script src="js/render.js?v=1.4.0"></script>
+<script src="js/api.js?v=1.4.0"></script>
+<script src="js/events.js?v=1.4.0"></script>
 
 </body>
 </html>

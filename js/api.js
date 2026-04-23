@@ -362,6 +362,39 @@ async function loadVersionHistory() {
   }
 }
 
+async function loadSystemHealth() {
+  try {
+    const res = await fetch("/api/system-health");
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `Server returned ${res.status}`);
+    }
+    if (typeof window.renderSystemHealth === "function") {
+      window.renderSystemHealth(data);
+    }
+    return data;
+  } catch (err) {
+    console.error("loadSystemHealth error:", err);
+    if (typeof window.renderSystemHealth === "function") {
+      window.renderSystemHealth({
+        status: "fail",
+        score: 0,
+        release: { version: "unknown", branch: "unknown", commit: "unknown" },
+        checks: [
+          {
+            label: "System health API",
+            status: "fail",
+            summary: "Health check failed.",
+            detail: err.message,
+          },
+        ],
+        actions: ["Restart the backend and retry the health check."],
+      });
+    }
+    return null;
+  }
+}
+
 function ensureLearningPolling() {
   if (learningStatusTimer) return;
   learningStatusTimer = window.setInterval(() => {
@@ -375,4 +408,5 @@ window.refreshLearningStatus = refreshLearningStatus;
 window.refreshValidationQueue = refreshValidationQueue;
 window.submitValidationAction = submitValidationAction;
 window.loadVersionHistory = loadVersionHistory;
+window.loadSystemHealth = loadSystemHealth;
 window.ensureLearningPolling = ensureLearningPolling;

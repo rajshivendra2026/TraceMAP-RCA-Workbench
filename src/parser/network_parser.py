@@ -1,5 +1,7 @@
+import json
 import re
 from typing import Optional
+from urllib.parse import unquote
 
 from loguru import logger
 
@@ -245,6 +247,22 @@ IKE_NOTIFY_NAMES = {
     "16400": "INITIAL_CONTACT",
 }
 
+IKE_INNER_IP_FIELDS = (
+    "isakmp.cfg.attr.internal_ip4_address",
+    "isakmp.cfg.attr.internal_ip6_address",
+    "isakmp.cfg.attr.internal_ip6_prefix_ip",
+    "isakmp.ts.start_ipv4",
+    "isakmp.ts.start_ipv6",
+    "isakmp.ts.end_ipv4",
+    "isakmp.ts.end_ipv6",
+    "ikev2.cfg.attr.internal_ip4_address",
+    "ikev2.cfg.attr.internal_ip6_address",
+    "ikev2.traffic_selector.initiator_ts_ipv4",
+    "ikev2.traffic_selector.initiator_ts_ipv6",
+    "ikev2.traffic_selector.responder_ts_ipv4",
+    "ikev2.traffic_selector.responder_ts_ipv6",
+)
+
 
 def parse_network_packets(raw_packets: list, protocol_name: str) -> list:
     packets = []
@@ -319,7 +337,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     )
     method = _clean_text(_get(raw, "http.request.method", "http2.headers.method"))
     status_code = _clean_text(_get(raw, "http.response.code", "http2.headers.status"))
-    uri = _clean_text(_get(raw, "http.request.uri", "http2.headers.path"))
+    uri = _clean_text(_get(raw, "http.request.uri", "http.request.full_uri", "http2.headers.path"))
     radius_code = _clean_text(_get(raw, "radius.code"))
     radius_id = _clean_text(_get(raw, "radius.id"))
     radius_user_name = _clean_text(_get(raw, "radius.User_Name"))
@@ -340,24 +358,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     sbi_context = _extract_sbi_context(raw, uri, host, ws_info) if protocol == "HTTP" else {}
     ike_exchange_type = _clean_text(_get(raw, "ikev2.exchange_type", "isakmp.exchangetype"))
     ike_notify_type = _clean_text(_get(raw, "isakmp.notify.msgtype"))
-    ike_inner_ip = _clean_text(
-        _get(
-            raw,
-            "isakmp.cfg.attr.internal_ip4_address",
-            "isakmp.cfg.attr.internal_ip6_address",
-            "isakmp.cfg.attr.internal_ip6_prefix_ip",
-            "isakmp.ts.start_ipv4",
-            "isakmp.ts.start_ipv6",
-            "isakmp.ts.end_ipv4",
-            "isakmp.ts.end_ipv6",
-            "ikev2.cfg.attr.internal_ip4_address",
-            "ikev2.cfg.attr.internal_ip6_address",
-            "ikev2.traffic_selector.initiator_ts_ipv4",
-            "ikev2.traffic_selector.initiator_ts_ipv6",
-            "ikev2.traffic_selector.responder_ts_ipv4",
-            "ikev2.traffic_selector.responder_ts_ipv6",
-        )
-    )
+    ike_inner_ips = _unique_clean_values(_values(raw, *IKE_INNER_IP_FIELDS))
+    ike_inner_ip = ike_inner_ips[0] if ike_inner_ips else None
     ike_identity = _clean_text(
         _get(
             raw,
@@ -371,6 +373,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
             "isakmp.id.data.key_id",
         )
     )
+    ike_imsi = _extract_imsi_from_identity(ike_identity)
+    ike_msisdn = _extract_msisdn_from_identity(ike_identity)
     dns_query = _clean_text(_get(raw, "dns.qry.name", "dns.resp.name"))
     dns_rcode = _clean_text(_get(raw, "dns.flags.rcode"))
     dns_answer = _clean_text(_get(raw, "dns.a", "dns.aaaa", "dns.cname"))
@@ -424,8 +428,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
             "gsm_map.tbcd_digits",
         )
     )
-    imsi = _clean_text(_get(raw, "gsm_map.imsi", "e212.imsi", "gtpv2.imsi")) or sbi_context.get("imsi")
-    msisdn = msisdn or sbi_context.get("msisdn")
+    imsi = _clean_text(_get(raw, "gsm_map.imsi", "e212.imsi", "gtpv2.imsi")) or sbi_context.get("imsi") or ike_imsi
+    msisdn = msisdn or sbi_context.get("msisdn") or ike_msisdn
     procedure = _clean_text(
         _get(
             raw,
@@ -486,7 +490,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     if protocol == "GTP":
         transaction_id = _first_non_null(transaction_id, gtp_tid, gtp_teid, gtp_f_teid, gtp_subscriber_ip, gtp_imsi)
     if protocol == "HTTP":
-        transaction_id = _first_non_null(transaction_id, sbi_context.get("supi"), sbi_context.get("gpsi"), stream_id)
+        transaction_id = _first_non_null(transaction_id, sbi_context.get("supi"), sbi_context.get("suci"), sbi_context.get("gpsi"), stream_id)
     if protocol == "IKEV2":
         transaction_id = _first_non_null(transaction_id, ike_identity, ike_inner_ip, stream_id)
 
@@ -546,11 +550,13 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "uri": uri,
         "sbi_service": sbi_context.get("sbi_service"),
         "supi": sbi_context.get("supi"),
+        "suci": sbi_context.get("suci"),
         "gpsi": sbi_context.get("gpsi"),
         "sbi_payload_hint": sbi_context.get("payload_hint"),
         "ike_exchange_type": ike_exchange_type,
         "ike_notify_type": ike_notify_type,
         "ike_inner_ip": ike_inner_ip,
+        "ike_inner_ips": ike_inner_ips,
         "ike_identity": ike_identity,
         "radius_code": radius_code,
         "radius_id": radius_id,
@@ -621,27 +627,38 @@ def _extract_sbi_context(
     host: Optional[str],
     ws_info: Optional[str],
 ) -> dict[str, Optional[str]]:
+    payload_values = _values(
+        raw,
+        "http.file_data",
+        "http2.data.data",
+        "http2.header.value",
+        "http2.headers.value",
+        "json.key",
+        "json.value",
+        "json.value.string",
+        "json.value.number",
+        "json.member",
+        "json.member_with_value",
+        "json.path",
+        "data.data",
+        "tcp.payload",
+    )
     payload = _joined_text(
         [
             uri,
             host,
             ws_info,
-            *_values(
-                raw,
-                "http.file_data",
-                "http2.data.data",
-                "json.key",
-                "json.value.string",
-                "json.value.number",
-                "json.member_with_value",
-            ),
+            *_json_scalar_texts(payload_values),
+            *payload_values,
         ]
     )
     supi = _extract_supi(payload)
+    suci = _extract_suci(payload)
     gpsi = _extract_gpsi(payload)
     return {
         "sbi_service": _extract_sbi_service(payload),
         "supi": supi,
+        "suci": suci,
         "gpsi": gpsi,
         "imsi": _digits_from_prefixed_identity(supi, "imsi"),
         "msisdn": _digits_from_prefixed_identity(gpsi, "msisdn"),
@@ -652,8 +669,9 @@ def _extract_sbi_context(
 def _extract_supi(text: str) -> Optional[str]:
     if not text:
         return None
+    text = _normalise_payload_text(text)
     patterns = (
-        r"\b(?:supi|supiOrSuci|ueId|imsi)[\"'\s:=/-]*(?:imsi-)?(\d{14,16})\b",
+        r"\b(?:supi|supiOrSuci|supi-or-suci|ueId|ue-id|subscriberId|subscriber-id|imsi)[\s:=\"'/+\-]*(?:imsi-)?(\d{14,16})\b",
         r"\bimsi-(\d{14,16})\b",
     )
     for pattern in patterns:
@@ -663,12 +681,30 @@ def _extract_supi(text: str) -> Optional[str]:
     return None
 
 
+def _extract_suci(text: str) -> Optional[str]:
+    if not text:
+        return None
+    text = _normalise_payload_text(text)
+    patterns = (
+        r"\b(?:suci|supiOrSuci|supi-or-suci|ueId|ue-id)[\s:=\"'/+\-]*((?:suci|nai)-[A-Za-z0-9_.@:-]+)",
+        r"\b(suci-[A-Za-z0-9_.@:-]+)",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return match.group(1).rstrip('",;]}').lower()
+    return None
+
+
 def _extract_gpsi(text: str) -> Optional[str]:
     if not text:
         return None
+    text = _normalise_payload_text(text)
     patterns = (
-        r"\b(?:gpsi|msisdn)[\"'\s:=/-]*(?:msisdn-)?(\d{6,15})\b",
+        r"\b(?:gpsi|gpsis|msisdn|phoneNumber|phone-number)[\s:=\"'/+\-]*(?:tel:)?(?:msisdn-)?\+?(\d{6,15})\b",
+        r"\b(?:gpsi|gpsis)[\s:=\"'/+\-]*(?:tel:)?\+?(\d{6,15})\b",
         r"\bmsisdn-(\d{6,15})\b",
+        r"\btel:\+?(\d{6,15})\b",
     )
     for pattern in patterns:
         match = re.search(pattern, text, flags=re.IGNORECASE)
@@ -680,11 +716,32 @@ def _extract_gpsi(text: str) -> Optional[str]:
 def _extract_sbi_service(text: str) -> Optional[str]:
     if not text:
         return None
+    text = _normalise_payload_text(text)
     match = re.search(r"\b(n[a-z0-9]+(?:-[a-z0-9]+)*)\b", text, flags=re.IGNORECASE)
     if not match:
         return None
     service = match.group(1).lower()
-    if service.startswith(("namf", "nsmf", "nudm", "nrf", "nssf", "ausf", "nausf", "npcf", "nchf", "nef", "nnef", "bsf", "nbsf")):
+    if service.startswith((
+        "namf",
+        "nsmf",
+        "nudm",
+        "nudr",
+        "nrf",
+        "nnrf",
+        "nssf",
+        "ausf",
+        "nausf",
+        "npcf",
+        "nchf",
+        "nef",
+        "nnef",
+        "bsf",
+        "nbsf",
+        "nwdaf",
+        "nlmf",
+        "n5g-eir",
+        "nsacf",
+    )):
         return service
     return None
 
@@ -702,7 +759,7 @@ def _digits_from_prefixed_identity(value: Optional[str], prefix: str) -> Optiona
 def _trim_payload_hint(text: str) -> Optional[str]:
     if not text:
         return None
-    compact = re.sub(r"\s+", " ", text).strip()
+    compact = re.sub(r"\s+", " ", _normalise_payload_text(text)).strip()
     return compact[:240] if compact else None
 
 
@@ -716,6 +773,46 @@ def _joined_text(values: list[Optional[str]]) -> str:
     return " ".join(str(value) for value in values if value)
 
 
+def _normalise_payload_text(text: str) -> str:
+    value = str(text or "")
+    try:
+        value = unquote(value)
+    except ValueError:
+        pass
+    return value.replace("\\/", "/").replace("\\u003a", ":").replace("\\u002f", "/")
+
+
+def _json_scalar_texts(values: list[str]) -> list[str]:
+    extracted: list[str] = []
+    for value in values:
+        text = _normalise_payload_text(value).strip()
+        if not text or text[0] not in "[{":
+            continue
+        try:
+            decoded = json.loads(text)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        extracted.extend(_flatten_json_scalars(decoded))
+    return extracted
+
+
+def _flatten_json_scalars(value) -> list[str]:
+    if isinstance(value, dict):
+        result: list[str] = []
+        for key, item in value.items():
+            result.append(str(key))
+            result.extend(_flatten_json_scalars(item))
+        return result
+    if isinstance(value, list):
+        result: list[str] = []
+        for item in value:
+            result.extend(_flatten_json_scalars(item))
+        return result
+    if value is None:
+        return []
+    return [str(value)]
+
+
 def _values(raw: dict, *keys: str) -> list[str]:
     values: list[str] = []
     for key in keys:
@@ -724,14 +821,46 @@ def _values(raw: dict, *keys: str) -> list[str]:
             continue
         items = value if isinstance(value, list) else [value]
         for item in items:
-            text = _clean_text(item)
+            if isinstance(item, (dict, list)):
+                text = json.dumps(item, separators=(",", ":"))
+            else:
+                text = _clean_text(item)
             if not text:
                 continue
+            text = _normalise_payload_text(text)
             values.append(text)
             decoded = _decode_hex_payload(text)
             if decoded:
                 values.append(decoded)
     return values
+
+
+def _unique_clean_values(values: list[Optional[str]]) -> list[str]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        text = _clean_text(value)
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        result.append(text)
+    return result
+
+
+def _extract_imsi_from_identity(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return None
+    text = _normalise_payload_text(str(value))
+    match = re.search(r"(?:imsi[-:]?)?(\d{14,16})(?:@|$|\b)", text, flags=re.IGNORECASE)
+    return match.group(1) if match else None
+
+
+def _extract_msisdn_from_identity(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return None
+    text = _normalise_payload_text(str(value))
+    match = re.search(r"(?:msisdn[-:]?|tel:\+?)(\d{6,15})(?:@|$|\b)", text, flags=re.IGNORECASE)
+    return match.group(1) if match else None
 
 
 def _decode_hex_payload(value: str) -> Optional[str]:

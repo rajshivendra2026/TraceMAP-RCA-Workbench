@@ -1,5 +1,40 @@
 [
   {
+    "version": "v1.4.0",
+    "date": "2026-04-23",
+    "title": "5G SBI And VoWiFi Correlation Hardening",
+    "changes": [
+      "Expanded 5G SBI identity extraction across HTTP/2 headers, decoded hex payloads, JSON scalar fields, SUPI, concealed SUCI, GPSI, tel URI, and MSISDN payload variants.",
+      "Promoted SBI and NAS-5GS subscriber identities into stronger generic session seed keys so 5G control-plane context is stitched by subscriber state instead of only by stream or transaction fallback.",
+      "Added IKE/ePDG inner-IP list extraction, IKE NAI IMSI/MSISDN normalization, and conservative automatic outer-to-inner IP alias inference for VoWiFi traces.",
+      "Added a subscriber-conflict guard that blocks endpoint-only false merges when two sessions carry different IMSIs or different UE/framed IPs.",
+      "Added regression coverage for decoded SBI JSON identities, concealed SUCI, IKE NAI subscriber extraction, and multi-subscriber ePDG gateway false-merge prevention."
+    ]
+  },
+  {
+    "version": "v1.3.1",
+    "date": "2026-04-23",
+    "title": "Operator Color And Navigation Polish",
+    "changes": [
+      "Added a Cisco-inspired cyan product stripe, brighter blue/cyan workspace surfaces, and color-coded top navigation markers while preserving the existing TraceMAP workbench layout.",
+      "Added section-specific accent colors for Trace Overview, Trace Briefing, Capture Analytics, Session RCA, Failure Topology, autonomous reasoning, and correlation panels.",
+      "Color-coded KPI cards and session protocol chips so SIP, Diameter, GTP, access, transport, and service protocols are faster to scan in the dashboard.",
+      "Bumped frontend cache keys so refreshed deployments load the updated CSS and render logic reliably."
+    ]
+  },
+  {
+    "version": "v1.3.0",
+    "date": "2026-04-23",
+    "title": "Production Readiness Jump",
+    "changes": [
+      "Added a Release Health panel with app version, git branch/commit, readiness score, tshark compatibility, runtime directory checks, and recommended operator actions.",
+      "Added a system health API and command-line preflight so environment drift, missing tshark, unsupported protocol fields, dirty product files, and insecure local-only auth posture are visible before analysis.",
+      "Added Windows setup and run scripts to standardize venv creation, dependency installation, Wireshark/tshark detection, preflight checks, and server startup.",
+      "Added CI-ready Linux and Windows smoke coverage with backend tests, environment preflight, and a generated sample PCAP path; publishing the workflow file requires GitHub workflow-token scope.",
+      "Hardened IKE/ePDG compatibility by treating ISAKMP-backed IKEv2 support as a first-class production mode across health checks and parser tests."
+    ]
+  },
+  {
     "version": "v1.2.0",
     "date": "2026-04-23",
     "title": "Guided Correlation And Failure Topology UX",

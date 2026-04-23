@@ -157,6 +157,49 @@ class ProtocolExpansionTests(unittest.TestCase):
         self.assertEqual(packet["msisdn"], "46766642345")
         self.assertEqual(packet["transaction_id"], "imsi-001010123456789")
 
+    def test_extracts_5g_sbi_identity_from_hex_http2_json_and_headers(self):
+        payload = '{"ueId":"imsi-001010123456789","gpsis":["tel:+46766642345"],"pduSessionId":7}'
+        packet = parse_network_packet(
+            {
+                "frame.number": "19",
+                "frame.time_epoch": "105.2",
+                "ip.src": "10.5.0.10",
+                "ip.dst": "10.5.0.20",
+                "tcp.stream": "44",
+                "http2.headers.method": "POST",
+                "http2.headers.path": "/npcf-smpolicycontrol/v1/sm-policies",
+                "http2.header.value": ["application/json", "3gpp-Sbi-Discovery"],
+                "http2.data.data": payload.encode("utf-8").hex(":"),
+            },
+            "HTTP",
+        )
+
+        self.assertEqual(packet["technology"], "5G")
+        self.assertEqual(packet["sbi_service"], "npcf-smpolicycontrol")
+        self.assertEqual(packet["supi"], "imsi-001010123456789")
+        self.assertEqual(packet["gpsi"], "msisdn-46766642345")
+        self.assertEqual(packet["imsi"], "001010123456789")
+        self.assertEqual(packet["msisdn"], "46766642345")
+
+    def test_extracts_5g_sbi_suci_when_supi_is_concealed(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "20",
+                "frame.time_epoch": "105.3",
+                "ip.src": "10.5.0.10",
+                "ip.dst": "10.5.0.20",
+                "http2.headers.method": "GET",
+                "http2.headers.path": "/nudm-sdm/v2/suci-0-001-01-0000-0-0-123456789012345/am-data",
+                "http2.headers.authority": "nudm.5gc.example.net",
+            },
+            "HTTP",
+        )
+
+        self.assertEqual(packet["technology"], "5G")
+        self.assertEqual(packet["sbi_service"], "nudm-sdm")
+        self.assertEqual(packet["suci"], "suci-0-001-01-0000-0-0-123456789012345")
+        self.assertEqual(packet["transaction_id"], "suci-0-001-01-0000-0-0-123456789012345")
+
     def test_parses_ikev2_inner_ip_for_epdg_mapping(self):
         packet = parse_network_packet(
             {
@@ -174,7 +217,25 @@ class ProtocolExpansionTests(unittest.TestCase):
         self.assertEqual(packet["protocol"], "IKEV2")
         self.assertEqual(packet["technology"], "VoWiFi/ePDG")
         self.assertEqual(packet["ike_inner_ip"], "10.64.0.8")
+        self.assertEqual(packet["ike_inner_ips"], ["10.64.0.8"])
         self.assertEqual(packet["transaction_id"], "alice@example.net")
+
+    def test_parses_ike_identity_imsi_for_vowifi_subscriber_bridge(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "21",
+                "frame.time_epoch": "105.7",
+                "ip.src": "198.51.100.10",
+                "ip.dst": "203.0.113.20",
+                "udp.stream": "11",
+                "ikev2.cfg.attr.internal_ip4_address": "10.64.0.8",
+                "ikev2.idi": "001010123456789@nai.epc.mnc001.mcc001.3gppnetwork.org",
+            },
+            "IKEV2",
+        )
+
+        self.assertEqual(packet["imsi"], "001010123456789")
+        self.assertEqual(packet["ike_identity"], "001010123456789@nai.epc.mnc001.mcc001.3gppnetwork.org")
 
     def test_parses_isakmp_ikev2_fields_for_epdg_mapping(self):
         packet = parse_network_packet(

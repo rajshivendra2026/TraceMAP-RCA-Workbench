@@ -216,10 +216,13 @@ MAP_FIELDS = [
 HTTP_FIELDS = [
     "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "tcp.stream",
     "tcp.srcport", "tcp.dstport", "http.request.method", "http.request.uri",
-    "http.response.code", "http.host", "http2.headers.method", "http2.headers.path",
-    "http2.headers.status", "http2.headers.authority", "tls.handshake.type",
-    "http.file_data", "http2.data.data", "json.key", "json.value.string",
-    "json.value.number", "json.member_with_value", "_ws.col.info",
+    "http.request.full_uri", "http.response.code", "http.host",
+    "http2.headers.method", "http2.headers.path", "http2.headers.status",
+    "http2.headers.authority", "http2.header.name", "http2.header.value",
+    "http2.headers.value", "tls.handshake.type", "http.file_data",
+    "http2.data.data", "json.key", "json.value", "json.value.string",
+    "json.value.number", "json.member", "json.member_with_value",
+    "json.path", "data.data", "tcp.payload", "_ws.col.info",
 ]
 
 IKEV2_FIELDS = [

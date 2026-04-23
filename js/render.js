@@ -52,6 +52,13 @@ const FAILURE_COLOR  = "#dc2626";
 const LIFELINE_COLOR = "#e2e8f0";
 const FONT_FAMILY    = "'JetBrains Mono', 'Consolas', monospace";
 
+function _protocolClassName(protocol) {
+  return String(protocol || "unknown")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "unknown";
+}
+
 /* ════════════════════════════════════════════════════════════════
    VIEW SWITCH
    ════════════════════════════════════════════════════════════════ */
@@ -180,7 +187,7 @@ function renderSessions() {
     const priorityBadge = `<span class="priority-pill ${priorityBand}">P${priority}</span>`;
     const chips = [
       priorityBadge,
-      ...(s.protocols || []).slice(0, 3).map(p => `<span class="chip">${String(p).toUpperCase()}</span>`),
+      ...(s.protocols || []).slice(0, 3).map(p => `<span class="chip protocol-chip protocol-${_protocolClassName(p)}">${String(p).toUpperCase()}</span>`),
       ...(s.technologies || []).slice(0, 2).map(t => `<span class="chip">${t}</span>`),
     ].join("");
     div.dataset.helpTitle = "Session card";
@@ -1518,6 +1525,7 @@ window.hydrateFromState = hydrateFromState;
 window.renderLearningStatus = renderLearningStatus;
 window.renderValidationQueue = renderValidationQueue;
 window.renderVersionInfo = renderVersionInfo;
+window.renderSystemHealth = renderSystemHealth;
 window.toggleVersionHistory = toggleVersionHistory;
 
 if (window.__TRACE_PENDING_UPLOAD__) {
@@ -2901,6 +2909,81 @@ function renderVersionInfo(payload) {
     `;
     container.appendChild(card);
   });
+}
+
+function renderSystemHealth(payload) {
+  STATE.systemHealth = payload || null;
+  const release = payload?.release || {};
+  const status = String(payload?.status || "unknown").toLowerCase();
+  const score = Number(payload?.score ?? 0);
+  const checks = Array.isArray(payload?.checks) ? payload.checks : [];
+  const actions = Array.isArray(payload?.actions) ? payload.actions : [];
+  const scoreLabel = Number.isFinite(score) && score > 0 ? `${Math.round(score)}` : "--";
+  const statusClass = ["ok", "warn", "fail"].includes(status) ? status : "unknown";
+  const statusLabel = status === "ok" ? "Ready" : status === "warn" ? "Needs Review" : status === "fail" ? "Blocked" : "Checking";
+
+  _setText("appVersion", release.version || payload?.version || STATE.versionInfo?.version || "v0.0.0");
+  _setText("releaseHealthScore", scoreLabel);
+  _setText("releaseHealthCompactScore", scoreLabel);
+  _setText("releaseHealthTitle", _releaseHealthTitle(payload));
+  _setText("releaseHealthMeta", _releaseHealthMeta(payload));
+  _setText("releaseHealthCompactMeta", _releaseHealthMeta(payload));
+
+  ["releaseHealthStatus", "releaseHealthCompactStatus"].forEach(id => {
+    const statusEl = document.getElementById(id);
+    if (statusEl) {
+      statusEl.className = `release-health-status ${statusClass}`;
+      statusEl.innerText = statusLabel;
+    }
+  });
+
+  const checksEl = document.getElementById("releaseHealthChecks");
+  if (checksEl) {
+    const priorityChecks = checks.slice(0, 6);
+    checksEl.innerHTML = priorityChecks.length
+      ? priorityChecks.map(check => `
+          <div class="release-health-check ${_escapeHtml(check.status || "unknown")}">
+            <strong>${_escapeHtml(check.label || "Check")}</strong>
+            <span>${_escapeHtml(check.summary || "")}</span>
+          </div>
+        `).join("")
+      : `<div class="release-health-check warn"><strong>No checks</strong><span>Preflight did not return check details.</span></div>`;
+  }
+
+  const actionsEl = document.getElementById("releaseHealthActions");
+  if (actionsEl) {
+    actionsEl.innerHTML = actions.length
+      ? actions.map(action => `<li>${_escapeHtml(action)}</li>`).join("")
+      : `<li>No blocking actions. This instance is ready for local analysis.</li>`;
+  }
+
+  const modalSummary = document.getElementById("versionHealthSummary");
+  if (modalSummary) {
+    modalSummary.innerHTML = `
+      <div class="mini-title">Running Build</div>
+      <div class="release-health-title">${_escapeHtml(_releaseHealthTitle(payload))}</div>
+      <div class="release-health-meta">${_escapeHtml(_releaseHealthMeta(payload))}</div>
+    `;
+  }
+}
+
+function _releaseHealthTitle(payload) {
+  const release = payload?.release || {};
+  const version = release.version || payload?.version || "unknown";
+  const status = String(payload?.status || "unknown").toLowerCase();
+  const label = status === "ok" ? "production-ready" : status === "warn" ? "ready with review items" : status === "fail" ? "blocked by environment" : "checking";
+  return `${version} · ${label}`;
+}
+
+function _releaseHealthMeta(payload) {
+  const release = payload?.release || {};
+  const env = payload?.environment || {};
+  const tshark = payload?.tshark || {};
+  const branch = release.branch || "unknown";
+  const commit = release.commit || "unknown";
+  const python = env.python || "unknown";
+  const tsharkLabel = tshark.available ? (tshark.version || "tshark available") : (tshark.error || "tshark unavailable");
+  return `branch ${branch} · commit ${commit} · Python ${python} · ${tsharkLabel}`;
 }
 
 function _summarizeGovernanceState(retraining, status = {}) {

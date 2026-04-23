@@ -37,6 +37,13 @@ class AppAuthTests(unittest.TestCase):
         response = self._dispatch(app, "/health")
         self.assertEqual(response.status_code, 200)
 
+    def test_system_health_endpoint_remains_open_with_auth_enabled(self):
+        os.environ["TC_RCA__AUTH__TOKEN"] = "secret-token"
+        app = create_app()
+
+        response = self._dispatch(app, "/api/system-health")
+        self.assertEqual(response.status_code, 200)
+
     def _dispatch(self, app, path, *, method="GET", headers=None):
         builder = EnvironBuilder(path=path, method=method, headers=headers or {})
         with app.request_context(builder.get_environ()):

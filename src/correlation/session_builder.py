@@ -665,25 +665,45 @@ def _extract_priority_ips(sip_msgs: list) -> list:
 
 
 def _build_epdg_ip_aliases(generic_pkts: list) -> dict[str, set[str]]:
-    aliases: dict[str, set[str]] = defaultdict(set)
+    trusted_aliases: dict[str, set[str]] = defaultdict(set)
+    inferred_aliases: dict[str, set[str]] = defaultdict(set)
 
     configured = cfg("correlation.epdg_ip_mappings", {}) or {}
     if isinstance(configured, dict):
         for outer_ip, inner_values in configured.items():
             for inner_ip in _as_list(inner_values):
-                _add_ip_alias(aliases, outer_ip, inner_ip)
+                _add_ip_alias(trusted_aliases, outer_ip, inner_ip)
 
     for packet in generic_pkts:
         if str(packet.get("protocol") or "").upper() != "IKEV2":
             continue
-        inner_ip = packet.get("ike_inner_ip")
-        if not inner_ip:
+        inner_ips = _packet_ike_inner_ips(packet)
+        if not inner_ips:
             continue
-        for outer_ip in (packet.get("src_ip"), packet.get("dst_ip")):
-            if _is_configured_epdg_outer_ip(outer_ip):
-                _add_ip_alias(aliases, outer_ip, inner_ip)
+        endpoints = [value for value in (packet.get("src_ip"), packet.get("dst_ip")) if value]
+        configured_outers = [outer_ip for outer_ip in endpoints if _is_configured_epdg_outer_ip(outer_ip)]
+        gateway_filtered_outers = [
+            outer_ip
+            for outer_ip in endpoints
+            if not _is_configured_epdg_gateway_ip(outer_ip)
+        ]
+        target_outers = configured_outers or gateway_filtered_outers or endpoints
 
-    return {outer: set(inner) for outer, inner in aliases.items() if inner}
+        for outer_ip in target_outers:
+            target = trusted_aliases if outer_ip in configured_outers else inferred_aliases
+            for inner_ip in inner_ips:
+                _add_ip_alias(target, outer_ip, inner_ip)
+
+    aliases: dict[str, set[str]] = {outer: set(inner) for outer, inner in trusted_aliases.items() if inner}
+    for outer, inner_values in inferred_aliases.items():
+        if outer in aliases:
+            continue
+        # Automatic ePDG inference is deliberately conservative. A shared ePDG
+        # gateway often maps to many subscribers, so keep only one-to-one outer
+        # IP aliases unless the operator explicitly configures a mapping/range.
+        if len(inner_values) == 1:
+            aliases[outer] = set(inner_values)
+    return aliases
 
 
 def _add_ip_alias(aliases: dict[str, set[str]], outer_ip: Optional[str], inner_ip: Optional[str]) -> None:
@@ -701,9 +721,17 @@ def _as_list(value) -> list:
 
 
 def _is_configured_epdg_outer_ip(value: Optional[str]) -> bool:
+    return _is_ip_in_configured_ranges(value, "correlation.epdg_outer_ranges")
+
+
+def _is_configured_epdg_gateway_ip(value: Optional[str]) -> bool:
+    return _is_ip_in_configured_ranges(value, "correlation.epdg_gateway_ranges")
+
+
+def _is_ip_in_configured_ranges(value: Optional[str], key: str) -> bool:
     if not value:
         return False
-    ranges = cfg("correlation.epdg_outer_ranges", []) or []
+    ranges = cfg(key, []) or []
     try:
         ip = ipaddress.ip_address(str(value))
     except ValueError:
@@ -715,6 +743,16 @@ def _is_configured_epdg_outer_ip(value: Optional[str]) -> bool:
         except ValueError:
             continue
     return False
+
+
+def _packet_ike_inner_ips(packet: dict) -> set[str]:
+    values = set()
+    for value in _as_list(packet.get("ike_inner_ips")):
+        if value:
+            values.add(str(value))
+    if packet.get("ike_inner_ip"):
+        values.add(str(packet["ike_inner_ip"]))
+    return values
 
 
 def _group_sip_seed_sessions(sip_pkts: list) -> list[tuple[str, list, Optional[str]]]:
@@ -837,15 +875,7 @@ def _build_non_sip_seed_sessions(
 
     for session_id, packets in _group_packets(
         generic_pkts,
-        lambda packet: (
-            packet.get("transaction_id")
-            or packet.get("pfcp.seid")
-            or packet.get("pfcp.seqno")
-            or packet.get("imsi")
-            or packet.get("msisdn")
-            or packet.get("stream_id")
-            or _seed_fallback_key(packet)
-        ),
+        _generic_seed_key,
         None,
     ).items():
         for index, segment in enumerate(_segment_generic_packets(_sort_ts(packets))):
@@ -1062,6 +1092,8 @@ def _session_merge_score(
     shared_ids = left_desc["ids"] & right_desc["ids"]
     if shared_ids:
         return 120
+    if _has_conflicting_subscriber_context(left_desc, right_desc):
+        return 0
 
     score = 0
     relationship_methods, _ = _relationship_annotations_between(left, right, relationship_registry)
@@ -1104,6 +1136,23 @@ def _has_conflicting_sip_dialog_keys(left: dict, right: dict) -> bool:
     left_key = left.get("sip_dialog_key")
     right_key = right.get("sip_dialog_key")
     return bool(left_key and right_key and left_key != right_key)
+
+
+def _has_conflicting_subscriber_context(left_desc: dict, right_desc: dict) -> bool:
+    left_imsi = _imsi_like_values(left_desc["subscriber_ids"])
+    right_imsi = _imsi_like_values(right_desc["subscriber_ids"])
+    if left_imsi and right_imsi and not left_imsi & right_imsi:
+        return True
+
+    if (
+        left_desc["subscriber_ips"]
+        and right_desc["subscriber_ips"]
+        and not left_desc["subscriber_ips"] & right_desc["subscriber_ips"]
+        and not left_desc["subscriber_ids"] & right_desc["subscriber_ids"]
+    ):
+        return True
+
+    return False
 
 
 def _empty_relationship_registry() -> dict:
@@ -1319,8 +1368,7 @@ def _session_descriptor(session: dict) -> dict:
         if dia.get("session_id"):
             ids.add(f"dia:{dia['session_id']}")
         for value in (dia.get("imsi"), dia.get("msisdn")):
-            if value:
-                subscriber_ids.add(_norm(value))
+            _add_subscriber_identity(subscriber_ids, value)
         if dia.get("framed_ip"):
             ips.add(dia["framed_ip"])
             subscriber_ips.add(dia["framed_ip"])
@@ -1329,15 +1377,13 @@ def _session_descriptor(session: dict) -> dict:
         if inap.get("tcap_tid"):
             ids.add(f"inap:{inap['tcap_tid']}")
         for value in (inap.get("calling_number"), inap.get("called_number")):
-            if value:
-                subscriber_ids.add(_norm(value))
+            _add_subscriber_identity(subscriber_ids, value)
 
     for gtp in session.get("gtp_msgs", []):
         if gtp.get("gtp.tid"):
             ids.add(f"gtp:{gtp['gtp.tid']}")
         gtp_imsi = gtp.get("gtpv2.imsi") or gtp.get("imsi")
-        if gtp_imsi:
-            subscriber_ids.add(_norm(gtp_imsi))
+        _add_subscriber_identity(subscriber_ids, gtp_imsi)
         for tunnel_id in _gtp_tunnel_ids(gtp):
             tunnel_ids.add(tunnel_id)
         for subscriber_ip in _gtp_subscriber_ips(gtp):
@@ -1351,18 +1397,18 @@ def _session_descriptor(session: dict) -> dict:
             value = packet.get(field)
             if value:
                 access_ids.add(f"{field}:{value}")
-        for value in (packet.get("imsi"), packet.get("msisdn")):
-            if value:
-                subscriber_ids.add(_norm(value))
-        for value in (packet.get("supi"), packet.get("gpsi")):
-            if value:
-                subscriber_ids.add(_norm(str(value).replace("imsi-", "").replace("msisdn-", "")))
+        for value in (packet.get("imsi"), packet.get("msisdn"), packet.get("supi"), packet.get("suci"), packet.get("gpsi")):
+            _add_subscriber_identity(subscriber_ids, value)
         if packet.get("radius_framed_ip"):
             subscriber_ips.add(packet["radius_framed_ip"])
             ips.add(packet["radius_framed_ip"])
         if packet.get("ike_inner_ip"):
             subscriber_ips.add(packet["ike_inner_ip"])
             ips.add(packet["ike_inner_ip"])
+        for inner_ip in _as_list(packet.get("ike_inner_ips")):
+            if inner_ip:
+                subscriber_ips.add(str(inner_ip))
+                ips.add(str(inner_ip))
         if packet.get("stream_id"):
             stream_ids.add(f"{packet.get('protocol', 'GENERIC')}:{packet.get('stream_id')}")
         if packet.get("technology"):
@@ -1701,7 +1747,13 @@ def _session_stateful_evidence(session: dict, descriptor: dict, stateful_methods
 
 def _session_has_sbi_identity(session: dict) -> bool:
     for packet in session.get("generic_msgs", []):
-        if packet.get("sbi_service") and (packet.get("supi") or packet.get("gpsi") or packet.get("imsi") or packet.get("msisdn")):
+        if packet.get("sbi_service") and (
+            packet.get("supi")
+            or packet.get("suci")
+            or packet.get("gpsi")
+            or packet.get("imsi")
+            or packet.get("msisdn")
+        ):
             return True
     return False
 
@@ -1901,13 +1953,7 @@ def _build_generic_sessions(packets: list) -> list:
     grouped: dict[str, list] = defaultdict(list)
 
     for packet in packets:
-        key = (
-            packet.get("transaction_id")
-            or packet.get("pfcp.seid")
-            or packet.get("pfcp.seqno")
-            or packet.get("stream_id")
-            or _packet_peer_key(packet)
-        )
+        key = _generic_seed_key(packet)
         grouped[f"{packet.get('protocol', 'GENERIC')}:{key}"].append(packet)
 
     sessions = []
@@ -2171,6 +2217,48 @@ def _seed_fallback_key(packet: dict) -> str:
     return _packet_peer_key(packet)
 
 
+def _generic_seed_key(packet: dict) -> str:
+    protocol = str(packet.get("protocol") or "").upper()
+    subscriber_key = _subscriber_seed_key(packet)
+
+    if packet.get("sbi_service") and subscriber_key:
+        return f"sbi:{subscriber_key}"
+
+    if protocol == "NAS_5GS" and subscriber_key:
+        return f"5gs:{subscriber_key}"
+
+    if protocol == "IKEV2":
+        return (
+            packet.get("ike_identity")
+            or subscriber_key
+            or packet.get("ike_inner_ip")
+            or packet.get("transaction_id")
+            or packet.get("stream_id")
+            or _seed_fallback_key(packet)
+        )
+
+    return (
+        packet.get("transaction_id")
+        or packet.get("pfcp.seid")
+        or packet.get("pfcp.seqno")
+        or subscriber_key
+        or packet.get("stream_id")
+        or _seed_fallback_key(packet)
+    )
+
+
+def _subscriber_seed_key(packet: dict) -> Optional[str]:
+    for field in ("imsi", "supi", "suci", "msisdn", "gpsi"):
+        identity = _normalise_subscriber_identity(packet.get(field))
+        if identity:
+            if identity.isdigit() and 14 <= len(identity) <= 16:
+                return f"imsi:{identity}"
+            if identity.isdigit():
+                return f"msisdn:{identity}"
+            return f"id:{identity}"
+    return None
+
+
 def _gtp_seed_key(packet: dict) -> str:
     tunnel_ids = sorted(_gtp_tunnel_ids(packet))
     if tunnel_ids:
@@ -2269,6 +2357,29 @@ def _norm(num: Optional[str]) -> Optional[str]:
     if not num:
         return None
     return str(num).replace("+", "").strip()
+
+
+def _normalise_subscriber_identity(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    lowered = text.lower()
+    for prefix in ("imsi-", "msisdn-", "tel:+", "tel:"):
+        if lowered.startswith(prefix):
+            text = text[len(prefix):]
+            lowered = text.lower()
+            break
+    if lowered.startswith("suci-") or lowered.startswith("nai-"):
+        return lowered
+    return _norm(text)
+
+
+def _add_subscriber_identity(target: set[str], value: Optional[str]) -> None:
+    identity = _normalise_subscriber_identity(value)
+    if identity:
+        target.add(identity)
 
 
 def _sort_ts(msgs: list) -> list:
@@ -2471,6 +2582,9 @@ def _extract_subscriber_ip(dia_msgs: list, gtp_msgs: list, generic_msgs: list) -
             return message["radius_framed_ip"]
         if message.get("ike_inner_ip"):
             return message["ike_inner_ip"]
+        for inner_ip in _as_list(message.get("ike_inner_ips")):
+            if inner_ip:
+                return str(inner_ip)
     return None
 
 

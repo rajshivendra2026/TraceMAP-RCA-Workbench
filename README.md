@@ -2,7 +2,7 @@
 
 TraceMAP RCA Workbench is a telecom packet-analysis and root-cause-analysis workbench for mixed IMS, packet-core, access, and transport captures. It ingests PCAP files, decodes protocol activity, correlates packets into end-to-end sessions, explains failure points, and presents the result in an analyst-friendly web dashboard.
 
-The current release focuses on making the RCA path visible: selected session filters, correlation anchors, failure topology, evidence compaction, and a guided Demo Mode for walkthroughs.
+The current release focuses on 5G and VoWiFi correlation maturity: stronger SBI SUPI/GPSI/SUCI extraction, safer ePDG inner/outer IP fusion, subscriber-conflict protection, and the production-readiness foundations from the prior release.
 
 ![TraceMAP architecture and flow](docs/assets/tracemap_overview.svg)
 
@@ -18,17 +18,23 @@ The current release focuses on making the RCA path visible: selected session fil
 
 ## Latest Release
 
-Current app version: `v1.2.0`
+Current app version: `v1.4.0`
 
 Major upgrades in this release:
 
-- Guided `Production` / `Demo` mode toggle.
-- Demo Mode explanations for tabs, upload, filters, sessions, graphs, topology, learning, validation, and version history.
-- Front-page Failure Topology with clickable nodes and edges.
-- Light topology styling, no red failure state for normal sessions, draggable nodes, and automatic layout for larger node sets.
-- Trace Briefing now reflects the selected session filter, such as `Call-ID`, `TEID`, `Diameter Session-ID`, `SEID`, `IMSI`, `MSISDN`, subscriber IP, or access UE IDs.
-- RCA evidence compaction so repeated errors are shown once with a count.
-- Learning moved into its own tab, with more dashboard space for analytics, Session RCA, and topology investigation.
+- Expanded 5G SBI extraction across HTTP/2 headers, decoded hex payloads, JSON scalar fields, SUPI, concealed SUCI, GPSI, tel URI, and MSISDN variants.
+- Stronger 5G session seeding through SBI/NAS-5GS subscriber identity instead of falling back only to stream or transaction IDs.
+- VoWiFi/ePDG inner/outer IP fusion now supports decoded IKE inner-IP lists, IKE NAI IMSI/MSISDN extraction, and conservative automatic alias inference.
+- Added subscriber-conflict protection to prevent endpoint-only false merges when different IMSIs or UE/framed IPs share the same core nodes.
+- Cisco-inspired cyan/blue visual refresh with colored navigation markers and stronger operator scanability.
+- Section-specific accents for Trace Overview, Trace Briefing, Capture Analytics, Session RCA, Failure Topology, and correlation panels.
+- Color-coded KPI cards and protocol chips for faster SIP/Diameter/GTP/access/transport scanning.
+- Release Health panel with app version, git branch/commit, readiness score, tshark compatibility, writable runtime checks, and operator actions.
+- System health API plus CLI preflight for stale branch, dirty product files, missing tshark, unsupported fields, auth posture, and runtime directory issues.
+- Windows setup and run scripts for repeatable laptop bootstrap.
+- CI-ready smoke coverage for Linux and Windows; the workflow file remains on the feature branch until the GitHub token has `workflow` scope.
+- Generated sample PCAP smoke test that exercises the real tshark parser path.
+- IKE/ePDG compatibility checks aligned with the ISAKMP-backed parser mode.
 
 Full version history is stored in [docs/version_history.json](docs/version_history.json).
 
@@ -118,11 +124,8 @@ Windows PowerShell:
 ```powershell
 git clone https://github.com/rajshivendra2026/TraceMAP-RCA-Workbench.git
 cd TraceMAP-RCA-Workbench
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-python main.py
+.\scripts\setup_windows.ps1
+.\scripts\run_windows.ps1
 ```
 
 Open the workbench:
@@ -143,6 +146,18 @@ Run the test suite:
 
 ```bash
 python -m pytest -q
+```
+
+Run production preflight:
+
+```bash
+python scripts/preflight.py
+```
+
+Run the generated sample-PCAP parser smoke test:
+
+```bash
+python -m pytest -q tests/test_ci_smoke_pcap.py
 ```
 
 Run focused summary/UI-support tests:
@@ -169,6 +184,27 @@ Serve through Waitress directly:
 waitress-serve --host=0.0.0.0 --port=5050 wsgi:app
 ```
 
+## Release Health And Preflight
+
+The dashboard includes a `Release Health` panel on the front page. It shows the running app version, git branch, commit, readiness score, Python runtime, tshark version, IKE/ePDG compatibility mode, writable runtime paths, and recommended operator actions.
+
+The same checks are available from the CLI:
+
+```bash
+python scripts/preflight.py
+python scripts/preflight.py --json
+python scripts/preflight.py --strict
+```
+
+Use `--strict` in release gates when warnings should block deployment.
+
+The health API is available at:
+
+```text
+http://localhost:5050/health
+http://localhost:5050/api/system-health
+```
+
 ## TShark Setup
 
 TraceMAP uses `tshark` for PCAP field extraction.
@@ -190,6 +226,12 @@ Windows:
 
 - Install Wireshark.
 - Confirm `tshark.exe` exists at `C:\Program Files\Wireshark\tshark.exe`.
+- Or let the bootstrap script attempt installation:
+
+```powershell
+.\scripts\setup_windows.ps1 -InstallTshark
+```
+
 - If auto-detection does not find it, set:
 
 ```powershell
@@ -258,6 +300,18 @@ Operational state may change during local runs:
 - `run_reports/`
 
 Do not blindly commit operational churn unless you intentionally want to publish updated learning state.
+
+## CI
+
+CI smoke coverage is implemented in the test suite and the workflow template is prepared on the feature branch. Publishing `.github/workflows/ci.yml` requires a GitHub token with `workflow` scope.
+
+The intended CI gate runs on Linux and Windows:
+
+- Installs Python dependencies.
+- Installs Wireshark/tshark.
+- Runs production preflight.
+- Runs the full test suite.
+- Runs a generated sample PCAP smoke test through the real parser path.
 
 ## Docker
 

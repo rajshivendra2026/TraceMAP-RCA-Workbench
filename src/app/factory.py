@@ -19,9 +19,9 @@ from src.intelligence.learning_loop import run_learning_cycle
 from src.ml.retrain import retrain_from_feedback
 from src.ml.predict import predict_session
 from src.parser.pcap_loader import load_pcap
-from src.parser.tshark_runner import TSharkRunner
 from src.rules.rca_rules import apply_rca
 
+from .health import build_system_health
 from .learning import (
     APP_VERSION,
     default_learning_path,
@@ -103,7 +103,7 @@ def create_app() -> Flask:
     def require_api_auth():
         if request.method == "OPTIONS":
             return None
-        if request.path in {"/", "/health"} or request.path.startswith("/css/") or request.path.startswith("/js/"):
+        if request.path in {"/", "/health", "/api/system-health"} or request.path.startswith("/css/") or request.path.startswith("/js/"):
             return None
         if not (request.path.startswith("/api/") or request.path == "/upload"):
             return None
@@ -148,16 +148,11 @@ def create_app() -> Flask:
 
     @app.route("/health")
     def health():
-        status = system_status()
-        return jsonify(
-            {
-                "status": "ok",
-                "version": "production-hardened",
-                "tshark": status["tshark"],
-                "model": status["model"],
-                "cache": cache_stats(),
-            }
-        )
+        return jsonify({**system_status(), "cache": cache_stats()})
+
+    @app.route("/api/system-health")
+    def system_health():
+        return jsonify({**system_status(), "cache": cache_stats()})
 
     @app.route("/api/model-status")
     def model_status():
@@ -437,13 +432,7 @@ def _request_auth_token() -> str | None:
 
 
 def system_status() -> dict:
-    try:
-        tshark = TSharkRunner()
-        tshark_status = {"available": True, "version": tshark.version()}
-    except Exception as exc:
-        tshark_status = {"available": False, "error": str(exc)}
-
-    return {"tshark": tshark_status, "model": load_model_status()}
+    return build_system_health(model_status=load_model_status())
 
 
 def load_model_status() -> dict:

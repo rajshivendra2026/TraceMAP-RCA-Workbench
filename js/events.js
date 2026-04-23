@@ -129,6 +129,9 @@ window.addEventListener("load", () => {
   if (typeof loadVersionHistory === "function") {
     loadVersionHistory();
   }
+  if (typeof loadSystemHealth === "function") {
+    loadSystemHealth();
+  }
   initContextHelp();
 
 });
@@ -349,9 +352,15 @@ const CONTEXT_HELP_ITEMS = [
   },
   {
     selector: "#versionButton",
-    title: "Version History",
-    body: "Opens the tool improvement history.",
-    detail: "How it works: the frontend calls the version-history API, displays the current app version, and lists release notes from docs/version_history.json."
+    title: "Release History",
+    body: "Opens the release health summary and tool improvement history.",
+    detail: "How it works: the frontend calls the version-history and system-health APIs, displays the current app version, git commit, environment checks, and release notes from docs/version_history.json."
+  },
+  {
+    selector: ".release-health-panel",
+    title: "Release Health",
+    body: "Production-readiness checkpoint for the running tool instance.",
+    detail: "How it works: the backend checks Python, writable runtime folders, git release state, auth posture, tshark availability, and protocol/field compatibility. This catches stale branch, Windows setup, and tshark-version issues before upload."
   },
   {
     selector: ".failure-topology-legend",

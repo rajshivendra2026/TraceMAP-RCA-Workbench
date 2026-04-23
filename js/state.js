@@ -13,6 +13,7 @@ const STATE = {
   summary:   null,     // capture-level technology/protocol summary
   learning:  null,     // learning status payload
   validation: null,    // validation queue payload
+  systemHealth: null,  // release/runtime preflight payload
   versionInfo: null,   // version history payload
   captureGraph: null,  // capture-wide topology graph
   sessions:  [],       // Session[] from server

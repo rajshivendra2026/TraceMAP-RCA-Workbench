@@ -106,8 +106,10 @@ correlation:
 
   # Optional VoWiFi/ePDG aliases. Use static mappings when IKEv2 payloads are
   # encrypted or unavailable, and ranges to infer outer->inner aliases from
-  # decoded IKEv2 configuration traffic.
+  # decoded IKEv2 configuration traffic. Gateway ranges mark shared ePDG nodes
+  # so automatic inference avoids treating them as subscriber-specific outers.
   epdg_outer_ranges: []
+  epdg_gateway_ranges: []
   epdg_ip_mappings: {}
 
 
