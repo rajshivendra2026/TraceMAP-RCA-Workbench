@@ -176,6 +176,30 @@ class ProtocolExpansionTests(unittest.TestCase):
         self.assertEqual(packet["ike_inner_ip"], "10.64.0.8")
         self.assertEqual(packet["transaction_id"], "alice@example.net")
 
+    def test_parses_isakmp_ikev2_fields_for_epdg_mapping(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "18",
+                "frame.time_epoch": "106.0",
+                "ip.src": "198.51.100.10",
+                "ip.dst": "203.0.113.20",
+                "udp.stream": "10",
+                "isakmp.exchangetype": "35",
+                "isakmp.notify.msgtype": "24",
+                "isakmp.cfg.attr.internal_ip4_address": "10.64.0.9",
+                "isakmp.id.data.user_fqdn": "bob@example.net",
+            },
+            "IKEV2",
+        )
+
+        self.assertEqual(packet["ike_exchange_type"], "35")
+        self.assertEqual(packet["ike_notify_type"], "24")
+        self.assertEqual(packet["ike_inner_ip"], "10.64.0.9")
+        self.assertEqual(packet["ike_identity"], "bob@example.net")
+        self.assertEqual(packet["transaction_id"], "bob@example.net")
+        self.assertEqual(packet["message"], "IKE_AUTH (AUTHENTICATION_FAILED)")
+        self.assertTrue(packet["is_failure"])
+
     def test_prefers_ngap_ws_info_over_numeric_procedure(self):
         packet = parse_network_packet(
             {

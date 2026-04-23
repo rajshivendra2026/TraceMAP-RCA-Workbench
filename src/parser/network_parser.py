@@ -215,6 +215,35 @@ RADIUS_SERVICE_TYPE_NAMES = {
     "8": "Authenticate-Only",
     "10": "Call-Check",
 }
+IKEV2_EXCHANGE_NAMES = {
+    "34": "IKE_SA_INIT",
+    "35": "IKE_AUTH",
+    "36": "CREATE_CHILD_SA",
+    "37": "INFORMATIONAL",
+    "38": "IKE_SESSION_RESUME",
+}
+IKE_NOTIFY_NAMES = {
+    "1": "UNSUPPORTED_CRITICAL_PAYLOAD",
+    "4": "INVALID_IKE_SPI",
+    "5": "INVALID_MAJOR_VERSION",
+    "7": "INVALID_SYNTAX",
+    "9": "INVALID_MESSAGE_ID",
+    "11": "INVALID_SPI",
+    "14": "NO_PROPOSAL_CHOSEN",
+    "17": "INVALID_KE_PAYLOAD",
+    "24": "AUTHENTICATION_FAILED",
+    "34": "SINGLE_PAIR_REQUIRED",
+    "35": "NO_ADDITIONAL_SAS",
+    "36": "INTERNAL_ADDRESS_FAILURE",
+    "37": "FAILED_CP_REQUIRED",
+    "38": "TS_UNACCEPTABLE",
+    "39": "INVALID_SELECTORS",
+    "43": "TEMPORARY_FAILURE",
+    "44": "CHILD_SA_NOT_FOUND",
+    "16388": "NAT_DETECTION_SOURCE_IP",
+    "16389": "NAT_DETECTION_DESTINATION_IP",
+    "16400": "INITIAL_CONTACT",
+}
 
 
 def parse_network_packets(raw_packets: list, protocol_name: str) -> list:
@@ -309,20 +338,39 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     host = _clean_text(_get(raw, "http.host", "http2.headers.authority"))
     ws_info = _clean_text(_get(raw, "_ws.col.info"))
     sbi_context = _extract_sbi_context(raw, uri, host, ws_info) if protocol == "HTTP" else {}
+    ike_exchange_type = _clean_text(_get(raw, "ikev2.exchange_type", "isakmp.exchangetype"))
+    ike_notify_type = _clean_text(_get(raw, "isakmp.notify.msgtype"))
     ike_inner_ip = _clean_text(
         _get(
             raw,
-            "ikev2.cfg.attr.internal_ip4_address",
-            "ikev2.cfg.attr.internal_ip6_address",
             "isakmp.cfg.attr.internal_ip4_address",
             "isakmp.cfg.attr.internal_ip6_address",
+            "isakmp.cfg.attr.internal_ip6_prefix_ip",
+            "isakmp.ts.start_ipv4",
+            "isakmp.ts.start_ipv6",
+            "isakmp.ts.end_ipv4",
+            "isakmp.ts.end_ipv6",
+            "ikev2.cfg.attr.internal_ip4_address",
+            "ikev2.cfg.attr.internal_ip6_address",
             "ikev2.traffic_selector.initiator_ts_ipv4",
             "ikev2.traffic_selector.initiator_ts_ipv6",
             "ikev2.traffic_selector.responder_ts_ipv4",
             "ikev2.traffic_selector.responder_ts_ipv6",
         )
     )
-    ike_identity = _clean_text(_get(raw, "ikev2.idi", "ikev2.idr", "isakmp.idir_data"))
+    ike_identity = _clean_text(
+        _get(
+            raw,
+            "ikev2.idi",
+            "ikev2.idr",
+            "isakmp.idir_data",
+            "isakmp.id.data.user_fqdn",
+            "isakmp.id.data.fqdn",
+            "isakmp.id.data.ipv4_addr",
+            "isakmp.id.data.ipv6_addr",
+            "isakmp.id.data.key_id",
+        )
+    )
     dns_query = _clean_text(_get(raw, "dns.qry.name", "dns.resp.name"))
     dns_rcode = _clean_text(_get(raw, "dns.flags.rcode"))
     dns_answer = _clean_text(_get(raw, "dns.a", "dns.aaaa", "dns.cname"))
@@ -413,6 +461,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
             "ranap.Cause",
             "pfcp.cause",
             "dns.flags.rcode",
+            "isakmp.notify.msgtype",
             "nas-eps.emm.cause",
             "nas-eps.esm.cause",
             "nas-5gs.mm.5gmm_cause",
@@ -449,6 +498,7 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         _format_sctp_message(protocol, _clean_text(_get(raw, "sctp.chunk_type")), _clean_text(_get(raw, "sctp.ppid"))),
         _format_pfcp_message(pfcp_message_type, cause_code),
         _format_gtp_message(gtpv2_message_type, gtp_message_type, gtp_cause),
+        _format_ike_message(protocol, ike_exchange_type, ike_notify_type),
         _format_ws_info_message(protocol, ws_info),
         _format_access_message(protocol, procedure),
         _format_nas_message(protocol, nas_eps_mm, nas_eps_sm, nas_5gs_mm, nas_5gs_sm, cause_code),
@@ -498,6 +548,8 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "supi": sbi_context.get("supi"),
         "gpsi": sbi_context.get("gpsi"),
         "sbi_payload_hint": sbi_context.get("payload_hint"),
+        "ike_exchange_type": ike_exchange_type,
+        "ike_notify_type": ike_notify_type,
         "ike_inner_ip": ike_inner_ip,
         "ike_identity": ike_identity,
         "radius_code": radius_code,
@@ -768,6 +820,20 @@ def _format_pfcp_message(
     return message_name
 
 
+def _format_ike_message(
+    protocol: str,
+    exchange_type: Optional[str],
+    notify_type: Optional[str],
+) -> Optional[str]:
+    if protocol != "IKEV2":
+        return None
+    exchange = IKEV2_EXCHANGE_NAMES.get(str(exchange_type), f"IKE exchange {exchange_type}") if exchange_type else "IKEv2"
+    if notify_type:
+        notify = IKE_NOTIFY_NAMES.get(str(notify_type), f"Notify {notify_type}")
+        return f"{exchange} ({notify})"
+    return exchange
+
+
 def _format_access_message(protocol: str, procedure: Optional[str]) -> Optional[str]:
     if not procedure:
         return None
@@ -903,6 +969,14 @@ def _is_failure(
             return str(cause_code) != "1"
         upper = str(message or "").upper()
         return any(marker in upper for marker in ("REJECT", "NOT FOUND", "FAIL", "MISSING", "ERROR"))
+    if protocol == "IKEV2":
+        if cause_code:
+            try:
+                return 0 < int(str(cause_code)) < 16384
+            except ValueError:
+                pass
+        upper = str(message or "").upper()
+        return any(marker in upper for marker in ("FAIL", "INVALID", "UNSUPPORTED", "UNACCEPTABLE", "NOT_FOUND"))
     if cause_code and str(cause_code) not in SUCCESS_CAUSE_CODES:
         return True
     return False

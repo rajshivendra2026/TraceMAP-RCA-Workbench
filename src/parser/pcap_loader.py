@@ -224,13 +224,21 @@ HTTP_FIELDS = [
 
 IKEV2_FIELDS = [
     "frame.number", "frame.time_epoch", "ip.src", "ip.dst", "ipv6.src", "ipv6.dst",
-    "udp.stream", "udp.srcport", "udp.dstport", "ikev2.exchange_type",
+    "udp.stream", "udp.srcport", "udp.dstport", "isakmp.exchangetype",
+    "isakmp.messageid", "isakmp.ispi", "isakmp.rspi", "isakmp.notify.msgtype",
+    "isakmp.idir_data", "isakmp.id.data.fqdn", "isakmp.id.data.user_fqdn",
+    "isakmp.id.data.ipv4_addr", "isakmp.id.data.ipv6_addr", "isakmp.id.data.key_id",
+    "isakmp.cfg.attr.internal_ip4_address", "isakmp.cfg.attr.internal_ip6_address",
+    "isakmp.cfg.attr.internal_ip6_prefix_ip", "isakmp.cfg.attr.internal_ip6_prefix_length",
+    "isakmp.cfg.attr.p_cscf_ip4_address", "isakmp.cfg.attr.p_cscf_ip6_address",
+    "isakmp.ts.start_ipv4", "isakmp.ts.end_ipv4", "isakmp.ts.start_ipv6",
+    "isakmp.ts.end_ipv6", "isakmp.ike.nat_original_address_ipv4",
+    "isakmp.ike.nat_original_address_ipv6",
+    "ikev2.exchange_type",
     "ikev2.idi", "ikev2.idr", "ikev2.cfg.attr.internal_ip4_address",
     "ikev2.cfg.attr.internal_ip6_address", "ikev2.traffic_selector.initiator_ts_ipv4",
     "ikev2.traffic_selector.initiator_ts_ipv6", "ikev2.traffic_selector.responder_ts_ipv4",
-    "ikev2.traffic_selector.responder_ts_ipv6", "isakmp.exchange.type",
-    "isakmp.idir_data", "isakmp.cfg.attr.internal_ip4_address",
-    "isakmp.cfg.attr.internal_ip6_address", "_ws.col.info",
+    "ikev2.traffic_selector.responder_ts_ipv6", "_ws.col.info",
 ]
 
 RADIUS_FIELDS = [
@@ -317,18 +325,30 @@ def _extract_optional_protocol(runner: TSharkRunner,
         except TSharkParseError as exc:
             has_fallback = index < len(filters_to_try) - 1
             if has_fallback:
-                logger.warning(
+                _log_warning(
                     f"Optional {key} extraction failed for filter "
                     f"{candidate!r}: {exc}; retrying fallback"
                 )
                 continue
-            logger.warning(
+            _log_warning(
                 f"Skipping optional {key} extraction because tshark "
                 f"rejected filter {candidate!r}: {exc}"
             )
             return []
 
     return []
+
+
+def _log_warning(message: str) -> None:
+    log = getattr(logger, "warning", None) or getattr(logger, "info", None)
+    if callable(log):
+        log(message)
+
+
+def _log_success(message: str) -> None:
+    log = getattr(logger, "success", None) or getattr(logger, "info", None)
+    if callable(log):
+        log(message)
 
 
 # ══════════════════════════════════════════════════════════════
@@ -455,7 +475,7 @@ def load_pcap(pcap_path: str,
     }
 
     total = sum(len(v) for v in results.values())
-    logger.success(
+    _log_success(
         f"PCAP load complete — {total} total packets "
         f"(SIP:{len(sip_parsed)} "
         f"Diameter:{len(dia_parsed)} "
