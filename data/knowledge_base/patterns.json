@@ -7969,8 +7969,8 @@
     ],
     "root_cause": "NETWORK_CONGESTION",
     "confidence": 0.995,
-    "occurrence_count": 54,
-    "last_seen": "2026-04-23T06:33:26.583259+00:00",
+    "occurrence_count": 55,
+    "last_seen": "2026-04-23T06:33:49.744942+00:00",
     "evidence_template": "TCP retransmissions detected; TCP retransmissions observed; TCP retransmissions observed",
     "embedding_vector": [
       0.030576,
@@ -71351,8 +71351,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 109,
-    "last_seen": "2026-04-23T06:33:31.377222+00:00",
+    "occurrence_count": 116,
+    "last_seen": "2026-04-23T06:34:09.949219+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 90%; Causal inference points to DNS:DNS scs-config-use2.bixbyllm.com -> 34.110.146.49",
     "embedding_vector": [
       -0.414992,
@@ -75885,8 +75885,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 60,
-    "last_seen": "2026-04-23T06:33:34.815095+00:00",
+    "occurrence_count": 65,
+    "last_seen": "2026-04-23T06:34:09.419171+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 91%; Causal inference points to DNS:DNS mobile.events.data.microsoft.com -> 20.189.173.6",
     "embedding_vector": [
       -0.374393,
@@ -118218,8 +118218,8 @@
     ],
     "root_cause": "ICMP_NETWORK_FAILURE",
     "confidence": 0.995,
-    "occurrence_count": 47,
-    "last_seen": "2026-04-23T06:33:38.599071+00:00",
+    "occurrence_count": 48,
+    "last_seen": "2026-04-23T06:33:40.392082+00:00",
     "evidence_template": "ICMP unreachable or path error observed; Matched historical pattern 'Generic telecom session - ICMP Network Failure' with similarity 86%; Causal inference points to ICMP:ICMP type 3 code 1",
     "embedding_vector": [
       0.0,
@@ -118315,8 +118315,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 25,
-    "last_seen": "2026-04-23T06:32:46.867046+00:00",
+    "occurrence_count": 28,
+    "last_seen": "2026-04-23T06:34:00.355596+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 86%; Causal inference points to DNS:DNS cepsig.us.prod.c3.volvocars.com",
     "embedding_vector": [
       -0.278361,
@@ -118509,8 +118509,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 144,
-    "last_seen": "2026-04-23T06:33:31.910444+00:00",
+    "occurrence_count": 155,
+    "last_seen": "2026-04-23T06:34:10.465925+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 87%; Causal inference points to DNS:DNS ocsp.volvocars.com -> ocsp.prod.c3.volvocars.com",
     "embedding_vector": [
       -0.330971,
@@ -118607,9 +118607,9 @@
       "DNS:DNS inet.connect.c3.volvocars.com -> 18.160.46.39"
     ],
     "root_cause": "NORMAL_CALL",
-    "confidence": 0.96,
-    "occurrence_count": 15,
-    "last_seen": "2026-04-23T06:33:34.285760+00:00",
+    "confidence": 0.98,
+    "occurrence_count": 16,
+    "last_seen": "2026-04-23T06:33:55.530114+00:00",
     "evidence_template": "Insufficient signalling; Causal inference points to DNS:DNS ocsp.volvocars.com -> ocsp.prod.c3.volvocars.com; TRANSPORT agent proposed NORMAL_CALL with 35% confidence",
     "embedding_vector": [
       1.0,
@@ -118716,8 +118716,8 @@
     ],
     "root_cause": "NETWORK_CONGESTION",
     "confidence": 0.995,
-    "occurrence_count": 151,
-    "last_seen": "2026-04-23T06:33:38.934104+00:00",
+    "occurrence_count": 163,
+    "last_seen": "2026-04-23T06:34:10.995350+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Transport Congestion' with similarity 91%; Causal inference points to TCP:TCP",
     "embedding_vector": [
       -0.111757,
@@ -118815,8 +118815,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 59,
-    "last_seen": "2026-04-23T06:33:20.264580+00:00",
+    "occurrence_count": 64,
+    "last_seen": "2026-04-23T06:34:07.237051+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 91%; Causal inference points to DNS:DNS ocsp.volvocars.com -> 44.196.195.72",
     "embedding_vector": [
       -0.350511,
@@ -119428,8 +119428,8 @@
     ],
     "root_cause": "UNKNOWN",
     "confidence": 0.995,
-    "occurrence_count": 16,
-    "last_seen": "2026-04-23T06:32:08.305653+00:00",
+    "occurrence_count": 20,
+    "last_seen": "2026-04-23T06:34:12.013252+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 86%; Causal inference points to DNS:DNS supl.google.com -> 172.253.122.192",
     "embedding_vector": [
       -0.3405,
@@ -119525,8 +119525,8 @@
     ],
     "root_cause": "NORMAL_CALL",
     "confidence": 0.995,
-    "occurrence_count": 15,
-    "last_seen": "2026-04-23T06:33:33.109303+00:00",
+    "occurrence_count": 16,
+    "last_seen": "2026-04-23T06:34:06.186583+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 91%; Causal inference points to DNS:DNS cnep.volvocars.com -> 3.92.16.252",
     "embedding_vector": [
       -0.385474,
@@ -120106,9 +120106,9 @@
       "DNS:DNS cepsig.us.prod.c3.volvocars.com -> 23.20.62.248"
     ],
     "root_cause": "UNKNOWN",
-    "confidence": 0.96,
-    "occurrence_count": 9,
-    "last_seen": "2026-04-23T06:32:46.370712+00:00",
+    "confidence": 0.98,
+    "occurrence_count": 10,
+    "last_seen": "2026-04-23T06:34:00.870898+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 87%; Causal inference points to DNS:DNS cepsig.us.prod.c3.volvocars.com -> 23.20.62.248",
     "embedding_vector": [
       0.097293,
@@ -123218,9 +123218,9 @@
       "DNS:DNS cepsig.us.prod.c3.volvocars.com -> 3.212.7.250"
     ],
     "root_cause": "UNKNOWN",
-    "confidence": 0.96,
-    "occurrence_count": 9,
-    "last_seen": "2026-04-23T06:32:15.637774+00:00",
+    "confidence": 0.995,
+    "occurrence_count": 11,
+    "last_seen": "2026-04-23T06:33:48.703351+00:00",
     "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 89%; Causal inference points to DNS:DNS cepsig.us.prod.c3.volvocars.com -> 3.212.7.250",
     "embedding_vector": [
       -0.342719,
@@ -124675,6 +124675,103 @@
       },
       "dominant_signal": "signaling",
       "model_score": 0.3467,
+      "model_type": "ensemble"
+    }
+  },
+  {
+    "pattern_id": "pat-dcb654cbb1f1",
+    "protocols": [
+      "DNS"
+    ],
+    "scenario": "Generic telecom session - Unknown or Incomplete Session",
+    "signature": [
+      "DNS:DNS supl.google.com",
+      "DNS:DNS supl.google.com -> 142.251.179.192"
+    ],
+    "root_cause": "UNKNOWN",
+    "confidence": 0.84,
+    "occurrence_count": 3,
+    "last_seen": "2026-04-23T06:33:57.111720+00:00",
+    "evidence_template": "Insufficient signalling; Matched historical pattern 'Generic telecom session - Unknown or Incomplete Session' with similarity 89%; Causal inference points to DNS:DNS supl.google.com -> 142.251.179.192",
+    "embedding_vector": [
+      -0.350957,
+      0.0,
+      0.456321,
+      0.258008,
+      0.258008,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.412814,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.457333,
+      0.0,
+      0.263067,
+      0.294433,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context": {
+      "network_scope": "HOME",
+      "protocol_stack": [
+        "DNS"
+      ],
+      "technology_family": [
+        "Core"
+      ],
+      "vendor": "UNKNOWN",
+      "call_type": "Generic telecom session"
+    },
+    "historical_success": 1.0,
+    "validation_status": "auto_validated",
+    "source_sessions": [
+      "0x769f"
+    ],
+    "anomaly_profile": {
+      "score": 0.1172,
+      "is_anomalous": false,
+      "suggested_root_cause": "UNKNOWN",
+      "signals": [],
+      "component_scores": {
+        "transport": 0.0,
+        "charging": 0.0,
+        "signaling": 0.1967,
+        "mobility": 0.02
+      },
+      "dominant_signal": "signaling",
+      "model_score": 0.4377,
       "model_type": "ensemble"
     }
   }

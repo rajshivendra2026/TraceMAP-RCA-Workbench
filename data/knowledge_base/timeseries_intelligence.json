@@ -1,596 +1,6 @@
 {
   "events": [
     {
-      "timestamp": "2026-04-23T05:50:30.847593+00:00",
-      "session_id": "GTP:0x80ca8384:seg150",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:31.393206+00:00",
-      "session_id": "GTP:0x80ca8384:seg151",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:31.881403+00:00",
-      "session_id": "GTP:0x80ca8384:seg152",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:32.379295+00:00",
-      "session_id": "GTP:0x80ca8384:seg153",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:32.852122+00:00",
-      "session_id": "GTP:0x80ca8384:seg154",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:33.336581+00:00",
-      "session_id": "GTP:0x80ca8384:seg155",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:33.771297+00:00",
-      "session_id": "GTP:0x80ca8384:seg156",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:34.236185+00:00",
-      "session_id": "GTP:0x80ca8384:seg157",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:34.706689+00:00",
-      "session_id": "GTP:0x80ca8384:seg158",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:35.239833+00:00",
-      "session_id": "GTP:0x80ca8384:seg159",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:35.724603+00:00",
-      "session_id": "GTP:0x80ca8384:seg160",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:36.192125+00:00",
-      "session_id": "GTP:0x80ca8384:seg161",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:36.655227+00:00",
-      "session_id": "GTP:0x80ca8384:seg162",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:37.123261+00:00",
-      "session_id": "GTP:0x80ca8384:seg163",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:37.632481+00:00",
-      "session_id": "GTP:0x80ca8384:seg164",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:38.139989+00:00",
-      "session_id": "GTP:0x80ca8384:seg165",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:38.638076+00:00",
-      "session_id": "GTP:0x80ca8384:seg166",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:39.100985+00:00",
-      "session_id": "GTP:0x80ca8384:seg167",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:39.538561+00:00",
-      "session_id": "GTP:0x80ca8384:seg168",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:39.969017+00:00",
-      "session_id": "GTP:0x80ca8384:seg169",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:40.396163+00:00",
-      "session_id": "GTP:0x80ca8384:seg170",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:40.837557+00:00",
-      "session_id": "GTP:0x80ca8384:seg171",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:41.281282+00:00",
-      "session_id": "GTP:0x80ca8384:seg172",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:41.716623+00:00",
-      "session_id": "GTP:0x80ca8384:seg173",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:42.217438+00:00",
-      "session_id": "GTP:0x80ca8384:seg174",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:42.712463+00:00",
-      "session_id": "GTP:0x80ca8384:seg175",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:43.243219+00:00",
-      "session_id": "GTP:0x80ca8384:seg176",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:43.748864+00:00",
-      "session_id": "GTP:0x80ca8384:seg177",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:44.209771+00:00",
-      "session_id": "GTP:0x80ca8384:seg178",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:44.645883+00:00",
-      "session_id": "GTP:0x80ca8384:seg179",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:45.088973+00:00",
-      "session_id": "GTP:0x80ca8384:seg180",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:45.529826+00:00",
-      "session_id": "GTP:0x80ca8384:seg181",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:45.961746+00:00",
-      "session_id": "GTP:0x80ca8384:seg182",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:46.389467+00:00",
-      "session_id": "GTP:0x80ca8384:seg183",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:46.823392+00:00",
-      "session_id": "GTP:0x80ca8384:seg184",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:47.257608+00:00",
-      "session_id": "GTP:0x80ca8384:seg185",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:47.683133+00:00",
-      "session_id": "GTP:0x80ca8384:seg186",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:48.115399+00:00",
-      "session_id": "GTP:0x80ca8384:seg187",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:48.550981+00:00",
-      "session_id": "GTP:0x80ca8384:seg188",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:48.991465+00:00",
-      "session_id": "GTP:0x80ca8384:seg189",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:49.436020+00:00",
-      "session_id": "GTP:0x80ca8384:seg190",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:49.863755+00:00",
-      "session_id": "GTP:0x80ca8384:seg191",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:50.298068+00:00",
-      "session_id": "GTP:0x80ca8384:seg192",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:50.754050+00:00",
-      "session_id": "GTP:0x80ca8384:seg193",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:51.180850+00:00",
-      "session_id": "GTP:0x80ca8384:seg194",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:51.622099+00:00",
-      "session_id": "GTP:0x80ca8384:seg195",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:52.053476+00:00",
-      "session_id": "GTP:0x80ca8384:seg196",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:52.494278+00:00",
-      "session_id": "GTP:0x80ca8384:seg197",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:52.926699+00:00",
-      "session_id": "GTP:0x80ca8384:seg198",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:53.356870+00:00",
-      "session_id": "GTP:0x80ca8384:seg199",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:53.796425+00:00",
-      "session_id": "GTP:0x80ca8384:seg200",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:54.233840+00:00",
-      "session_id": "GTP:0x80ca8384:seg201",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:54.680931+00:00",
-      "session_id": "GTP:0x80ca8384:seg202",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:55.115641+00:00",
-      "session_id": "GTP:0x80ca8384:seg203",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:55.558556+00:00",
-      "session_id": "GTP:0x80ca8384:seg204",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:55.994467+00:00",
-      "session_id": "GTP:0x80ca8384:seg205",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:56.439725+00:00",
-      "session_id": "GTP:0x80ca8384:seg206",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:56.874465+00:00",
-      "session_id": "GTP:0x80ca8384:seg207",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "NORMAL_CALL",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
-      "timestamp": "2026-04-23T05:50:57.308198+00:00",
-      "session_id": "GTP:0x80ca8384:seg208",
-      "pcap_source": "310170424509386_1752198671571",
-      "root_cause": "UNKNOWN",
-      "protocols": [
-        "gtp"
-      ],
-      "signature": null
-    },
-    {
       "timestamp": "2026-04-23T05:50:57.744355+00:00",
       "session_id": "GTP:0x80ca8384:seg209",
       "pcap_source": "310170424509386_1752198671571",
@@ -50345,18 +49755,623 @@
         "tcp"
       ],
       "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:40.374457+00:00",
+      "session_id": "108.151.171.10:-->199.19.149.38:-#f29288",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "ICMP_NETWORK_FAILURE",
+      "protocols": [
+        "icmp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:40.685180+00:00",
+      "session_id": "0x8085",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:41.225976+00:00",
+      "session_id": "0x9185",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:41.759162+00:00",
+      "session_id": "275",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:42.280467+00:00",
+      "session_id": "0x0ce7",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:42.794228+00:00",
+      "session_id": "0x0fe7",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:43.338979+00:00",
+      "session_id": "276",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:43.852629+00:00",
+      "session_id": "0xb489",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:44.401856+00:00",
+      "session_id": "0xb789",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:45.025991+00:00",
+      "session_id": "277",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:45.557433+00:00",
+      "session_id": "0xfff6",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:46.235292+00:00",
+      "session_id": "0x02f7",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:46.825056+00:00",
+      "session_id": "278",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:47.394157+00:00",
+      "session_id": "0x9431",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:47.927859+00:00",
+      "session_id": "0x769f",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:48.458029+00:00",
+      "session_id": "0xf21e",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:48.984751+00:00",
+      "session_id": "0xf61e",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:49.509193+00:00",
+      "session_id": "279",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:50.034357+00:00",
+      "session_id": "0x50e9",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:50.591996+00:00",
+      "session_id": "0x53e9",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:51.221829+00:00",
+      "session_id": "280",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:51.836584+00:00",
+      "session_id": "0x5621",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:52.344020+00:00",
+      "session_id": "0x5921",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:52.899484+00:00",
+      "session_id": "281",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:53.439747+00:00",
+      "session_id": "0xe9cc",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:54.016644+00:00",
+      "session_id": "0xedcc",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:54.567125+00:00",
+      "session_id": "282",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:55.268259+00:00",
+      "session_id": "0xbdc3",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:55.822483+00:00",
+      "session_id": "0x81fb",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:56.354423+00:00",
+      "session_id": "0x7c8d",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:56.864167+00:00",
+      "session_id": "0x46e6",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:57.399421+00:00",
+      "session_id": "0x32af",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:57.959730+00:00",
+      "session_id": "0x36af",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:58.527727+00:00",
+      "session_id": "0xfca6",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:59.033062+00:00",
+      "session_id": "0x00a7",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:33:59.558094+00:00",
+      "session_id": "283",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:00.090799+00:00",
+      "session_id": "0x60ee",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:00.632767+00:00",
+      "session_id": "0x53ee",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:01.145862+00:00",
+      "session_id": "284",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:01.665393+00:00",
+      "session_id": "0xb6aa",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:02.183467+00:00",
+      "session_id": "0xb9aa",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:02.730863+00:00",
+      "session_id": "285",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:03.323218+00:00",
+      "session_id": "0x5f06",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:03.840129+00:00",
+      "session_id": "286",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:04.360162+00:00",
+      "session_id": "0xd9c3",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:04.888885+00:00",
+      "session_id": "0xddc3",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:05.437832+00:00",
+      "session_id": "287",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:05.947692+00:00",
+      "session_id": "0x3f4d",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NORMAL_CALL",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:06.461371+00:00",
+      "session_id": "0x424d",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:06.992667+00:00",
+      "session_id": "0xebae",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:07.513955+00:00",
+      "session_id": "0xeeae",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:08.037625+00:00",
+      "session_id": "288",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:08.601543+00:00",
+      "session_id": "0x9e71",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:09.175461+00:00",
+      "session_id": "0xa271",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:09.701276+00:00",
+      "session_id": "0xc8aa",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:10.229422+00:00",
+      "session_id": "0xccaa",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:10.745532+00:00",
+      "session_id": "289",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "NETWORK_CONGESTION",
+      "protocols": [
+        "http",
+        "tcp"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:11.267733+00:00",
+      "session_id": "0x8bce",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
+    },
+    {
+      "timestamp": "2026-04-23T06:34:11.776498+00:00",
+      "session_id": "0xb9cb",
+      "pcap_source": "310170431581071_1736994000483",
+      "root_cause": "UNKNOWN",
+      "protocols": [
+        "dns"
+      ],
+      "signature": null
     }
   ],
-  "last_updated": "2026-04-23T06:33:39.849087+00:00",
+  "last_updated": "2026-04-23T06:34:11.776498+00:00",
   "recurring_summary": {
     "recurring_failures": [
       {
         "root_cause": "UNKNOWN",
-        "count": 2257
+        "count": 2277
       },
       {
         "root_cause": "NETWORK_CONGESTION",
-        "count": 242
+        "count": 257
       },
       {
         "root_cause": "CORE_NETWORK_FAILURE",
@@ -50364,7 +50379,7 @@
       },
       {
         "root_cause": "ICMP_NETWORK_FAILURE",
-        "count": 48
+        "count": 49
       },
       {
         "root_cause": "DNS_FAILURE",
