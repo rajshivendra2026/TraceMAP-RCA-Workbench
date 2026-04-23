@@ -184,21 +184,62 @@ def _extract_subscription_ids(raw: dict) -> tuple[Optional[str], Optional[str]]:
     elif sub_id_raw not in (None, ""):
         values = [str(sub_id_raw).strip()]
 
-    imsi = None
-    msisdn = None
+    imsi = _clean_identifier(_get(raw, "e212.imsi"))
+    msisdn = _clean_identifier(_get(raw, "e164.msisdn"))
+
+    user_name = _clean_identifier(_get(raw, "diameter.User-Name"))
+    if imsi is None and _looks_like_imsi(user_name):
+        imsi = user_name
+
     for value in values:
-        digits = value.replace("+", "").strip()
-        if digits.isdigit() and len(digits) == 15 and imsi is None:
+        digits = _clean_identifier(value)
+        if _looks_like_imsi(digits) and imsi is None:
             imsi = digits
         elif digits and msisdn is None:
             msisdn = digits
 
+    if msisdn is None:
+        msisdn = _decode_tbcd_digits(_get(raw, "diameter.MSISDN"))
+
     if imsi is None and values:
-        imsi = values[0]
+        first = _clean_identifier(values[0])
+        imsi = first or values[0]
     if msisdn is None and len(values) > 1:
-        msisdn = values[1]
+        msisdn = _clean_identifier(values[1]) or values[1]
 
     return imsi, msisdn
+
+
+def _looks_like_imsi(value: Optional[str]) -> bool:
+    return bool(value and value.isdigit() and len(value) == 15)
+
+
+def _clean_identifier(value: Optional[object]) -> Optional[str]:
+    text = _clean_text(value)
+    if not text:
+        return None
+    digits = "".join(ch for ch in text if ch.isdigit())
+    return digits or text
+
+
+def _decode_tbcd_digits(value: Optional[object]) -> Optional[str]:
+    text = _clean_text(value)
+    if not text:
+        return None
+    compact = "".join(ch for ch in text if ch.isalnum())
+    if not compact or len(compact) % 2 != 0 or any(ch not in "0123456789abcdefABCDEF" for ch in compact):
+        return None
+
+    digits = []
+    for index in range(0, len(compact), 2):
+        low = compact[index]
+        high = compact[index + 1]
+        if high.upper() != "F":
+            digits.append(high)
+        if low.upper() != "F":
+            digits.append(low)
+    normalized = "".join(digits)
+    return normalized or None
 
 
 def _clean_text(value: Optional[object]) -> Optional[str]:

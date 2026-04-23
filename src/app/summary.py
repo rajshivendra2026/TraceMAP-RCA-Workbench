@@ -171,8 +171,13 @@ def session_summary(session: dict) -> dict:
         "flow_summary": session.get("flow_summary", ""),
         "final_sip_code": session.get("final_sip_code", ""),
         "dia_correlation": session.get("dia_correlation", ""),
+        "gtp_correlation": session.get("gtp_correlation", ""),
+        "correlation_summary": _build_correlation_summary(session),
+        "correlation_methods": session.get("correlation_methods", []),
+        "correlation_evidence": session.get("correlation_evidence", []),
         "imsi": session.get("imsi"),
         "msisdn": session.get("msisdn"),
+        "subscriber_ip": session.get("subscriber_ip"),
         "duration_ms": session.get("duration_ms", 0),
         "packet_count": packet_count,
         "protocols": session.get("protocols", []),
@@ -208,6 +213,66 @@ def session_summary(session: dict) -> dict:
         "contributing_factors": rca.get("contributing_factors", []),
         "correlation_confidence": rca.get("correlation_confidence", 0),
     }
+
+
+def _build_correlation_summary(session: dict) -> str:
+    parts = []
+
+    dia = session.get("dia_correlation")
+    if dia and dia not in {"none", "unmatched"}:
+        parts.append(f"Dia {dia}")
+
+    gtp = session.get("gtp_correlation")
+    if gtp and gtp not in {"none", "unmatched"}:
+        parts.append(f"GTP {gtp}")
+
+    methods = set(session.get("correlation_methods", []) or [])
+    if "state:teid_continuation" in methods:
+        parts.append("State TEID chain")
+    if "state:access_subscriber_bridge" in methods:
+        parts.append("State access bridge")
+
+    subscriber_ip = session.get("subscriber_ip") or next(
+        (
+            message.get("framed_ip")
+            for message in session.get("dia_msgs", [])
+            if message.get("framed_ip")
+        ),
+        None,
+    ) or next(
+        (
+            message.get("gtp.subscriber_ip")
+            for message in session.get("gtp_msgs", [])
+            if message.get("gtp.subscriber_ip")
+        ),
+        None,
+    )
+    if subscriber_ip:
+        parts.append(f"UE IP {subscriber_ip}")
+
+    imsi = session.get("imsi") or next(
+        (
+            message.get("gtpv2.imsi")
+            for message in session.get("gtp_msgs", [])
+            if message.get("gtpv2.imsi")
+        ),
+        None,
+    )
+    if imsi:
+        parts.append(f"IMSI {imsi}")
+
+    teid = next(
+        (
+            message.get("gtp.teid") or message.get("gtp.f_teid") or message.get("gtp.tid")
+            for message in session.get("gtp_msgs", [])
+            if message.get("gtp.teid") or message.get("gtp.f_teid") or message.get("gtp.tid")
+        ),
+        None,
+    )
+    if teid:
+        parts.append(f"TEID {teid}")
+
+    return " · ".join(parts[:5]) or dia or gtp or "No correlation"
 
 
 def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | None = None) -> dict:
@@ -670,22 +735,32 @@ def build_session_details_summary(session: dict) -> dict:
     protocols = session.get("protocols", [])
     technologies = session.get("technologies", [])
     call_type = _infer_session_type(session)
+    a_party = _display_session_party(session)
+    b_party = session.get("called") or "Unknown"
     return {
         "headline": f"{call_type} session",
         "call_type": call_type,
-        "a_party": session.get("calling") or session.get("msisdn") or "Unknown",
-        "b_party": session.get("called") or "Unknown",
+        "a_party": a_party,
+        "b_party": b_party,
         "protocols": protocols,
         "technologies": technologies,
         "summary_lines": [
             f"Call/session type: {call_type}",
             f"Technologies: {', '.join(technologies) if technologies else 'Unknown'}",
             f"Protocols: {', '.join(protocols) if protocols else 'Unknown'}",
-            f"A-party: {session.get('calling') or session.get('msisdn') or 'Unknown'}",
-            f"B-party: {session.get('called') or 'Unknown'}",
+            f"A-party: {a_party}",
+            f"B-party: {b_party}",
             f"Flow summary: {session.get('flow_summary') or 'Unavailable'}",
         ],
     }
+
+
+def _display_session_party(session: dict) -> str:
+    msisdn = session.get("msisdn")
+    if msisdn:
+        return str(msisdn)
+    calling = session.get("calling")
+    return str(calling) if calling else "Unknown"
 
 
 def _build_party_identities(parsed: dict, sessions: list, subscriber: str | None, calling_party: str | None, called_party: str | None) -> list[dict]:
@@ -1059,6 +1134,10 @@ def _extract_trace_parties(parsed: dict, sessions: list, subscriber: str | None 
     for session in sessions:
         if session.get("calling") or session.get("called"):
             return session.get("calling"), session.get("called")
+
+    for packet in parsed.get("diameter", []):
+        if packet.get("msisdn"):
+            return packet.get("msisdn"), packet.get("destination_host") or packet.get("apn") or packet.get("dst_ip")
 
     if subscriber:
         for packet in parsed.get("diameter", []):

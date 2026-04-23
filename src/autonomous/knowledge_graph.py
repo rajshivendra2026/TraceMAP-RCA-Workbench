@@ -147,9 +147,7 @@ class TelecomKnowledgeGraph:
                 cause_node = self.upsert_node("event", hop.get("event", "UNKNOWN"))
                 self.add_relation(cause_node, "causes", error_id, weight=hop.get("score", 0.5))
 
-        self.metrics["node_count"] = len(self.nodes)
-        self.metrics["edge_count"] = len(self.edges)
-        self.metrics["protocol_count"] = dict(Counter(node["name"] for node in self.nodes.values() if node.get("type") == "protocol"))
+        self.rebuild_metrics()
         self.save()
         return self.summary()
 
@@ -164,6 +162,16 @@ class TelecomKnowledgeGraph:
             event_id = self.upsert_node("event", signature)
             self.add_relation(scenario_id, "contains", event_id, weight=1.0)
         self.save()
+
+    def rebuild_metrics(self) -> dict[str, Any]:
+        self.metrics["node_count"] = len(self.nodes)
+        self.metrics["edge_count"] = len(self.edges)
+        self.metrics["protocol_count"] = {
+            node["name"]: int(node.get("occurrence_count", 0))
+            for node in self.nodes.values()
+            if node.get("type") == "protocol"
+        }
+        return self.metrics
 
     def summary(self) -> dict:
         return {

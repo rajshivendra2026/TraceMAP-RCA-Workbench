@@ -57,6 +57,20 @@ class DiameterParserTests(unittest.TestCase):
         self.assertEqual(packet["imsi"], "001010123456789")
         self.assertEqual(packet["msisdn"], "15551230000")
 
+    def test_extracts_vendor_specific_msisdn_and_generic_imsi_fields(self):
+        packet = parse_diameter_packet(
+            {
+                "diameter.Session-Id": "sess-3",
+                "diameter.cmd.code": "8388647",
+                "e164.msisdn": "14105331485",
+                "diameter.MSISDN": "4101351384f5",
+                "e212.imsi": "310170123456789",
+            }
+        )
+
+        self.assertEqual(packet["imsi"], "310170123456789")
+        self.assertEqual(packet["msisdn"], "14105331485")
+
     def test_interprets_diameter_experimental_absent_user(self):
         packet = parse_diameter_packet(
             {

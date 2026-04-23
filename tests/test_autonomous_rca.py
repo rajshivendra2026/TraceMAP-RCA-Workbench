@@ -61,6 +61,17 @@ class AutonomousRCATests(unittest.TestCase):
             self.assertIs(loop.knowledge, knowledge)
             self.assertTrue(callable(learning_loop.run_learning_cycle))
 
+    def test_knowledge_graph_protocol_metrics_track_observations(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            knowledge = KnowledgeEngine(base_dir=tmpdir)
+            engine = AutonomousRCAEngine(knowledge_engine=knowledge)
+            engine.analyze_session(sample_session())
+            engine.analyze_session(sample_session())
+
+            protocol_counts = engine.knowledge_graph.metrics["protocol_count"]
+            self.assertGreaterEqual(protocol_counts["DIAMETER"], 2)
+            self.assertGreaterEqual(protocol_counts["SCTP"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

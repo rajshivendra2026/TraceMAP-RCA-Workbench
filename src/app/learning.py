@@ -62,8 +62,13 @@ def save_learning_settings(payload: dict) -> None:
 
 def default_learning_path() -> str:
     settings = load_learning_settings()
-    path = settings.get("learn_path") or cfg_path("data.raw_pcaps", "data/raw_pcaps")
-    return str(Path(path).expanduser().resolve())
+    configured = Path(cfg_path("data.raw_pcaps", "data/raw_pcaps")).expanduser().resolve()
+    saved = settings.get("learn_path")
+    if saved:
+        candidate = Path(saved).expanduser().resolve()
+        if candidate.exists():
+            return str(candidate)
+    return str(configured)
 
 
 def save_default_learning_path(path_value: str) -> str:
@@ -116,7 +121,7 @@ def run_learning_job(learn_path: str, pending_files: list[dict], job_id: str | N
                     total_pcaps=total,
                     path=learn_path,
                 )
-            process_pcap(item["path"])
+            process_pcap(item["path"], raise_on_error=True)
             manifest[item["signature"]] = {
                 "path": item["path"],
                 "name": item["name"],

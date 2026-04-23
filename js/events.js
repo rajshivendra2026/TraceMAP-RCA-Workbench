@@ -147,4 +147,8 @@ function switchTab(tab) {
   tabButtons.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.tab === tab);
   });
+
+  if (tab === "visual" && typeof _refreshVisualView === "function") {
+    _refreshVisualView();
+  }
 }

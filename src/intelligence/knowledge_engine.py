@@ -18,6 +18,17 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+DEFAULT_METRICS: dict[str, Any] = {
+    "pattern_reuse_count": 0,
+    "candidate_pattern_count": 0,
+    "validation_queue_size": 0,
+    "validated_count": 0,
+    "rejected_count": 0,
+    "last_compaction": None,
+    "pattern_count": 0,
+}
+
+
 class KnowledgeEngine:
     """Hybrid JSON plus vector storage for telecom RCA patterns."""
 
@@ -31,19 +42,9 @@ class KnowledgeEngine:
 
         self.patterns: list[dict[str, Any]] = self._read_json(self.patterns_path, [])
         self.validation_queue: list[dict[str, Any]] = self._read_json(self.validation_path, [])
-        self.metrics: dict[str, Any] = self._read_json(
-            self.metrics_path,
-            {
-                "pattern_reuse_count": 0,
-                "candidate_pattern_count": 0,
-                "validation_queue_size": 0,
-                "validated_count": 0,
-                "rejected_count": 0,
-                "last_compaction": None,
-            },
-        )
-        self._normalize_validation_queue()
-        self._rebuild_vectors_if_needed()
+        self.metrics: dict[str, Any] = self._read_json(self.metrics_path, DEFAULT_METRICS)
+        self._synchronize_state()
+        self.save()
 
     def query_similar(
         self,
@@ -114,7 +115,6 @@ class KnowledgeEngine:
                 "validation_status": payload["validation_status"],
             },
         )
-        self.metrics["candidate_pattern_count"] = int(self.metrics.get("candidate_pattern_count", 0)) + 1
         self.save()
         return payload
 
@@ -123,10 +123,12 @@ class KnowledgeEngine:
         payload.setdefault("validation_id", f"val-{uuid4().hex[:12]}")
         payload.setdefault("queued_at", utc_now())
         payload.setdefault("validation_status", "pending_review")
-        self.validation_queue.append(payload)
-        self.metrics["validation_queue_size"] = len(self.validation_queue)
-        self._write_json(self.validation_path, self.validation_queue)
-        self._write_json(self.metrics_path, self.metrics)
+        existing = self._find_pending_validation(payload)
+        if existing:
+            self._merge_validation_items(existing, payload)
+        else:
+            self.validation_queue.append(payload)
+        self.save()
 
     def resolve_validation(
         self,
@@ -162,27 +164,20 @@ class KnowledgeEngine:
         )
 
         pattern_id = item.get("pattern_id")
-        if action == "approve":
-            self.metrics["validated_count"] = int(self.metrics.get("validated_count", 0)) + 1
-            if pattern_id:
-                pattern = self.get_pattern(pattern_id)
-                if pattern:
-                    pattern["validation_status"] = "validated"
-                    approved_root = item.get("hybrid_root_cause") or item.get("knowledge_root_cause") or pattern.get("root_cause")
-                    if approved_root:
-                        pattern["root_cause"] = approved_root
-                    pattern["last_seen"] = utc_now()
-        elif action == "reject":
-            self.metrics["rejected_count"] = int(self.metrics.get("rejected_count", 0)) + 1
-            if pattern_id:
-                pattern = self.get_pattern(pattern_id)
-                if pattern:
-                    pattern["validation_status"] = "needs_review"
-                    pattern["confidence"] = round(max(0.2, float(pattern.get("confidence", 0.5)) - 0.08), 4)
+        if action == "approve" and pattern_id:
+            pattern = self.get_pattern(pattern_id)
+            if pattern:
+                pattern["validation_status"] = "validated"
+                approved_root = item.get("hybrid_root_cause") or item.get("knowledge_root_cause") or pattern.get("root_cause")
+                if approved_root:
+                    pattern["root_cause"] = approved_root
+                pattern["last_seen"] = utc_now()
+        elif action == "reject" and pattern_id:
+            pattern = self.get_pattern(pattern_id)
+            if pattern:
+                pattern["validation_status"] = "needs_review"
+                pattern["confidence"] = round(max(0.2, float(pattern.get("confidence", 0.5)) - 0.08), 4)
 
-        self.metrics["validation_queue_size"] = len(
-            [row for row in self.validation_queue if row.get("validation_status") == "pending_review"]
-        )
         append_feedback_record(
             {
                 "validation_id": item.get("validation_id"),
@@ -217,13 +212,14 @@ class KnowledgeEngine:
 
     def replace_patterns(self, patterns: list[dict]) -> None:
         self.patterns = patterns
-        self._rebuild_vectors_if_needed(force=True)
         self.save()
 
     def save(self) -> None:
+        self._synchronize_state()
         self._write_json(self.patterns_path, self.patterns)
         self._write_json(self.validation_path, self.validation_queue)
         self._write_json(self.metrics_path, self.metrics)
+        self.vector_store.save()
 
     def build_context(self, session: dict, intelligence: dict) -> dict:
         technologies = sorted({str(t) for t in session.get("technologies", [])})
@@ -263,36 +259,118 @@ class KnowledgeEngine:
                 return False
         return True
 
-    def _rebuild_vectors_if_needed(self, force: bool = False) -> None:
-        if not force and self.vector_store.items():
-            return
-        self.vector_store = VectorStore(self.base_dir / "vectors.json")
-        if self.vector_store.items() and not force:
-            return
-        for entry in self.patterns:
-            vector = entry.get("embedding_vector") or []
-            if vector:
-                self.vector_store.upsert(
-                    entry["pattern_id"],
-                    vector,
-                    {
-                        "root_cause": entry.get("root_cause"),
-                        "validation_status": entry.get("validation_status"),
-                    },
-                )
+    def _synchronize_state(self) -> None:
+        self._normalize_validation_queue()
+        self._sync_vector_store()
+        self._refresh_metrics()
 
     def _normalize_validation_queue(self) -> None:
         changed = False
+        normalized: list[dict[str, Any]] = []
+        pending_index: dict[tuple[Any, ...], dict[str, Any]] = {}
         for item in self.validation_queue:
             if not item.get("validation_id"):
                 item["validation_id"] = f"val-{uuid4().hex[:12]}"
                 changed = True
-        if changed:
-            self.metrics["validation_queue_size"] = len(
-                [row for row in self.validation_queue if row.get("validation_status") == "pending_review"]
-            )
-            self._write_json(self.validation_path, self.validation_queue)
-            self._write_json(self.metrics_path, self.metrics)
+            item.setdefault("validation_status", "pending_review")
+            if item.get("validation_status") != "pending_review":
+                normalized.append(item)
+                continue
+            key = self._validation_key(item)
+            existing = pending_index.get(key)
+            if existing is None:
+                pending_index[key] = item
+                normalized.append(item)
+                continue
+            self._merge_validation_items(existing, item)
+            changed = True
+        if changed or len(normalized) != len(self.validation_queue):
+            self.validation_queue = normalized
+
+    def _sync_vector_store(self) -> None:
+        pattern_rows = {
+            entry["pattern_id"]: entry
+            for entry in self.patterns
+            if entry.get("pattern_id")
+        }
+        expected_dims = {
+            len(entry.get("embedding_vector") or [])
+            for entry in pattern_rows.values()
+            if entry.get("embedding_vector")
+        }
+        if len(expected_dims) > 1:
+            raise ValueError(f"inconsistent pattern embedding dimensions: {sorted(expected_dims)}")
+
+        expected_dim = next(iter(expected_dims), None)
+        records = self.vector_store.items()
+        current_dim = len(records[0]["vector"]) if records else None
+        if expected_dim is not None and current_dim is not None and expected_dim != current_dim:
+            if self.vector_store.path.exists():
+                self.vector_store.path.unlink()
+            self.vector_store = VectorStore(self.base_dir / "vectors.json")
+            records = []
+
+        stale_ids = [
+            row["id"]
+            for row in records
+            if row.get("id") not in pattern_rows or not pattern_rows[row["id"]].get("embedding_vector")
+        ]
+        if stale_ids:
+            self.vector_store.delete(stale_ids)
+
+        current = {row["id"]: row for row in self.vector_store.items()}
+        for pattern_id, entry in pattern_rows.items():
+            vector = entry.get("embedding_vector") or []
+            if not vector:
+                continue
+            metadata = {
+                "root_cause": entry.get("root_cause"),
+                "validation_status": entry.get("validation_status"),
+            }
+            stored = current.get(pattern_id)
+            if stored is None or stored.get("metadata") != metadata:
+                self.vector_store.upsert(pattern_id, vector, metadata)
+
+    def _refresh_metrics(self) -> None:
+        merged = dict(DEFAULT_METRICS)
+        merged.update(self.metrics)
+        merged["pattern_count"] = len(self.patterns)
+        merged["candidate_pattern_count"] = len(self.vector_store.items())
+        merged["validation_queue_size"] = len(
+            [row for row in self.validation_queue if row.get("validation_status") == "pending_review"]
+        )
+        merged["validated_count"] = len(
+            [row for row in self.validation_queue if row.get("validation_status") == "approved"]
+        )
+        merged["rejected_count"] = len(
+            [row for row in self.validation_queue if row.get("validation_status") == "rejected"]
+        )
+        self.metrics = merged
+
+    def _find_pending_validation(self, payload: dict[str, Any]) -> dict[str, Any] | None:
+        key = self._validation_key(payload)
+        for item in self.validation_queue:
+            if item.get("validation_status", "pending_review") != "pending_review":
+                continue
+            if self._validation_key(item) == key:
+                return item
+        return None
+
+    def _merge_validation_items(self, target: dict[str, Any], incoming: dict[str, Any]) -> None:
+        for key, value in incoming.items():
+            if key in {"validation_id", "queued_at"} or value in (None, "", [], {}):
+                continue
+            target[key] = value
+        target.setdefault("queued_at", incoming.get("queued_at") or utc_now())
+
+    @staticmethod
+    def _validation_key(item: dict[str, Any]) -> tuple[Any, ...]:
+        return (
+            item.get("session_id"),
+            item.get("pattern_id"),
+            item.get("hybrid_root_cause"),
+            item.get("validation_status", "pending_review"),
+        )
 
     @staticmethod
     def _read_json(path: Path, default):

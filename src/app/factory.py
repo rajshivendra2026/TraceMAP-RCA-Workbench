@@ -508,6 +508,7 @@ def _run_upload_job(job_id: str, save_path: Path, original_name: str) -> None:
                 },
             ),
             "learning": learning["metrics"],
+            "knowledge_health": learning.get("doctor"),
             "model": load_model_status(),
         }
         update_job(

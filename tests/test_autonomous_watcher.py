@@ -54,7 +54,7 @@ class AutonomousWatcherTests(unittest.TestCase):
                 {"session_id": "sess-2", "rca": {"rca_label": "UNKNOWN"}},
             ]
 
-            def fake_process_pcap(path: str):
+            def fake_process_pcap(path: str, **kwargs):
                 _write_json(
                     knowledge / "patterns.json",
                     [{"pattern_id": "pat-1", "root_cause": "NORMAL_CALL", "embedding_vector": [0.1, 0.2]}],
@@ -64,6 +64,9 @@ class AutonomousWatcherTests(unittest.TestCase):
 
             with patch("src.autonomous.watcher.process_pcap", side_effect=fake_process_pcap), patch(
                 "src.autonomous.watcher.report_dir", return_value=report_dir
+            ), patch(
+                "src.autonomous.watcher.cfg",
+                side_effect=lambda key, default=None: False if key == "autonomous.auto_commit" else default,
             ):
                 watcher = AutonomousLearningWatcher(
                     watch_paths=[str(input_dir)],
@@ -82,6 +85,9 @@ class AutonomousWatcherTests(unittest.TestCase):
             self.assertEqual(report["processed_trace_count"], 1)
             self.assertEqual(report["label_counts"]["UNKNOWN"], 1)
             self.assertTrue(Path(report["report_path"]).exists())
+            written_report = json.loads(Path(report["report_path"]).read_text(encoding="utf-8"))
+            self.assertEqual(written_report["finished_at"], report["finished_at"])
+            self.assertEqual(written_report["git"], report["git"])
             manifest = json.loads((knowledge / "processed_sources.json").read_text(encoding="utf-8"))
             self.assertEqual(len(manifest), 1)
 
@@ -98,7 +104,7 @@ class AutonomousWatcherTests(unittest.TestCase):
             _write_json(knowledge / "validation_queue.json", [])
             (input_dir / "trace-1.pcap").write_text("pcap", encoding="utf-8")
 
-            def fake_process_pcap(path: str):
+            def fake_process_pcap(path: str, **kwargs):
                 _write_json(
                     knowledge / "patterns.json",
                     [{"pattern_id": "pat-1", "root_cause": "NORMAL_CALL", "embedding_vector": [0.1, 0.2]}],
@@ -124,6 +130,50 @@ class AutonomousWatcherTests(unittest.TestCase):
                     watcher.run_cycle()
 
             self.assertFalse((knowledge / "processed_sources.json").exists())
+
+    def test_watcher_does_not_persist_manifest_for_held_cycles(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir)
+            knowledge = base / "knowledge"
+            input_dir = base / "raw"
+            report_dir = knowledge / "run_reports"
+            input_dir.mkdir(parents=True)
+            _write_json(knowledge / "patterns.json", [])
+            _write_json(knowledge / "metrics.json", {"validation_queue_size": 0})
+            _write_json(knowledge / "vectors.json", [])
+            _write_json(knowledge / "validation_queue.json", [])
+            (input_dir / "trace-1.pcap").write_text("pcap", encoding="utf-8")
+
+            def fake_process_pcap(path: str, **kwargs):
+                _write_json(
+                    knowledge / "patterns.json",
+                    [{"pattern_id": "pat-1", "root_cause": "UNKNOWN", "embedding_vector": [0.1, 0.2]}],
+                )
+                _write_json(knowledge / "vectors.json", [{"id": "pat-1"}])
+                return [{"session_id": "sess-1", "rca": {"rca_label": "UNKNOWN"}}]
+
+            with patch("src.autonomous.watcher.process_pcap", side_effect=fake_process_pcap), patch(
+                "src.autonomous.watcher.report_dir", return_value=report_dir
+            ):
+                watcher = AutonomousLearningWatcher(
+                    watch_paths=[str(input_dir)],
+                    base_dir=knowledge,
+                    manifest_path=knowledge / "processed_sources.json",
+                    policy=SeedRefreshPolicy(
+                        max_unknown_ratio=0.0,
+                        max_validation_queue_growth=2,
+                        max_pattern_drop=0,
+                        benchmark_enabled=False,
+                    ),
+                )
+                report = watcher.run_cycle()
+
+            self.assertEqual(report["status"], "held")
+            self.assertFalse(report["manifest_persisted"])
+            self.assertFalse((knowledge / "processed_sources.json").exists())
+            written_report = json.loads(Path(report["report_path"]).read_text(encoding="utf-8"))
+            self.assertEqual(written_report["status"], "held")
+            self.assertTrue(written_report["finished_at"])
 
     def test_git_publisher_commits_only_changed_paths(self):
         with tempfile.TemporaryDirectory() as tmpdir:

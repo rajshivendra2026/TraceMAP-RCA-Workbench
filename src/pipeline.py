@@ -68,6 +68,7 @@ from src.rules.rca_rules              import label_sessions
 def process_pcap(
         pcap_path: str,
         runner:    TSharkRunner = None,
+        raise_on_error: bool = False,
 ) -> list:
     """
     Run the full parse → correlate → label pipeline on one PCAP.
@@ -76,6 +77,9 @@ def process_pcap(
         pcap_path: path to .pcap or .pcapng file
         runner:    TSharkRunner instance (injectable for testing).
                    If None a real runner is constructed from config.
+        raise_on_error: re-raise failures instead of returning an empty
+                   session list. Use this for workflows that must not
+                   mark a broken trace as successfully processed.
 
     Returns:
         List of labeled session dicts.
@@ -83,7 +87,7 @@ def process_pcap(
         and a "pcap_source" key with the PCAP filename (stem only,
         e.g. "Trace-05" from "Trace-05.pcap").
 
-    Does not raise on parse errors — logs and returns [] instead,
+    Does not raise on parse errors by default — logs and returns []
     so process_all_pcaps() can continue to the next file.
     """
     pcap_name = Path(pcap_path).name
@@ -135,6 +139,8 @@ def process_pcap(
             f"Failed to process {pcap_name}: {exc}"
         )
         logger.debug(f"Traceback:", exc_info=True)
+        if raise_on_error:
+            raise
         return []
 
 

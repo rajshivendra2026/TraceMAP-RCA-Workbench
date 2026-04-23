@@ -68,10 +68,24 @@ sys.modules["pandas"] = _real_pandas or types.SimpleNamespace(DataFrame=_FakePan
 sys.modules["numpy"] = _real_numpy or types.SimpleNamespace(array=lambda data, dtype=float: data, dtype=object, __version__="1.0.0")
 
 from main import build_capture_summary
-from src.app.summary import session_summary
+from src.app.summary import build_session_details_summary, session_summary
 
 
 class TraceSummaryTests(unittest.TestCase):
+    def test_session_details_summary_prefers_msisdn_over_calling_ip(self):
+        details = build_session_details_summary(
+            {
+                "calling": "10.48.38.112",
+                "called": "10.3.160.10",
+                "msisdn": "14105331485",
+                "protocols": ["diameter", "sctp"],
+                "technologies": ["IMS", "Transport"],
+            }
+        )
+
+        self.assertEqual(details["a_party"], "14105331485")
+        self.assertEqual(details["b_party"], "10.3.160.10")
+
     def test_map_trace_summary_mentions_map(self):
         parsed = {
             "map": [
@@ -230,6 +244,42 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertIn("UPF/SGW", roles)
         self.assertIn("SMF/PGW-C", roles)
         self.assertIn("P-CSCF", roles)
+
+    def test_capture_summary_prefers_diameter_msisdn_for_diameter_only_trace(self):
+        parsed = {
+            "sip": [],
+            "diameter": [
+                {
+                    "msisdn": "14105331485",
+                    "src_ip": "10.48.38.112",
+                    "dst_ip": "10.3.160.10",
+                    "destination_host": "phxvhssa1.epc.mnc016.mcc901.3gppnetwork.org",
+                    "frame_number": 1,
+                }
+            ],
+            "inap": [],
+            "gtp": [],
+            "s1ap": [],
+            "ngap": [],
+            "ranap": [],
+            "bssap": [],
+            "map": [],
+            "http": [],
+            "tcp": [],
+            "udp": [],
+            "pfcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+            "sctp": [],
+        }
+
+        summary = build_capture_summary(parsed, [])
+        identities = {item["label"]: item for item in summary["details"]["party_identities"]}
+        self.assertEqual(summary["details"]["a_party"], "14105331485")
+        self.assertEqual(identities["A-party"]["msisdn"], "14105331485")
+        self.assertEqual(identities["A-party"]["imsi"], "Not observed")
 
     def test_capture_summary_builds_error_analysis_report(self):
         parsed = {

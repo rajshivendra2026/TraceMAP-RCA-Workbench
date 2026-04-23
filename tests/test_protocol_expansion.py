@@ -66,6 +66,32 @@ class ProtocolExpansionTests(unittest.TestCase):
 
         self.assertEqual(packet["message"], "Echo Request")
 
+    def test_parses_gtpv2_correlation_identity_fields(self):
+        packet = parse_network_packet(
+            {
+                "frame.number": "12",
+                "frame.time_epoch": "103.7",
+                "ip.src": "10.10.0.1",
+                "ip.dst": "10.10.0.2",
+                "gtpv2.message_type": "32",
+                "gtpv2.teid": "1001",
+                "gtpv2.f_teid_gre_key": "2002",
+                "gtpv2.f_teid_ipv4": "192.0.2.10",
+                "gtpv2.pdn_addr_and_prefix.ipv4": "10.23.45.67",
+                "gtpv2.apn": "internet",
+                "gtpv2.ebi": "5",
+                "gtpv2.imsi": "001010123456789",
+            },
+            "GTP",
+        )
+
+        self.assertEqual(packet["gtp.teid"], "1001")
+        self.assertEqual(packet["gtp.f_teid"], "2002")
+        self.assertEqual(packet["gtp.f_teid_ip"], "192.0.2.10")
+        self.assertEqual(packet["gtp.subscriber_ip"], "10.23.45.67")
+        self.assertEqual(packet["gtp.apn"], "internet")
+        self.assertEqual(packet["gtp.bearer_id"], "5")
+
     def test_parses_5gs_security_mode_complete_with_human_readable_name(self):
         packet = parse_network_packet(
             {

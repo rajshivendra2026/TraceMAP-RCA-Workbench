@@ -26,4 +26,5 @@ class RealTimeRCAPipeline:
         return {
             "sessions": learning["sessions"],
             "metrics": learning["metrics"],
+            "knowledge_health": learning.get("doctor"),
         }

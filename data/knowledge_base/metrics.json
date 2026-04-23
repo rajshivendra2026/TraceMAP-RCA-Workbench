@@ -1,8 +1,9 @@
 {
-  "pattern_reuse_count": 5335,
-  "candidate_pattern_count": 381,
-  "validation_queue_size": 2033,
-  "last_compaction": "2026-04-19T11:51:51.402774+00:00",
-  "pattern_count": 367,
-  "validated_count": 1
+  "pattern_reuse_count": 32314,
+  "candidate_pattern_count": 1213,
+  "validation_queue_size": 21876,
+  "validated_count": 1,
+  "rejected_count": 0,
+  "last_compaction": "2026-04-23T06:05:31.314792+00:00",
+  "pattern_count": 1213
 }

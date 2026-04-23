@@ -48,8 +48,9 @@ def build_sessions(parsed: dict) -> list:
         if cid:
             sip_by_callid[cid].append(pkt)
 
-    # Build Diameter index ONCE — not per Call-ID
+    # Build indexes ONCE — not per Call-ID
     dia_index = _build_dia_index(dia_pkts)
+    gtp_index = _build_gtp_index(gtp_pkts)
 
     sessions = []
     strategy_counts: dict[str, int] = defaultdict(int)
@@ -78,7 +79,16 @@ def build_sessions(parsed: dict) -> list:
         )
 
         inap_msgs = _select_in_window(inap_pkts, start_time, end_time, window_sec)
-        gtp_msgs = _select_in_window(gtp_pkts, start_time, end_time, window_sec)
+        gtp_msgs, gtp_strategy = _correlate_gtp_fusion(
+            gtp_pkts,
+            gtp_index,
+            candidate_ips=_correlation_candidate_ips(priority_ips, dia_msgs),
+            imsi=_extract_imsi(dia_msgs),
+            apns=_extract_apns(dia_msgs),
+            start_time=start_time,
+            end_time=end_time,
+            window_sec=window_sec,
+        )
         generic_msgs = _select_related_generic_packets(
             generic_pkts, start_time, end_time, window_sec, priority_ips
         )
@@ -97,6 +107,7 @@ def build_sessions(parsed: dict) -> list:
                 gtp_msgs=gtp_msgs,
                 generic_msgs=generic_msgs,
                 dia_correlation=strategy,
+                gtp_correlation=gtp_strategy,
                 calling=calling,
                 called=called,
             )
@@ -110,20 +121,23 @@ def build_sessions(parsed: dict) -> list:
     )
 
     sessions.extend(non_sip_sessions)
-    sessions = _suppress_low_value_sessions(sessions)
 
     max_compaction_sessions = int(cfg("correlation.max_compaction_sessions", 1200))
     if sessions and len(sessions) <= max_compaction_sessions:
         sessions = _compact_correlated_sessions(sessions, window_sec)
     elif sessions:
-        logger.warning(
+        log_warning = getattr(logger, "warning", logger.info)
+        log_warning(
             "Skipping session compaction for oversized seed set: {} sessions exceeds limit {}",
             len(sessions),
             max_compaction_sessions,
         )
     elif generic_pkts:
         sessions = _build_generic_sessions(generic_pkts)
-        sessions = _suppress_low_value_sessions(sessions)
+
+    relationship_registry = _build_relationship_registry(sessions, window_sec) if sessions else _empty_relationship_registry()
+    sessions = [_refresh_session_record(session, relationship_registry) for session in sessions]
+    sessions = _suppress_low_value_sessions(sessions)
 
     logger.info(f"Sessions built: {len(sessions)} | strategies: {dict(strategy_counts)}")
     return sessions
@@ -182,6 +196,35 @@ def _build_dia_index(dia_pkts: list) -> dict:
         "by_imsi":          dict(by_imsi),
         "by_apn":           dict(by_apn),
         "msisdn_to_imsi":   msisdn_to_imsi,
+    }
+
+
+def _build_gtp_index(gtp_pkts: list) -> dict:
+    by_subscriber_ip = defaultdict(list)
+    by_imsi = defaultdict(list)
+    by_apn = defaultdict(list)
+    by_tunnel_id = defaultdict(list)
+
+    for packet in gtp_pkts:
+        for subscriber_ip in _gtp_subscriber_ips(packet):
+            by_subscriber_ip[subscriber_ip].append(packet)
+
+        imsi = _norm(packet.get("gtpv2.imsi") or packet.get("imsi"))
+        if imsi:
+            by_imsi[imsi].append(packet)
+
+        apn = packet.get("gtp.apn") or packet.get("apn")
+        if apn:
+            by_apn[str(apn).lower()].append(packet)
+
+        for tunnel_id in _gtp_tunnel_ids(packet):
+            by_tunnel_id[tunnel_id].append(packet)
+
+    return {
+        "by_subscriber_ip": dict(by_subscriber_ip),
+        "by_imsi": dict(by_imsi),
+        "by_apn": dict(by_apn),
+        "by_tunnel_id": dict(by_tunnel_id),
     }
 
 
@@ -271,10 +314,16 @@ def _build_merged_flow(sip_msgs: list, dia_msgs: list, inap_msgs: list, gtp_msgs
             "short_label": message,
             "frame_number": g.get("frame_number"),
             "failure": g.get("is_failure"),
-            "call_id": g.get("gtp.tid"),
+            "call_id": g.get("gtp.tid") or g.get("gtp.teid") or g.get("gtp.f_teid"),
             "details": {
                 "transaction_id": g.get("gtp.tid"),
+                "teid": g.get("gtp.teid"),
+                "f_teid": g.get("gtp.f_teid"),
+                "f_teid_ip": g.get("gtp.f_teid_ip"),
+                "subscriber_ip": g.get("gtp.subscriber_ip"),
                 "imsi": g.get("gtpv2.imsi"),
+                "apn": g.get("gtp.apn"),
+                "bearer_id": g.get("gtp.bearer_id"),
                 "cause_code": g.get("cause_code") or g.get("gtpv2.cause_value"),
                 "summary": message,
             },
@@ -323,6 +372,7 @@ def _make_session_record(
     gtp_msgs: list,
     generic_msgs: list,
     dia_correlation: str,
+    gtp_correlation: str = "none",
     calling: Optional[str] = None,
     called: Optional[str] = None,
 ) -> dict:
@@ -337,6 +387,7 @@ def _make_session_record(
         "gtp_msgs": _dedup(_sort_ts(gtp_msgs)),
         "generic_msgs": _dedup(_sort_ts(generic_msgs)),
         "dia_correlation": dia_correlation,
+        "gtp_correlation": gtp_correlation,
     }
     return _refresh_session_record(session)
 
@@ -509,6 +560,79 @@ def _correlate_diameter_fusion(
     return [], "unmatched"
 
 
+def _correlation_candidate_ips(priority_ips: list, dia_msgs: list) -> list:
+    seen: set[str] = set()
+    result: list[str] = []
+
+    for ip in list(priority_ips or []) + [msg.get("framed_ip") for msg in dia_msgs]:
+        if ip and ip not in seen:
+            seen.add(ip)
+            result.append(ip)
+
+    return result
+
+
+def _extract_apns(dia_msgs: list) -> list[str]:
+    seen: set[str] = set()
+    apns: list[str] = []
+    for message in dia_msgs:
+        apn = message.get("apn")
+        if not apn:
+            continue
+        normalized = str(apn).lower()
+        if normalized not in seen:
+            seen.add(normalized)
+            apns.append(normalized)
+    return apns
+
+
+def _correlate_gtp_fusion(
+    gtp_pkts: list,
+    gtp_index: dict,
+    candidate_ips: list,
+    imsi: Optional[str],
+    apns: list[str],
+    start_time: Optional[float],
+    end_time: Optional[float],
+    window_sec: int,
+) -> tuple[list, str]:
+    if not gtp_pkts or start_time is None:
+        return [], "none"
+
+    t_start = start_time - window_sec
+    t_end = (end_time or start_time) + window_sec
+
+    def in_window(pkts: list) -> list:
+        return [packet for packet in pkts if t_start <= (packet.get("timestamp") or 0) <= t_end]
+
+    best_match: list = []
+    best_score = 0
+    best_strategy = "unmatched"
+
+    def _update(pkts: list, score: int, strategy: str) -> None:
+        nonlocal best_match, best_score, best_strategy
+        if score > best_score:
+            best_match = pkts
+            best_score = score
+            best_strategy = strategy
+
+    for ip in candidate_ips or []:
+        packets = in_window(gtp_index["by_subscriber_ip"].get(ip, []))
+        if packets:
+            _update(packets, 120, "subscriber_ip_fusion")
+            break
+
+    if best_score < 120 and imsi:
+        packets = in_window(gtp_index["by_imsi"].get(_norm(imsi), []))
+        if packets:
+            _update(packets, 105, "imsi_bridge")
+
+    if best_match:
+        return _dedup(_sort_ts(best_match)), best_strategy
+
+    return [], "unmatched"
+
+
 # ============================================================
 # HELPERS
 # ============================================================
@@ -573,20 +697,23 @@ def _build_non_sip_seed_sessions(
 
     for session_id, packets in _group_packets(
         gtp_pkts,
-        lambda packet: packet.get("gtp.tid") or packet.get("gtpv2.imsi") or _seed_fallback_key(packet),
+        _gtp_seed_key,
         "GTP",
     ).items():
-        sessions.append(
-            _make_session_record(
-                session_id=session_id,
-                sip_msgs=[],
-                dia_msgs=[],
-                inap_msgs=[],
-                gtp_msgs=packets,
-                generic_msgs=[],
-                dia_correlation="gtp_seed",
+        for index, segment in enumerate(_segment_gtp_packets(_sort_ts(packets))):
+            segment_id = session_id if index == 0 else f"{session_id}:seg{index+1}"
+            sessions.append(
+                _make_session_record(
+                    session_id=segment_id,
+                    sip_msgs=[],
+                    dia_msgs=[],
+                    inap_msgs=[],
+                    gtp_msgs=segment,
+                    generic_msgs=[],
+                    dia_correlation="gtp_seed",
+                    gtp_correlation="gtp_seed",
+                )
             )
-        )
 
     for session_id, packets in _group_packets(
         generic_pkts,
@@ -629,19 +756,29 @@ def _group_packets(packets: list, key_fn, prefix: Optional[str]) -> dict[str, li
     return grouped
 
 
-def _merge_correlated_sessions(sessions: list, window_sec: int) -> list:
+def _merge_correlated_sessions(sessions: list, window_sec: int, relationship_registry: Optional[dict] = None) -> list:
     merged: list = []
     for session in sorted(sessions, key=lambda item: _session_time_bounds(item)[0] or 0):
         best_index = None
         best_score = 0
         for index, existing in enumerate(merged):
-            score = _session_merge_score(existing, session, window_sec)
+            score = _session_merge_score(existing, session, window_sec, relationship_registry)
             if score > best_score:
                 best_score = score
                 best_index = index
 
         if best_index is not None and best_score >= 70:
-            merged[best_index] = _merge_two_sessions(merged[best_index], session)
+            link_methods, link_evidence = _relationship_annotations_between(
+                merged[best_index],
+                session,
+                relationship_registry,
+            )
+            merged[best_index] = _merge_two_sessions(
+                merged[best_index],
+                session,
+                link_methods=link_methods,
+                link_evidence=link_evidence,
+            )
         else:
             merged.append(_refresh_session_record(session))
 
@@ -654,7 +791,8 @@ def _compact_correlated_sessions(sessions: list, window_sec: int, max_passes: in
     compacted = [_refresh_session_record(session) for session in sessions]
     previous_signature = None
     for _ in range(max(1, max_passes)):
-        compacted = _merge_correlated_sessions(compacted, window_sec)
+        relationship_registry = _build_relationship_registry(compacted, window_sec)
+        compacted = _merge_correlated_sessions(compacted, window_sec, relationship_registry)
         signature = tuple(sorted(str(session.get("session_id")) for session in compacted))
         if signature == previous_signature:
             break
@@ -662,7 +800,12 @@ def _compact_correlated_sessions(sessions: list, window_sec: int, max_passes: in
     return compacted
 
 
-def _merge_two_sessions(base: dict, incoming: dict) -> dict:
+def _merge_two_sessions(
+    base: dict,
+    incoming: dict,
+    link_methods: Optional[list[str]] = None,
+    link_evidence: Optional[list[str]] = None,
+) -> dict:
     merged = {
         "session_id": min(str(base.get("session_id")), str(incoming.get("session_id"))),
         "call_id": base.get("call_id") if _has_sip(base) else incoming.get("call_id") or base.get("call_id"),
@@ -677,12 +820,40 @@ def _merge_two_sessions(base: dict, incoming: dict) -> dict:
             base.get("dia_correlation"),
             incoming.get("dia_correlation"),
         ),
+        "gtp_correlation": _preferred_correlation(
+            base.get("gtp_correlation"),
+            incoming.get("gtp_correlation"),
+        ),
+        "stateful_methods": _merge_string_lists(
+            base.get("stateful_methods", []),
+            incoming.get("stateful_methods", []),
+            link_methods or [],
+        ),
+        "stateful_evidence": _merge_string_lists(
+            base.get("stateful_evidence", []),
+            incoming.get("stateful_evidence", []),
+            link_evidence or [],
+        ),
     }
     return _refresh_session_record(merged)
 
 
 def _merge_message_lists(first: list, second: list) -> list:
     return _dedup(_sort_ts(list(first) + list(second)))
+
+
+def _merge_string_lists(*values: list[str]) -> list[str]:
+    merged: list[str] = []
+    seen: set[str] = set()
+    for items in values:
+        for item in items:
+            if not item:
+                continue
+            value = str(item)
+            if value not in seen:
+                seen.add(value)
+                merged.append(value)
+    return merged
 
 
 def _attach_transport_only_sessions(sessions: list, window_sec: int) -> list:
@@ -749,7 +920,12 @@ def _transport_attachment_score(candidate: dict, orphan: dict, window_sec: int) 
     return score
 
 
-def _session_merge_score(left: dict, right: dict, window_sec: int) -> int:
+def _session_merge_score(
+    left: dict,
+    right: dict,
+    window_sec: int,
+    relationship_registry: Optional[dict] = None,
+) -> int:
     left_desc = _session_descriptor(left)
     right_desc = _session_descriptor(right)
     time_gap = _time_gap_seconds(left_desc["start"], left_desc["end"], right_desc["start"], right_desc["end"])
@@ -765,9 +941,19 @@ def _session_merge_score(left: dict, right: dict, window_sec: int) -> int:
         return 120
 
     score = 0
+    relationship_methods, _ = _relationship_annotations_between(left, right, relationship_registry)
+    if "state:teid_continuation" in relationship_methods:
+        score = max(score, 102)
+    if "state:access_id_continuation" in relationship_methods:
+        score = max(score, 92)
+
+    if within_window and left_desc["subscriber_ips"] & right_desc["subscriber_ips"]:
+        score += 110
+    if within_window and left_desc["tunnel_ids"] & right_desc["tunnel_ids"]:
+        score += 105
     if within_window and left_desc["access_ids"] & right_desc["access_ids"]:
         score += 95
-    if left_desc["subscriber_ids"] & right_desc["subscriber_ids"]:
+    if within_window and left_desc["subscriber_ids"] & right_desc["subscriber_ids"]:
         score += 90
 
     if left_desc["stream_ids"] & right_desc["stream_ids"]:
@@ -791,6 +977,165 @@ def _session_merge_score(left: dict, right: dict, window_sec: int) -> int:
     return score
 
 
+def _empty_relationship_registry() -> dict:
+    return {"pair_links": {}}
+
+
+def _build_relationship_registry(sessions: list, window_sec: int) -> dict:
+    if not sessions:
+        return _empty_relationship_registry()
+
+    registry = _empty_relationship_registry()
+    descriptors = []
+    by_imsi: dict[str, list[tuple[dict, dict]]] = defaultdict(list)
+    stateful_window = _stateful_window_seconds(window_sec)
+
+    for session in sessions:
+        desc = _session_descriptor(session)
+        descriptors.append((session, desc))
+        for imsi in _imsi_like_values(desc["subscriber_ids"]):
+            if desc["tunnel_ids"]:
+                by_imsi[imsi].append((session, desc))
+
+    for imsi, entries in by_imsi.items():
+        entries.sort(key=lambda item: item[1]["start"] or 0)
+        for index, (left_session, left_desc) in enumerate(entries):
+            for right_session, right_desc in entries[index + 1 :]:
+                time_gap = _time_gap_seconds(
+                    left_desc["start"],
+                    left_desc["end"],
+                    right_desc["start"],
+                    right_desc["end"],
+                )
+                if time_gap > stateful_window:
+                    break
+                if _is_teid_continuation_candidate(left_session, right_session, left_desc, right_desc):
+                    _register_relationship(
+                        registry,
+                        left_session,
+                        right_session,
+                        "state:teid_continuation",
+                        _teid_continuation_evidence(imsi, left_desc, right_desc),
+                    )
+                    break
+
+    for index, (left_session, left_desc) in enumerate(descriptors):
+        for right_session, right_desc in descriptors[index + 1 :]:
+            time_gap = _time_gap_seconds(
+                left_desc["start"],
+                left_desc["end"],
+                right_desc["start"],
+                right_desc["end"],
+            )
+            if time_gap > stateful_window:
+                continue
+            if _is_access_continuation_candidate(left_desc, right_desc):
+                _register_relationship(
+                    registry,
+                    left_session,
+                    right_session,
+                    "state:access_id_continuation",
+                    _access_continuation_evidence(left_desc, right_desc),
+                )
+
+    return registry
+
+
+def _register_relationship(
+    registry: dict,
+    left_session: dict,
+    right_session: dict,
+    method: str,
+    evidence: str,
+) -> None:
+    pair_links = registry.setdefault("pair_links", {})
+    pair_key = tuple(sorted((str(left_session.get("session_id")), str(right_session.get("session_id")))))
+    annotation = pair_links.setdefault(pair_key, {"methods": set(), "evidence": []})
+    annotation["methods"].add(method)
+    if evidence and evidence not in annotation["evidence"]:
+        annotation["evidence"].append(evidence)
+
+
+def _relationship_annotations_between(
+    left: dict,
+    right: dict,
+    relationship_registry: Optional[dict],
+) -> tuple[list[str], list[str]]:
+    if not relationship_registry:
+        return [], []
+    pair_key = tuple(sorted((str(left.get("session_id")), str(right.get("session_id")))))
+    annotation = relationship_registry.get("pair_links", {}).get(pair_key)
+    if not annotation:
+        return [], []
+    methods = sorted(str(method) for method in annotation.get("methods", set()) if method)
+    evidence = [str(item) for item in annotation.get("evidence", []) if item]
+    return methods, evidence
+
+
+def _stateful_window_seconds(window_sec: int) -> float:
+    return float(max(15, cfg("correlation.stateful_window_sec", max(30, window_sec * 6))))
+
+
+def _imsi_like_values(values: set[str]) -> set[str]:
+    return {
+        str(value)
+        for value in values
+        if value and str(value).isdigit() and 14 <= len(str(value)) <= 16
+    }
+
+
+def _is_teid_continuation_candidate(
+    left_session: dict,
+    right_session: dict,
+    left_desc: dict,
+    right_desc: dict,
+) -> bool:
+    if not left_desc["tunnel_ids"] or not right_desc["tunnel_ids"]:
+        return False
+    if left_desc["tunnel_ids"] & right_desc["tunnel_ids"]:
+        return False
+
+    supporting_context = bool(
+        left_desc["subscriber_ips"] & right_desc["subscriber_ips"]
+        or left_desc["access_ids"] & right_desc["access_ids"]
+        or _session_has_mobility_signal(left_session)
+        or _session_has_mobility_signal(right_session)
+    )
+    return supporting_context
+
+
+def _is_access_continuation_candidate(left_desc: dict, right_desc: dict) -> bool:
+    if not (left_desc["access_ids"] & right_desc["access_ids"]):
+        return False
+    if left_desc["ids"] & right_desc["ids"]:
+        return False
+    if left_desc["subscriber_ids"] & right_desc["subscriber_ids"]:
+        return True
+    if left_desc["subscriber_ips"] & right_desc["subscriber_ips"]:
+        return True
+    return bool(left_desc["tunnel_ids"] or right_desc["tunnel_ids"])
+
+
+def _teid_continuation_evidence(imsi: str, left_desc: dict, right_desc: dict) -> str:
+    left_teids = ", ".join(sorted(left_desc["tunnel_ids"])[:2])
+    right_teids = ", ".join(sorted(right_desc["tunnel_ids"])[:2])
+    shared_ip = next(iter(sorted(left_desc["subscriber_ips"] & right_desc["subscriber_ips"])), None)
+    if shared_ip:
+        return f"TEID continuity via IMSI {imsi} and UE IP {shared_ip}: {left_teids} -> {right_teids}"
+    return f"TEID continuity via IMSI {imsi}: {left_teids} -> {right_teids}"
+
+
+def _access_continuation_evidence(left_desc: dict, right_desc: dict) -> str:
+    access_id = next(iter(sorted(left_desc["access_ids"] & right_desc["access_ids"])), None)
+    subscriber_ip = next(iter(sorted(left_desc["subscriber_ips"] & right_desc["subscriber_ips"])), None)
+    if subscriber_ip:
+        return f"Access continuity via {access_id} with UE IP {subscriber_ip}"
+    subscriber_id = next(iter(sorted(left_desc["subscriber_ids"] & right_desc["subscriber_ids"])), None)
+    if subscriber_id:
+        return f"Access continuity via {access_id} and subscriber {subscriber_id}"
+    return f"Access continuity via {access_id}"
+
+
 def _is_segmented_variant(left: dict, right: dict) -> bool:
     left_id = str(left.get("session_id") or "")
     right_id = str(right.get("session_id") or "")
@@ -811,6 +1156,8 @@ def _session_descriptor(session: dict) -> dict:
     ids = set()
     access_ids = set()
     subscriber_ids = set()
+    subscriber_ips = set()
+    tunnel_ids = set()
     ips = set()
     endpoint_pairs = set()
     stream_ids = set()
@@ -832,41 +1179,42 @@ def _session_descriptor(session: dict) -> dict:
             endpoint_pairs.add(tuple(sorted((src_ip or "?", dst_ip or "?"))))
 
     for sip in session.get("sip_msgs", []):
-        for value in (sip.get("call_id"), sip.get("from_uri"), sip.get("to_uri")):
-            if value:
-                ids.add(f"sip:{value}")
         for value in (sip.get("contact_ip"), sip.get("via_ip")):
             if value:
                 ips.add(value)
 
     for dia in session.get("dia_msgs", []):
-        for value in (dia.get("session_id"), dia.get("framed_ip")):
-            if value:
-                ids.add(f"dia:{value}")
+        if dia.get("session_id"):
+            ids.add(f"dia:{dia['session_id']}")
         for value in (dia.get("imsi"), dia.get("msisdn")):
             if value:
                 subscriber_ids.add(_norm(value))
         if dia.get("framed_ip"):
             ips.add(dia["framed_ip"])
+            subscriber_ips.add(dia["framed_ip"])
 
     for inap in session.get("inap_msgs", []):
-        for value in (inap.get("tcap_tid"), inap.get("calling_number"), inap.get("called_number")):
+        if inap.get("tcap_tid"):
+            ids.add(f"inap:{inap['tcap_tid']}")
+        for value in (inap.get("calling_number"), inap.get("called_number")):
             if value:
-                ids.add(f"inap:{value}")
                 subscriber_ids.add(_norm(value))
 
     for gtp in session.get("gtp_msgs", []):
-        for field in ("gtp.tid", "gtpv2.imsi"):
-            value = gtp.get(field)
-            if value:
-                ids.add(f"gtp:{value}")
-                if "imsi" in field:
-                    subscriber_ids.add(_norm(value))
+        if gtp.get("gtp.tid"):
+            ids.add(f"gtp:{gtp['gtp.tid']}")
+        gtp_imsi = gtp.get("gtpv2.imsi") or gtp.get("imsi")
+        if gtp_imsi:
+            subscriber_ids.add(_norm(gtp_imsi))
+        for tunnel_id in _gtp_tunnel_ids(gtp):
+            tunnel_ids.add(tunnel_id)
+        for subscriber_ip in _gtp_subscriber_ips(gtp):
+            subscriber_ips.add(subscriber_ip)
+            ips.add(subscriber_ip)
 
     for packet in session.get("generic_msgs", []):
-        for value in (packet.get("transaction_id"), packet.get("message")):
-            if value and packet.get("transaction_id"):
-                ids.add(f"{packet.get('protocol', 'GENERIC')}:{value}")
+        if packet.get("transaction_id"):
+            ids.add(f"{packet.get('protocol', 'GENERIC')}:{packet.get('transaction_id')}")
         for field in ("s1ap_mme_ue_id", "s1ap_enb_ue_id", "ngap_amf_ue_id", "ngap_ran_ue_id"):
             value = packet.get(field)
             if value:
@@ -874,6 +1222,9 @@ def _session_descriptor(session: dict) -> dict:
         for value in (packet.get("imsi"), packet.get("msisdn")):
             if value:
                 subscriber_ids.add(_norm(value))
+        if packet.get("radius_framed_ip"):
+            subscriber_ips.add(packet["radius_framed_ip"])
+            ips.add(packet["radius_framed_ip"])
         if packet.get("stream_id"):
             stream_ids.add(f"{packet.get('protocol', 'GENERIC')}:{packet.get('stream_id')}")
         if packet.get("technology"):
@@ -886,6 +1237,8 @@ def _session_descriptor(session: dict) -> dict:
         "ids": ids,
         "access_ids": access_ids,
         "subscriber_ids": {value for value in subscriber_ids if value},
+        "subscriber_ips": subscriber_ips,
+        "tunnel_ids": tunnel_ids,
         "ips": ips,
         "endpoint_pairs": endpoint_pairs,
         "stream_ids": stream_ids,
@@ -963,7 +1316,7 @@ def _has_sip(session: dict) -> bool:
     return bool(session.get("sip_msgs"))
 
 
-def _refresh_session_record(session: dict) -> dict:
+def _refresh_session_record(session: dict, relationship_registry: Optional[dict] = None) -> dict:
     sip_msgs = _dedup(_sort_ts(session.get("sip_msgs", [])))
     dia_msgs = _dedup(_sort_ts(session.get("dia_msgs", [])))
     inap_msgs = _dedup(_sort_ts(session.get("inap_msgs", [])))
@@ -998,6 +1351,78 @@ def _refresh_session_record(session: dict) -> dict:
     protocols = _protocols_present(sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
     technologies = _technologies_present(sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
     session_id = _derive_session_id(session, sip_msgs, dia_msgs, inap_msgs, gtp_msgs, generic_msgs)
+    descriptor = _session_descriptor(
+        {
+            "session_id": session_id,
+            "call_id": session.get("call_id") or session_id,
+            "sip_msgs": sip_msgs,
+            "dia_msgs": dia_msgs,
+            "inap_msgs": inap_msgs,
+            "gtp_msgs": gtp_msgs,
+            "generic_msgs": generic_msgs,
+            "protocols": protocols,
+            "technologies": technologies,
+        }
+    )
+    preserved_stateful_methods = session.get("stateful_methods", [])
+    preserved_stateful_evidence = session.get("stateful_evidence", [])
+    linked_methods, linked_evidence = _relationship_annotations_between(
+        session,
+        session,
+        relationship_registry,
+    )
+    stateful_methods = _merge_string_lists(
+        preserved_stateful_methods,
+        list(_session_stateful_methods(
+            {
+                "sip_msgs": sip_msgs,
+                "dia_msgs": dia_msgs,
+                "inap_msgs": inap_msgs,
+                "gtp_msgs": gtp_msgs,
+                "generic_msgs": generic_msgs,
+                "flow": flow,
+            },
+            descriptor,
+        )),
+        linked_methods,
+    )
+    correlation_methods = _build_correlation_methods(
+        {
+            "sip_msgs": sip_msgs,
+            "dia_msgs": dia_msgs,
+            "gtp_msgs": gtp_msgs,
+            "dia_correlation": session.get("dia_correlation", "none"),
+            "gtp_correlation": session.get("gtp_correlation", "none"),
+        },
+        stateful_methods,
+    )
+    stateful_evidence = _merge_string_lists(
+        preserved_stateful_evidence,
+        _session_stateful_evidence(
+            {
+                "sip_msgs": sip_msgs,
+                "dia_msgs": dia_msgs,
+                "gtp_msgs": gtp_msgs,
+                "generic_msgs": generic_msgs,
+                "flow": flow,
+                "imsi": _extract_imsi(dia_msgs) or _extract_gtp_imsi(gtp_msgs) or _first_generic_identity(generic_msgs, "imsi"),
+                "subscriber_ip": _extract_subscriber_ip(dia_msgs, gtp_msgs, generic_msgs),
+            },
+            descriptor,
+            stateful_methods,
+        ),
+        linked_evidence,
+    )
+    correlation_evidence = _merge_string_lists(
+        _identity_correlation_evidence(
+            session.get("dia_correlation", "none"),
+            session.get("gtp_correlation", "none"),
+            descriptor,
+            _extract_imsi(dia_msgs) or _extract_gtp_imsi(gtp_msgs) or _first_generic_identity(generic_msgs, "imsi"),
+            _extract_subscriber_ip(dia_msgs, gtp_msgs, generic_msgs),
+        ),
+        stateful_evidence,
+    )
 
     refreshed = {
         "session_id": session_id,
@@ -1026,18 +1451,130 @@ def _refresh_session_record(session: dict) -> dict:
         "radius_msgs": protocol_buckets["RADIUS"],
         "flow": flow,
         "flow_summary": flow_summary,
-        "imsi": _extract_imsi(dia_msgs) or _first_generic_identity(generic_msgs, "imsi"),
-        "msisdn": _extract_msisdn(dia_msgs),
+        "imsi": _extract_imsi(dia_msgs) or _extract_gtp_imsi(gtp_msgs) or _first_generic_identity(generic_msgs, "imsi"),
+        "msisdn": _extract_msisdn(dia_msgs) or _first_generic_identity(generic_msgs, "msisdn"),
+        "subscriber_ip": _extract_subscriber_ip(dia_msgs, gtp_msgs, generic_msgs),
         "final_sip_code": final_sip_code,
         "dia_correlation": session.get("dia_correlation", "none"),
+        "gtp_correlation": session.get("gtp_correlation", "none"),
         "duration_ms": _duration_ms(start_time, end_time),
         "time_to_failure_ms": _time_to_failure_ms(sip_msgs, final_sip_code, start_time),
         "q850_cause": _extract_q850_cause(sip_msgs),
         "protocols": protocols,
         "technologies": technologies,
+        "stateful_methods": stateful_methods,
+        "stateful_evidence": stateful_evidence,
+        "correlation_methods": correlation_methods,
+        "correlation_evidence": correlation_evidence,
         **sip_flags,
     }
     return refreshed
+
+
+def _build_correlation_methods(session: dict, stateful_methods: list[str]) -> list[str]:
+    methods: list[str] = []
+    if session.get("sip_msgs"):
+        methods.append("identity:sip:call_id")
+    if session.get("dia_msgs") and any(message.get("session_id") for message in session.get("dia_msgs", [])):
+        methods.append("identity:diameter:session_id")
+    dia_correlation = session.get("dia_correlation")
+    if dia_correlation and dia_correlation not in {"none", "unmatched", "generic_seed"}:
+        methods.append(f"identity:diameter:{dia_correlation}")
+    if session.get("gtp_msgs") and any(message.get("gtp.tid") for message in session.get("gtp_msgs", [])):
+        methods.append("identity:gtp:transaction_id")
+    gtp_correlation = session.get("gtp_correlation")
+    if gtp_correlation and gtp_correlation not in {"none", "unmatched", "generic_seed"}:
+        methods.append(f"identity:gtp:{gtp_correlation}")
+    return _merge_string_lists(methods, stateful_methods)
+
+
+def _identity_correlation_evidence(
+    dia_correlation: str,
+    gtp_correlation: str,
+    descriptor: dict,
+    imsi: Optional[str],
+    subscriber_ip: Optional[str],
+) -> list[str]:
+    evidence: list[str] = []
+    if dia_correlation and dia_correlation not in {"none", "unmatched", "generic_seed"}:
+        evidence.append(f"Diameter correlation strategy: {dia_correlation}")
+    if gtp_correlation and gtp_correlation not in {"none", "unmatched", "generic_seed"}:
+        evidence.append(f"GTP correlation strategy: {gtp_correlation}")
+    if subscriber_ip:
+        evidence.append(f"Subscriber IP anchor: {subscriber_ip}")
+    if imsi:
+        evidence.append(f"Subscriber IMSI: {imsi}")
+    if descriptor["tunnel_ids"]:
+        evidence.append(f"Observed tunnel IDs: {', '.join(sorted(descriptor['tunnel_ids'])[:3])}")
+    return evidence
+
+
+def _session_stateful_methods(session: dict, descriptor: dict) -> set[str]:
+    methods: set[str] = set()
+    if descriptor["access_ids"] and (descriptor["subscriber_ids"] or descriptor["subscriber_ips"]):
+        methods.add("state:access_subscriber_bridge")
+    if _session_has_teid_continuity(session):
+        methods.add("state:teid_continuation")
+    return methods
+
+
+def _session_stateful_evidence(session: dict, descriptor: dict, stateful_methods: list[str]) -> list[str]:
+    evidence: list[str] = []
+    stateful_method_set = set(stateful_methods)
+    if "state:access_subscriber_bridge" in stateful_method_set:
+        access_id = next(iter(sorted(descriptor["access_ids"])), None)
+        if access_id:
+            evidence.append(f"Access IDs bridged to subscriber context via {access_id}")
+        else:
+            evidence.append("Access IDs bridged to subscriber context")
+    if "state:teid_continuation" in stateful_method_set:
+        evidence.append(_teid_chain_summary(session))
+    return evidence
+
+
+def _session_has_teid_continuity(session: dict) -> bool:
+    gtp_segments = [segment for segment in _segment_gtp_packets(_sort_ts(session.get("gtp_msgs", []))) if segment]
+    if len(gtp_segments) < 2:
+        return False
+
+    for left_segment, right_segment in zip(gtp_segments, gtp_segments[1:]):
+        left_session = {"gtp_msgs": left_segment, "flow": _build_merged_flow([], [], [], left_segment, [])}
+        right_session = {"gtp_msgs": right_segment, "flow": _build_merged_flow([], [], [], right_segment, [])}
+        left_desc = _session_descriptor(left_session)
+        right_desc = _session_descriptor(right_session)
+        if not (_imsi_like_values(left_desc["subscriber_ids"]) & _imsi_like_values(right_desc["subscriber_ids"])):
+            continue
+        if _is_teid_continuation_candidate(left_session, right_session, left_desc, right_desc):
+            return True
+    return False
+
+
+def _teid_chain_summary(session: dict) -> str:
+    descriptor = _session_descriptor(session)
+    imsi = next(iter(sorted(_imsi_like_values(descriptor["subscriber_ids"]))), None)
+    teids = ", ".join(sorted(descriptor["tunnel_ids"])[:4])
+    subscriber_ip = session.get("subscriber_ip")
+    if imsi and subscriber_ip:
+        return f"TEID chain stitched with IMSI {imsi}, UE IP {subscriber_ip}, tunnels {teids}"
+    if imsi:
+        return f"TEID chain stitched with IMSI {imsi}, tunnels {teids}"
+    return f"TEID chain stitched across tunnels {teids}"
+
+
+def _session_has_mobility_signal(session: dict) -> bool:
+    keywords = (
+        "HANDOVER",
+        "FORWARD RELOCATION",
+        "MODIFY BEARER",
+        "RELEASE ACCESS BEARERS",
+        "PATH SWITCH",
+        "UE CONTEXT RELEASE",
+    )
+    for message in _all_session_messages(session):
+        text = str(message.get("message") or "").upper()
+        if any(keyword in text for keyword in keywords):
+            return True
+    return False
 
 
 def _bucket_generic_messages(generic_msgs: list) -> dict:
@@ -1072,7 +1609,7 @@ def _derive_session_id(session: dict, sip_msgs: list, dia_msgs: list, inap_msgs:
         next((msg.get("call_id") for msg in sip_msgs if msg.get("call_id")), None),
         next((msg.get("session_id") for msg in dia_msgs if msg.get("session_id")), None),
         next((msg.get("tcap_tid") for msg in inap_msgs if msg.get("tcap_tid")), None),
-        next((msg.get("gtp.tid") for msg in gtp_msgs if msg.get("gtp.tid")), None),
+        _first_gtp_identity(gtp_msgs),
         next((msg.get("transaction_id") for msg in generic_msgs if msg.get("transaction_id")), None),
         next((msg.get("stream_id") for msg in generic_msgs if msg.get("stream_id")), None),
     ):
@@ -1327,11 +1864,34 @@ def _is_low_value_core_noise(session: dict) -> bool:
         if all(
             str(msg.get("message") or "").upper() == "GTP"
             and not (msg.get("cause_code") or msg.get("gtpv2.cause_value"))
-            and not (msg.get("gtp.tid") or msg.get("transaction_id"))
+            and not (
+                msg.get("gtp.tid")
+                or msg.get("gtp.teid")
+                or msg.get("gtp.f_teid")
+                or msg.get("gtp.subscriber_ip")
+                or msg.get("transaction_id")
+            )
             for msg in gtp_msgs
         ):
             return True
     return False
+
+
+def _segment_gtp_packets(msgs: list, gap_sec: float = 15.0) -> list[list]:
+    if not msgs:
+        return []
+    segments: list[list] = []
+    current: list = [msgs[0]]
+    for previous, message in zip(msgs, msgs[1:]):
+        gap = (message.get("timestamp") or 0) - (previous.get("timestamp") or 0)
+        if gap > gap_sec:
+            segments.append(current)
+            current = [message]
+            continue
+        current.append(message)
+    if current:
+        segments.append(current)
+    return segments
 
 
 def _segment_generic_packets(msgs: list) -> list[list]:
@@ -1433,6 +1993,28 @@ def _seed_fallback_key(packet: dict) -> str:
     if frame_number is not None:
         return f"{_packet_peer_key(packet)}#f{frame_number}"
     return _packet_peer_key(packet)
+
+
+def _gtp_seed_key(packet: dict) -> str:
+    tunnel_ids = sorted(_gtp_tunnel_ids(packet))
+    if tunnel_ids:
+        return tunnel_ids[0]
+
+    subscriber_ips = sorted(_gtp_subscriber_ips(packet))
+    if subscriber_ips:
+        imsi = _norm(packet.get("gtpv2.imsi") or packet.get("imsi"))
+        apn = str(packet.get("gtp.apn") or packet.get("apn") or "").lower() or None
+        if imsi:
+            return f"{subscriber_ips[0]}|imsi:{imsi}"
+        if apn:
+            return f"{subscriber_ips[0]}|apn:{apn}"
+        return f"ue:{subscriber_ips[0]}"
+
+    imsi = _norm(packet.get("gtpv2.imsi") or packet.get("imsi"))
+    if imsi:
+        return f"imsi:{imsi}"
+
+    return _seed_fallback_key(packet)
 
 
 def _select_in_window(pkts: list, start_time: Optional[float], end_time: Optional[float], window_sec: int) -> list:
@@ -1657,11 +2239,83 @@ def _extract_imsi(dia_msgs: list) -> Optional[str]:
     return None
 
 
+def _extract_gtp_imsi(gtp_msgs: list) -> Optional[str]:
+    for message in gtp_msgs:
+        value = message.get("gtpv2.imsi") or message.get("imsi")
+        if value:
+            return value
+    return None
+
+
+def _first_gtp_identity(gtp_msgs: list) -> Optional[str]:
+    for message in gtp_msgs:
+        value = (
+            message.get("gtp.tid")
+            or message.get("gtp.teid")
+            or message.get("gtp.f_teid")
+            or message.get("gtp.subscriber_ip")
+        )
+        if value:
+            return str(value)
+    return None
+
+
 def _extract_msisdn(dia_msgs: list) -> Optional[str]:
     for m in dia_msgs:
         if m.get("msisdn"):
             return m["msisdn"]
     return None
+
+
+def _extract_subscriber_ip(dia_msgs: list, gtp_msgs: list, generic_msgs: list) -> Optional[str]:
+    for message in dia_msgs:
+        if message.get("framed_ip"):
+            return message["framed_ip"]
+    for message in gtp_msgs:
+        for subscriber_ip in _gtp_subscriber_ips(message):
+            return subscriber_ip
+    for message in generic_msgs:
+        if message.get("radius_framed_ip"):
+            return message["radius_framed_ip"]
+    return None
+
+
+def _gtp_subscriber_ips(packet: dict) -> set[str]:
+    ips = set()
+    for field in (
+        "gtp.subscriber_ip",
+        "gtpv2.pdn_addr_and_prefix.ipv4",
+        "gtpv2.pdn_addr_and_prefix.ipv6",
+        "gtp.user_ipv4",
+        "gtp.user_ipv6",
+        "gtp.pdp_address.ipv4",
+        "gtp.pdp_address.ipv6",
+    ):
+        value = packet.get(field)
+        if value:
+            ips.add(str(value))
+    return ips
+
+
+def _gtp_tunnel_ids(packet: dict) -> set[str]:
+    tunnel_ids = set()
+    for field in (
+        "gtp.teid",
+        "gtp.f_teid",
+        "gtp.tid",
+        "gtpv2.teid",
+        "gtpv2.f_teid_gre_key",
+        "gtpv2.teid_c",
+        "gtpv2.sgw_s1u_teid",
+        "gtp.teid_cp",
+        "gtp.uplink_teid_cp",
+        "gtp.teid_data",
+        "gtp.uplink_teid_data",
+    ):
+        value = packet.get(field)
+        if value:
+            tunnel_ids.add(str(value))
+    return tunnel_ids
 
 
 def save_sessions(sessions: list, output_path: Optional[str] = None) -> str:

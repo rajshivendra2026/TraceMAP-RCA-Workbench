@@ -7,6 +7,7 @@ pull in the learning loop and autonomous engine during package initialization.
 from importlib import import_module
 
 __all__ = [
+    "KnowledgeBaseDoctor",
     "KnowledgeCompactor",
     "KnowledgeEngine",
     "LearningLoop",
@@ -16,6 +17,7 @@ __all__ = [
 ]
 
 _EXPORT_MAP = {
+    "KnowledgeBaseDoctor": ("src.intelligence.knowledge_doctor", "KnowledgeBaseDoctor"),
     "KnowledgeCompactor": ("src.intelligence.compaction_engine", "KnowledgeCompactor"),
     "KnowledgeEngine": ("src.intelligence.knowledge_engine", "KnowledgeEngine"),
     "LearningLoop": ("src.intelligence.learning_loop", "LearningLoop"),

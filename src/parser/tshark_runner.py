@@ -135,19 +135,20 @@ class TSharkRunner:
             raise TSharkTimeoutError(f"Timeout: {display_filter}")
 
         # ── Handle errors ─────────────────────────────────────
+        stderr = (result.stderr or "").strip()
+        real_err = [
+            line for line in stderr.splitlines()
+            if "hosts" not in line.lower() and line.strip()
+        ]
 
-        if result.returncode not in (0, 1, 2):
+        if result.returncode not in (0, 1):
             logger.warning(f"tshark exit={result.returncode}")
+            if real_err:
+                raise TSharkParseError(real_err[0][:300])
 
         stdout = (result.stdout or "").strip()
 
         if not stdout:
-            stderr = (result.stderr or "").strip()
-            real_err = [
-                l for l in stderr.splitlines()
-                if "hosts" not in l.lower() and l.strip()
-            ]
-
             if real_err:
                 logger.warning(
                     f"tshark no output for '{display_filter}' "

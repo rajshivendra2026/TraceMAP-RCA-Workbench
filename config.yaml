@@ -190,6 +190,9 @@ learning:
   feedback_max_pass_rate_drop: 0.0
   feedback_max_failed_case_increase: 0
   feedback_max_avg_abnormal_priority_drop: 3.0
+  knowledge_doctor_enabled: true
+  knowledge_doctor_repair: true
+  knowledge_doctor_strict: false
 
 
 # ============================================================

@@ -13,6 +13,7 @@ from src.features.feature_engineer import (
 )
 from src.autonomous.engine import AutonomousRCAEngine
 from src.intelligence.compaction_engine import KnowledgeCompactor
+from src.intelligence.knowledge_doctor import KnowledgeBaseDoctor
 from src.intelligence.knowledge_engine import KnowledgeEngine
 from src.intelligence.llm_explainer import build_llm_explanation
 from src.intelligence.skill_exporter import SkillExporter
@@ -174,12 +175,25 @@ def run_learning_cycle(
     export_skills: bool = False,
     knowledge_engine: KnowledgeEngine | None = None,
     autonomous_engine: AutonomousRCAEngine | None = None,
+    run_doctor: bool | None = None,
+    doctor_repair: bool | None = None,
+    doctor_strict: bool | None = None,
 ) -> dict:
     loop = LearningLoop(knowledge_engine=knowledge_engine, autonomous_engine=autonomous_engine)
     metrics = loop.process_sessions(sessions, compact=compact, export_skills=export_skills)
+    doctor_report = None
+    if run_doctor is None:
+        run_doctor = bool(cfg("learning.knowledge_doctor_enabled", True))
+    if run_doctor:
+        doctor = KnowledgeBaseDoctor(base_dir=str(loop.knowledge.base_dir))
+        doctor_report = doctor.enforce(
+            repair=bool(cfg("learning.knowledge_doctor_repair", True)) if doctor_repair is None else bool(doctor_repair),
+            strict=bool(cfg("learning.knowledge_doctor_strict", False)) if doctor_strict is None else bool(doctor_strict),
+        )
     return {
         "sessions": sessions,
         "metrics": metrics,
+        "doctor": doctor_report,
     }
 
 

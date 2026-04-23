@@ -68,7 +68,31 @@ function setView(mode) {
   if (lv) lv.style.display = mode === "ladder" ? "block" : "none";
   if (gv) gv.style.display = mode === "ladder" ? "none" : "block";
 
-  if (mode !== "ladder") renderGraph();
+  _refreshVisualView();
+}
+
+function _isVisualTabVisible() {
+  const visualTab = document.getElementById("visualTab");
+  return Boolean(visualTab) && visualTab.style.display !== "none";
+}
+
+function _refreshVisualView() {
+  if (!_isVisualTabVisible()) return;
+
+  window.requestAnimationFrame(() => {
+    if (STATE.viewMode === "ladder") {
+      renderLadder(Array.isArray(STATE.selected?.flow) ? STATE.selected.flow : []);
+      return;
+    }
+
+    renderGraph();
+    window.requestAnimationFrame(() => {
+      if (STATE.graphNetwork) {
+        STATE.graphNetwork.redraw();
+        STATE.graphNetwork.fit({ animation: false });
+      }
+    });
+  });
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -143,6 +167,14 @@ function renderSessions() {
     const rca    = s.rca_title || s.rca_label || "Unknown";
     const callId = (s.call_id || "").slice(0, 25);
     const callType = s.details_summary?.call_type || "Generic session";
+    const aParty = s.details_summary?.a_party || s.msisdn || "";
+    const bParty = s.details_summary?.b_party || "";
+    const partyLine = aParty && bParty
+      ? `${aParty} → ${bParty}`
+      : (aParty || callId);
+    const descriptorLine = callId && callId !== partyLine
+      ? `${callType} · ${callId}`
+      : callType;
     const priority = Math.round(Number(s.priority_score || 0));
     const priorityBand = String(s.priority_band || "low").toLowerCase();
     const priorityBadge = `<span class="priority-pill ${priorityBand}">P${priority}</span>`;
@@ -158,8 +190,8 @@ function renderSessions() {
         <span class="rca-label">${rca}</span>
         ${badge}
       </div>
-      <div class="session-line2">${callId}</div>
-      <div class="session-line2">${callType}</div>
+      <div class="session-line2">${partyLine}</div>
+      <div class="session-line2">${descriptorLine}</div>
       <div class="session-line2">${s.priority_reason || "baseline inspection"}</div>
       <div class="session-meta">${chips}</div>
     `;
@@ -274,8 +306,9 @@ function selectSession(s) {
   _setText("rcaSeverity",   `Severity ${s.severity || "N/A"}`);
   _setText("rcaRule",       s.rule_id || "Rule unavailable");
   _setText("rcaNarrative",  s.analyst_brief || s.rca_detail || "Detailed RCA narrative is not available for this session.");
-  _setText("corr",          s.dia_correlation || "No correlation");
+  _setText("corr",          s.correlation_summary || s.dia_correlation || "No correlation");
   _setText("tech",          (s.technologies || []).join(", ") || "Unknown technology");
+  _renderCorrelationInspector(s);
   _renderEvidence(s.evidence || []);
   _renderActions(s.recommendations || []);
   _renderDetails(s.details_summary || null, false);
@@ -285,8 +318,11 @@ function selectSession(s) {
   _renderKnowledgeSignals(s);
 
   /* FIX [7]: never pass flow_summary (string) to renderLadder */
-  renderLadder(Array.isArray(s.flow) ? s.flow : []);
-  if (STATE.viewMode !== "ladder") renderGraph();
+  if (STATE.viewMode === "ladder") {
+    renderLadder(Array.isArray(s.flow) ? s.flow : []);
+  } else {
+    _refreshVisualView();
+  }
 
   renderSessions(); /* refresh active highlight */
 }
@@ -1180,9 +1216,9 @@ function renderLadder(flow) {
 
   svg.addEventListener("mousemove", e => {
     const el = e.target.closest("[data-flow]");
+    _cancelTooltipHide();
     if (!el) {
-      /* FIX [6]: hide stale tooltip immediately on miss */
-      _hideTooltip();
+      _scheduleTooltipHide(120);
       return;
     }
     clearTimeout(_tooltipTimer);
@@ -1191,7 +1227,10 @@ function renderLadder(flow) {
     }, 60);
   });
 
-  svg.addEventListener("mouseleave", _hideTooltip);
+  svg.addEventListener("mouseleave", () => {
+    clearTimeout(_tooltipTimer);
+    _scheduleTooltipHide(180);
+  });
 
   container.appendChild(svg);
 }
@@ -1199,41 +1238,136 @@ function renderLadder(flow) {
 /* ════════════════════════════════════════════════════════════════
    TOOLTIP
    ════════════════════════════════════════════════════════════════ */
+let _ladderTooltipHideTimer = null;
+let _ladderTooltipCopyResetTimer = null;
+
 function showTooltip(e, f) {
-  let tt = document.getElementById("tt-flow");
+  const tt = _ensureLadderTooltip();
+  const body = tt.querySelector(".ladder-tooltip-body");
+  const copyBtn = tt.querySelector(".ladder-tooltip-copy");
+  if (!body) return;
 
-  if (!tt) {
-    tt = document.createElement("div");
-    tt.id = "tt-flow";
-    tt.style.cssText = [
-      "position:absolute",
-      "z-index:9999",
-      "background:#0f172a",
-      "color:#e2e8f0",
-      "border:1px solid #334155",
-      "border-radius:6px",
-      "padding:8px 10px",
-      "font-size:11px",
-      `font-family:${FONT_FAMILY}`,
-      "line-height:1.6",
-      "pointer-events:none",
-      "white-space:pre",
-      "max-width:320px",
-    ].join(";");
-    document.body.appendChild(tt);
-  }
-
-  /* FIX [5]: pageX/pageY — correct on scrolled pages */
-  tt.style.top     = (e.pageY + 14) + "px";
-  tt.style.left    = (e.pageX + 14) + "px";
+  _cancelTooltipHide();
+  tt.dataset.copyText = _formatLadderDetails(f);
+  body.textContent = tt.dataset.copyText;
+  body.scrollTop = 0;
+  if (copyBtn) copyBtn.textContent = "Copy";
   tt.style.display = "block";
-
-  tt.innerText = _formatLadderDetails(f);
+  _positionTooltip(tt, e);
 }
 
 function _hideTooltip() {
+  _cancelTooltipHide();
   const t = document.getElementById("tt-flow");
   if (t) t.style.display = "none";
+}
+
+function _scheduleTooltipHide(delay = 140) {
+  _cancelTooltipHide();
+  _ladderTooltipHideTimer = window.setTimeout(() => {
+    _hideTooltip();
+  }, delay);
+}
+
+function _cancelTooltipHide() {
+  if (_ladderTooltipHideTimer) {
+    window.clearTimeout(_ladderTooltipHideTimer);
+    _ladderTooltipHideTimer = null;
+  }
+}
+
+function _ensureLadderTooltip() {
+  let tt = document.getElementById("tt-flow");
+  if (tt) return tt;
+
+  tt = document.createElement("div");
+  tt.id = "tt-flow";
+  tt.className = "ladder-tooltip";
+  tt.innerHTML = `
+    <div class="ladder-tooltip-head">
+      <div class="ladder-tooltip-title">Message Details</div>
+      <button type="button" class="ladder-tooltip-copy">Copy</button>
+    </div>
+    <pre class="ladder-tooltip-body"></pre>
+  `;
+
+  tt.addEventListener("mouseenter", () => {
+    _cancelTooltipHide();
+  });
+  tt.addEventListener("mouseleave", () => {
+    _scheduleTooltipHide(140);
+  });
+
+  const copyBtn = tt.querySelector(".ladder-tooltip-copy");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", async event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const text = tt.dataset.copyText || "";
+      const copied = await _copyTooltipText(text);
+      copyBtn.textContent = copied ? "Copied" : "Copy failed";
+      if (_ladderTooltipCopyResetTimer) {
+        window.clearTimeout(_ladderTooltipCopyResetTimer);
+      }
+      _ladderTooltipCopyResetTimer = window.setTimeout(() => {
+        copyBtn.textContent = "Copy";
+      }, 1400);
+    });
+  }
+
+  document.body.appendChild(tt);
+  return tt;
+}
+
+function _positionTooltip(tt, e) {
+  const margin = 16;
+  const offset = 18;
+  tt.style.visibility = "hidden";
+  tt.style.display = "block";
+
+  const width = tt.offsetWidth || 440;
+  const height = tt.offsetHeight || 300;
+  const minLeft = window.scrollX + margin;
+  const maxLeft = window.scrollX + window.innerWidth - width - margin;
+  const minTop = window.scrollY + margin;
+  const maxTop = window.scrollY + window.innerHeight - height - margin;
+
+  let left = e.pageX + offset;
+  let top = e.pageY + offset;
+
+  if (left > maxLeft) left = Math.max(minLeft, e.pageX - width - 14);
+  if (top > maxTop) top = Math.max(minTop, e.pageY - height - 14);
+
+  tt.style.left = `${Math.max(minLeft, left)}px`;
+  tt.style.top = `${Math.max(minTop, top)}px`;
+  tt.style.visibility = "visible";
+}
+
+async function _copyTooltipText(text) {
+  if (!text) return false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+
+  const probe = document.createElement("textarea");
+  probe.value = text;
+  probe.setAttribute("readonly", "readonly");
+  probe.style.position = "absolute";
+  probe.style.left = "-9999px";
+  document.body.appendChild(probe);
+  probe.select();
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch (_) {
+    copied = false;
+  }
+  document.body.removeChild(probe);
+  return copied;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1483,6 +1617,101 @@ function _renderKnowledgeSignals(session) {
     <div class="autonomous-row"><span>Graph Edges</span><strong>${graph.edges ?? 0}</strong></div>
     <div class="autonomous-row"><span>Recurring Failure</span><strong>${topRecurring ? `${topRecurring.root_cause} x${topRecurring.count}` : "None"}</strong></div>
   `;
+}
+
+function _renderCorrelationInspector(session) {
+  const methodsEl = document.getElementById("corrMethods");
+  const evidenceEl = document.getElementById("corrEvidence");
+  if (!methodsEl || !evidenceEl) return;
+
+  const methods = Array.isArray(session?.correlation_methods) ? session.correlation_methods : [];
+  const evidence = Array.isArray(session?.correlation_evidence) ? session.correlation_evidence : [];
+
+  methodsEl.innerHTML = "";
+  if (!methods.length) {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.innerText = "No correlation methods";
+    methodsEl.appendChild(chip);
+  } else {
+    methods.forEach(method => {
+      const chip = document.createElement("span");
+      chip.className = `chip ${String(method).startsWith("state:") ? "state" : "identity"}`;
+      chip.innerText = _formatCorrelationMethod(method);
+      methodsEl.appendChild(chip);
+    });
+  }
+
+  evidenceEl.innerHTML = "";
+  if (!evidence.length) {
+    const item = document.createElement("li");
+    item.innerText = "No correlation evidence available";
+    evidenceEl.appendChild(item);
+    return;
+  }
+
+  evidence.forEach(text => {
+    const item = document.createElement("li");
+    item.innerText = text;
+    evidenceEl.appendChild(item);
+  });
+}
+
+function _formatCorrelationMethod(method) {
+  const value = String(method || "").trim();
+  if (!value) return "Unknown method";
+
+  const knownLabels = {
+    "identity:sip:call_id": "Identity SIP Call-ID",
+    "identity:diameter:session_id": "Identity Diameter Session-Id",
+    "identity:diameter:framed_ip_fusion": "Identity Diameter Framed-IP Fusion",
+    "identity:diameter:framed_ip_nat_similarity": "Identity Diameter Framed-IP NAT Similarity",
+    "identity:diameter:ip_layer_match": "Identity Diameter IP Layer Match",
+    "identity:diameter:msisdn_exact": "Identity Diameter MSISDN Exact",
+    "identity:diameter:msisdn_suffix_match": "Identity Diameter MSISDN Suffix",
+    "identity:diameter:imsi_bridge": "Identity Diameter IMSI Bridge",
+    "identity:diameter:apn_match": "Identity Diameter APN Match",
+    "identity:gtp:transaction_id": "Identity GTP Transaction ID",
+    "identity:gtp:subscriber_ip_fusion": "Identity GTP Subscriber IP Fusion",
+    "identity:gtp:imsi_bridge": "Identity GTP IMSI Bridge",
+    "state:teid_continuation": "State TEID Continuity",
+    "state:access_subscriber_bridge": "State Access Subscriber Bridge",
+    "state:access_id_continuation": "State Access ID Continuity",
+  };
+  if (knownLabels[value]) return knownLabels[value];
+
+  const parts = value.split(":").filter(Boolean);
+  return parts
+    .map((part, index) => {
+      if (index === 0) return part === "state" ? "State" : "Identity";
+      return _humanizeCorrelationToken(part);
+    })
+    .join(" ");
+}
+
+function _humanizeCorrelationToken(token) {
+  const normalized = String(token || "").trim();
+  if (!normalized) return "";
+
+  const acronyms = {
+    sip: "SIP",
+    gtp: "GTP",
+    teid: "TEID",
+    imsi: "IMSI",
+    apn: "APN",
+    ip: "IP",
+    msisdn: "MSISDN",
+  };
+
+  return normalized
+    .split(/[_-]+/)
+    .map(part => {
+      const lower = part.toLowerCase();
+      if (acronyms[lower]) return acronyms[lower];
+      if (lower === "id") return "ID";
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
 }
 
 function _renderDetails(details, isCaptureSummary) {

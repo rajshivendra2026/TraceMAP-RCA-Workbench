@@ -40,6 +40,23 @@ class LearningPathSettingsTests(unittest.TestCase):
                 self.assertEqual(metrics["learned_pcap_count"], 1)
                 self.assertEqual(metrics["default_learning_path"], str(raw.resolve()))
 
+    def test_default_learning_path_falls_back_when_saved_path_no_longer_exists(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir) / "knowledge"
+            raw = Path(tmpdir) / "raw_pcaps"
+            base.mkdir(parents=True)
+            raw.mkdir(parents=True)
+            stale = Path(tmpdir) / "stale-temp-path"
+            (base / "learning_settings.json").write_text(
+                json.dumps({"learn_path": str(stale)}),
+                encoding="utf-8",
+            )
+
+            with patch("src.app.learning.learning_base_dir", return_value=base), patch(
+                "src.app.learning.cfg_path", return_value=str(raw)
+            ):
+                self.assertEqual(learning.default_learning_path(), str(raw.resolve()))
+
 
 if __name__ == "__main__":
     unittest.main()

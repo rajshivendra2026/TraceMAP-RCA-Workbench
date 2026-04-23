@@ -316,6 +316,34 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     nas_5gs_mm = _clean_text(_get(raw, "nas-5gs.mm.message_type", "nas_5gs.mm.message_type"))
     nas_5gs_sm = _clean_text(_get(raw, "nas-5gs.sm.message_type", "nas_5gs.sm.message_type"))
     gtp_tid = _clean_text(_get(raw, "gtp.tid"))
+    gtp_teid = _clean_text(
+        _get(
+            raw,
+            "gtpv2.teid",
+            "gtp.teid",
+            "gtpv2.teid_c",
+            "gtp.teid_cp",
+            "gtp.uplink_teid_cp",
+            "gtp.teid_data",
+            "gtp.uplink_teid_data",
+            "gtpv2.sgw_s1u_teid",
+        )
+    )
+    gtp_f_teid = _clean_text(_get(raw, "gtpv2.f_teid_gre_key"))
+    gtp_f_teid_ip = _clean_text(_get(raw, "gtpv2.f_teid_ipv4", "gtpv2.f_teid_ipv6"))
+    gtp_subscriber_ip = _clean_text(
+        _get(
+            raw,
+            "gtpv2.pdn_addr_and_prefix.ipv4",
+            "gtpv2.pdn_addr_and_prefix.ipv6",
+            "gtp.user_ipv4",
+            "gtp.user_ipv6",
+            "gtp.pdp_address.ipv4",
+            "gtp.pdp_address.ipv6",
+        )
+    )
+    gtp_apn = _clean_text(_get(raw, "gtpv2.apn", "gtp.apn"))
+    gtp_bearer_id = _clean_text(_get(raw, "gtpv2.ebi", "gtpv2.eps_bearer_id_number"))
     gtpv2_message_type = _clean_text(_get(raw, "gtpv2.message_type"))
     gtp_message_type = _clean_text(_get(raw, "gtp.message_type"))
     gtp_cause = _clean_text(_get(raw, "gtpv2.cause_value", "gtpv2.cause"))
@@ -388,6 +416,9 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
     if frame_number is None and timestamp is None and not (src_ip or dst_ip):
         return None
 
+    if protocol == "GTP":
+        transaction_id = _first_non_null(transaction_id, gtp_tid, gtp_teid, gtp_f_teid, gtp_subscriber_ip, gtp_imsi)
+
     message = _first_non_null(
         _format_radius_message(radius_code, radius_acct_status, radius_service_type, radius_reply_message),
         _format_http_message(method, status_code, uri),
@@ -418,6 +449,12 @@ def parse_network_packet(raw: dict, protocol_name: str) -> Optional[dict]:
         "stream_id": stream_id,
         "transaction_id": transaction_id,
         "gtp.tid": gtp_tid,
+        "gtp.teid": gtp_teid,
+        "gtp.f_teid": gtp_f_teid,
+        "gtp.f_teid_ip": gtp_f_teid_ip,
+        "gtp.subscriber_ip": gtp_subscriber_ip,
+        "gtp.apn": gtp_apn.lower() if gtp_apn else None,
+        "gtp.bearer_id": gtp_bearer_id,
         "gtpv2.imsi": gtp_imsi,
         "gtpv2.message_type": gtpv2_message_type,
         "gtp.message_type": gtp_message_type,

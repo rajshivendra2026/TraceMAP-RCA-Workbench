@@ -74,6 +74,390 @@ class SessionCorrelationTests(unittest.TestCase):
         self.assertIn("gtp", sessions[0]["protocols"])
         self.assertIn("udp", sessions[0]["protocols"])
 
+    def test_gtp_seed_groups_bidirectional_packets_on_teid_when_tid_missing(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [
+                    {
+                        "frame_number": 1,
+                        "timestamp": 1.0,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.tid": None,
+                        "gtp.teid": "1001",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                    },
+                    {
+                        "frame_number": 2,
+                        "timestamp": 1.1,
+                        "src_ip": "10.1.0.2",
+                        "dst_ip": "10.1.0.1",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Response (Request Accepted)",
+                        "cause_code": "16",
+                        "gtp.tid": None,
+                        "gtp.teid": "1001",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                    },
+                ],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(len(sessions[0]["gtp_msgs"]), 2)
+
+    def test_sip_session_uses_diameter_framed_ip_to_pick_the_right_gtp_bearer(self):
+        sessions = build_sessions(
+            {
+                "sip": [
+                    {
+                        "call_id": "call-1",
+                        "method": "INVITE",
+                        "timestamp": 1.0,
+                        "from_uri": "sip:+12345@ims.example.com",
+                        "to_uri": "sip:67890@ims.example.com",
+                        "src_ip": "172.16.0.10",
+                        "dst_ip": "172.16.0.20",
+                        "contact_ip": "172.16.0.10",
+                        "via_ip": "172.16.0.20",
+                    },
+                    {
+                        "call_id": "call-1",
+                        "status_code": "200",
+                        "timestamp": 2.0,
+                        "src_ip": "172.16.0.20",
+                        "dst_ip": "172.16.0.10",
+                    },
+                ],
+                "diameter": [
+                    {
+                        "session_id": "dia-1",
+                        "cmd_code": "272",
+                        "command_code": "272",
+                        "command_name": "CCR",
+                        "timestamp": 1.4,
+                        "src_ip": "10.0.0.2",
+                        "dst_ip": "10.0.0.9",
+                        "framed_ip": "10.23.45.67",
+                        "imsi": "001010123456789",
+                        "msisdn": "12345",
+                        "apn": "internet",
+                    },
+                    {
+                        "session_id": "dia-1",
+                        "cmd_code": "272",
+                        "command_code": "272",
+                        "command_name": "CCA",
+                        "timestamp": 1.45,
+                        "src_ip": "10.0.0.9",
+                        "dst_ip": "10.0.0.2",
+                        "framed_ip": "10.23.45.67",
+                        "imsi": "001010123456789",
+                        "msisdn": "12345",
+                        "apn": "internet",
+                    }
+                ],
+                "inap": [],
+                "gtp": [
+                    {
+                        "frame_number": 10,
+                        "timestamp": 1.5,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "1001",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                        "gtp.apn": "internet",
+                    },
+                    {
+                        "frame_number": 11,
+                        "timestamp": 1.6,
+                        "src_ip": "10.9.0.1",
+                        "dst_ip": "10.9.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "9999",
+                        "gtp.subscriber_ip": "10.99.99.99",
+                        "gtpv2.imsi": "999990123456789",
+                        "gtp.apn": "internet",
+                    },
+                ],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 2)
+        correlated = next(session for session in sessions if "sip" in session["protocols"])
+        self.assertEqual(len(correlated["gtp_msgs"]), 1)
+        self.assertEqual(correlated["gtp_msgs"][0]["gtp.teid"], "1001")
+        self.assertEqual(correlated["gtp_correlation"], "subscriber_ip_fusion")
+
+    def test_diameter_and_gtp_seed_sessions_merge_on_shared_subscriber_ip(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [
+                    {
+                        "session_id": "dia-1",
+                        "command_code": "272",
+                        "cmd_code": "272",
+                        "timestamp": 1.0,
+                        "src_ip": "10.0.0.2",
+                        "dst_ip": "10.0.0.9",
+                        "framed_ip": "10.23.45.67",
+                        "imsi": None,
+                        "msisdn": None,
+                    }
+                ],
+                "inap": [],
+                "gtp": [
+                    {
+                        "frame_number": 20,
+                        "timestamp": 1.2,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "2001",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                    }
+                ],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertIn("diameter", sessions[0]["protocols"])
+        self.assertIn("gtp", sessions[0]["protocols"])
+        self.assertEqual(sessions[0]["subscriber_ip"], "10.23.45.67")
+
+    def test_stateful_teid_continuity_merges_successive_gtp_segments(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [
+                    {
+                        "frame_number": 31,
+                        "timestamp": 1.0,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "3101",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                    },
+                    {
+                        "frame_number": 32,
+                        "timestamp": 1.1,
+                        "src_ip": "10.1.0.2",
+                        "dst_ip": "10.1.0.1",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Response (Request Accepted)",
+                        "gtp.teid": "3101",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                        "cause_code": "16",
+                    },
+                    {
+                        "frame_number": 33,
+                        "timestamp": 21.0,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Modify Bearer Request",
+                        "gtp.teid": "4202",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                    },
+                    {
+                        "frame_number": 34,
+                        "timestamp": 21.1,
+                        "src_ip": "10.1.0.2",
+                        "dst_ip": "10.1.0.1",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Modify Bearer Response (Request Accepted)",
+                        "gtp.teid": "4202",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                        "cause_code": "16",
+                    },
+                ],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(len(sessions[0]["gtp_msgs"]), 4)
+        self.assertIn("state:teid_continuation", sessions[0]["correlation_methods"])
+        self.assertTrue(
+            any("TEID continuity" in item for item in sessions[0]["correlation_evidence"])
+        )
+
+    def test_gtp_sessions_with_same_imsi_but_no_stateful_support_remain_separate(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [
+                    {
+                        "frame_number": 41,
+                        "timestamp": 1.0,
+                        "src_ip": "10.1.0.1",
+                        "dst_ip": "10.1.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "5101",
+                        "gtpv2.imsi": "001010123456789",
+                    },
+                    {
+                        "frame_number": 42,
+                        "timestamp": 21.0,
+                        "src_ip": "10.9.0.1",
+                        "dst_ip": "10.9.0.2",
+                        "protocol": "GTP",
+                        "technology": "LTE/4G",
+                        "message": "Create Session Request",
+                        "gtp.teid": "6202",
+                        "gtpv2.imsi": "001010123456789",
+                    },
+                ],
+                "s1ap": [],
+                "http": [],
+                "tcp": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "udp": [],
+                "sctp": [],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "pfcp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 2)
+
+    def test_access_sessions_expose_stateful_access_bridge_metadata(self):
+        sessions = build_sessions(
+            {
+                "sip": [],
+                "diameter": [],
+                "inap": [],
+                "gtp": [],
+                "s1ap": [
+                    {
+                        "frame_number": 51,
+                        "protocol": "S1AP",
+                        "technology": "LTE/4G",
+                        "timestamp": 5.0,
+                        "src_ip": "10.0.0.1",
+                        "dst_ip": "10.0.0.2",
+                        "transaction_id": "991",
+                        "s1ap_mme_ue_id": "991",
+                        "s1ap_enb_ue_id": "77",
+                        "message": "Initial UE Message",
+                        "imsi": "001010123456789",
+                    }
+                ],
+                "ngap": [],
+                "ranap": [],
+                "bssap": [],
+                "map": [],
+                "http": [],
+                "dns": [],
+                "icmp": [],
+                "nas_eps": [],
+                "nas_5gs": [],
+                "tcp": [],
+                "udp": [],
+                "pfcp": [],
+                "sctp": [],
+            }
+        )
+
+        self.assertEqual(len(sessions), 1)
+        self.assertIn("state:access_subscriber_bridge", sessions[0]["correlation_methods"])
+        self.assertTrue(
+            any("Access IDs bridged" in item for item in sessions[0]["correlation_evidence"])
+        )
+
     def test_repeated_lte_procedures_are_split_into_separate_generic_sessions(self):
         parsed = {
             "sip": [],

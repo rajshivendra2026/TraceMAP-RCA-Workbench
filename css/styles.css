@@ -726,6 +726,10 @@ button:hover {
   grid-column: span 3;
 }
 
+.correlation-section {
+  margin-top: 12px;
+}
+
 .rca-columns .mini-panel,
 .autonomous-grid .mini-panel {
   grid-column: span 6;
@@ -1143,6 +1147,33 @@ button:hover {
   color: var(--text-soft);
 }
 
+.correlation-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.correlation-chip-list .chip {
+  background: rgba(37, 99, 235, 0.08);
+  color: #295d9e;
+}
+
+.correlation-chip-list .chip.state {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.correlation-chip-list .chip.identity {
+  background: rgba(37, 99, 235, 0.08);
+  color: #295d9e;
+}
+
+.correlation-evidence-list {
+  padding-left: 18px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
 .autonomous-list,
 .validation-queue {
   display: grid;
@@ -1433,6 +1464,74 @@ button:hover {
   color: var(--text-soft);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.ladder-tooltip {
+  position: absolute;
+  z-index: 9999;
+  display: none;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  max-height: min(460px, calc(100vh - 32px));
+  padding: 12px;
+  border: 1px solid rgba(71, 85, 105, 0.95);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.98);
+  color: #e2e8f0;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.34);
+  pointer-events: auto;
+}
+
+.ladder-tooltip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ladder-tooltip-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.ladder-tooltip-copy {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #dbeafe;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.ladder-tooltip-copy:hover {
+  background: rgba(59, 130, 246, 0.28);
+  border-color: rgba(147, 197, 253, 0.5);
+}
+
+.ladder-tooltip-copy:focus-visible {
+  outline: 2px solid rgba(147, 197, 253, 0.9);
+  outline-offset: 2px;
+}
+
+.ladder-tooltip-body {
+  margin: 0;
+  max-height: min(380px, calc(100vh - 120px));
+  overflow: auto;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+  cursor: text;
+  font-family: "SFMono-Regular", SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .segmented {

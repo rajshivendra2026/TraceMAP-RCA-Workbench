@@ -421,5 +421,1034 @@
     "size": 727208,
     "mtime": 1776274071,
     "learned_at": 1776532518.878093
+  },
+  "c05917631e694b848ade0af6f0cd821654ffd5a4": {
+    "path": "/Users/shivendraraj/Downloads/00305513_Analysis_89011703272103814055.pcap",
+    "name": "00305513_Analysis_89011703272103814055.pcap",
+    "size": 60961,
+    "mtime": 1762498426,
+    "learned_at": 1776875637.254482
+  },
+  "f576b0b45d49625491d5b2e4d2327930861b4759": {
+    "path": "/Users/shivendraraj/Downloads/0414_FHR_TS.pcapng",
+    "name": "0414_FHR_TS.pcapng",
+    "size": 4401788,
+    "mtime": 1776267223,
+    "learned_at": 1776875752.706505
+  },
+  "2bc10b100cb325a4817790f7244c62d3d5dfda24": {
+    "path": "/Users/shivendraraj/Downloads/054217_02202025_UTC_GM_N4_onstarihu_issue_310170132388132_CLR.pcapng",
+    "name": "054217_02202025_UTC_GM_N4_onstarihu_issue_310170132388132_CLR.pcapng",
+    "size": 1656,
+    "mtime": 1740373417,
+    "learned_at": 1776875755.876971
+  },
+  "4a8d98b1f012e680b1fa65508fe0db3c19ca4f92": {
+    "path": "/Users/shivendraraj/Downloads/1(1).pcapng",
+    "name": "1(1).pcapng",
+    "size": 62860,
+    "mtime": 1748359575,
+    "learned_at": 1776875758.882972
+  },
+  "e4be639d9d04d1c3af9f532d04ab49e770692b3f": {
+    "path": "/Users/shivendraraj/Downloads/10.24.237.57_0255_0305_1767059353141.pcapng",
+    "name": "10.24.237.57_0255_0305_1767059353141.pcapng",
+    "size": 1379488,
+    "mtime": 1767060081,
+    "learned_at": 1776875788.4261792
+  },
+  "f5f9addaac6d9b64f1b28faaf8276e525fb21d05": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260116T220719-4b1a09be.pcap",
+    "name": "1010_20260116T220719-4b1a09be.pcap",
+    "size": 7347946,
+    "mtime": 1776168807,
+    "learned_at": 1776875799.540535
+  },
+  "a6eb92e32997cdccf023a57eccfbb95b4d1590d6": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260219T153846-sctp-SC126-06c81ae2.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-06c81ae2.pcap",
+    "size": 4016,
+    "mtime": 1776169916,
+    "learned_at": 1776875802.2188768
+  },
+  "8a2eb5d82974677a9a3cb576235eada10250ee35": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260219T153846-sctp-SC126-57dd7d3b.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-57dd7d3b.pcap",
+    "size": 4016,
+    "mtime": 1776169264,
+    "learned_at": 1776875804.925387
+  },
+  "a0735b359388a59e2936abaace64b28581c4fe6c": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260219T153846-sctp-SC126-688e5883.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-688e5883.pcap",
+    "size": 4016,
+    "mtime": 1776169413,
+    "learned_at": 1776875807.540286
+  },
+  "535bfeb21298324fdeb8f1c94d1c573bceaa719d": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260219T153846-sctp-SC126-8fbc8c14.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-8fbc8c14.pcap",
+    "size": 4016,
+    "mtime": 1776169889,
+    "learned_at": 1776875810.099773
+  },
+  "0914d034b1515170bf84412cf0f5f2d0c811e778": {
+    "path": "/Users/shivendraraj/Downloads/1010_20260219T153846-sctp-SC126-92de3a36.pcap",
+    "name": "1010_20260219T153846-sctp-SC126-92de3a36.pcap",
+    "size": 4016,
+    "mtime": 1776170815,
+    "learned_at": 1776875812.7356129
+  },
+  "d5f34ff527e392843b282b530f2352d5286fc813": {
+    "path": "/Users/shivendraraj/Downloads/14048846225-311588146999163-313460009999163-533fef81-6915-478d-90ed-c654f25205dc.pcap",
+    "name": "14048846225-311588146999163-313460009999163-533fef81-6915-478d-90ed-c654f25205dc.pcap",
+    "size": 407248,
+    "mtime": 1776875552,
+    "learned_at": 1776875817.538275
+  },
+  "6df7c2861c97d4609dd57c06366a8d0870bf1c69": {
+    "path": "/Users/shivendraraj/Downloads/14105331485.pcap",
+    "name": "14105331485.pcap",
+    "size": 9396,
+    "mtime": 1776583824,
+    "learned_at": 1776875821.485825
+  },
+  "1aa4a7b66589f0c6bad1bc4b9a8764fa1086c04f": {
+    "path": "/Users/shivendraraj/Downloads/1772384_20250123T183846 (1).pcap",
+    "name": "1772384_20250123T183846 (1).pcap",
+    "size": 911719,
+    "mtime": 1763986174,
+    "learned_at": 1776875838.381239
+  },
+  "7a3ab41626f7c86eb73255ff41b52e1b1b761a49": {
+    "path": "/Users/shivendraraj/Downloads/1772384_20250123T183846.pcap",
+    "name": "1772384_20250123T183846.pcap",
+    "size": 911719,
+    "mtime": 1737678506,
+    "learned_at": 1776875854.990329
+  },
+  "008b235d96ba33ad2211ab7e3d41d0efbfa87bc2": {
+    "path": "/Users/shivendraraj/Downloads/1_20251112T102929.pcap",
+    "name": "1_20251112T102929.pcap",
+    "size": 39843,
+    "mtime": 1763986476,
+    "learned_at": 1776875857.737948
+  },
+  "4ca4d143e38dd75ae1530d9ce31a237544aa0280": {
+    "path": "/Users/shivendraraj/Downloads/2-Spark_642710404064_05Apr2023.pcap",
+    "name": "2-Spark_642710404064_05Apr2023.pcap",
+    "size": 70372,
+    "mtime": 1751705379,
+    "learned_at": 1776875861.896148
+  },
+  "0478797574f5581d30d9e6efdac33ca7286704e9": {
+    "path": "/Users/shivendraraj/Downloads/20120730_W0110_14hours_MmeEr2_Interesting.pcap",
+    "name": "20120730_W0110_14hours_MmeEr2_Interesting.pcap",
+    "size": 31678,
+    "mtime": 1751434221,
+    "learned_at": 1776875864.893856
+  },
+  "68d576e492b333e100f132f1c8c0237b2af57a8d": {
+    "path": "/Users/shivendraraj/Downloads/20140312-TC4.9(fx).pcap",
+    "name": "20140312-TC4.9(fx).pcap",
+    "size": 865014,
+    "mtime": 1753155145,
+    "learned_at": 1776876041.742846
+  },
+  "47085c7723b432c4a8e8d33bc84fa782754af18c": {
+    "path": "/Users/shivendraraj/Downloads/201403281324-TC4.10(fx).pcap",
+    "name": "201403281324-TC4.10(fx).pcap",
+    "size": 189028,
+    "mtime": 1753155135,
+    "learned_at": 1776876053.111639
+  },
+  "8df02b33d78b58ac75e5cc5cb3ba97ca09a7961e": {
+    "path": "/Users/shivendraraj/Downloads/20140603-CSCup10472-TA48000(f).pcap",
+    "name": "20140603-CSCup10472-TA48000(f).pcap",
+    "size": 26215,
+    "mtime": 1748723795,
+    "learned_at": 1776876057.300503
+  },
+  "2b3d5a0114963cfa0895b4e35483ebbecd7fed35": {
+    "path": "/Users/shivendraraj/Downloads/20250306_Identity_Not_Registered.pcap",
+    "name": "20250306_Identity_Not_Registered.pcap",
+    "size": 11612,
+    "mtime": 1741222242,
+    "learned_at": 1776876060.565353
+  },
+  "4257db3dc4ab0063116b2883d2132f374a541c62": {
+    "path": "/Users/shivendraraj/Downloads/20250822_wireshard_4gsession_ciscop5g_reattach (2).pcap",
+    "name": "20250822_wireshard_4gsession_ciscop5g_reattach (2).pcap",
+    "size": 327577,
+    "mtime": 1756186845,
+    "learned_at": 1776876064.324406
+  },
+  "fbb6f3ab3c95dc9d6914f6038351d3425e3a6f7c": {
+    "path": "/Users/shivendraraj/Downloads/20260218-Cisco.pcap",
+    "name": "20260218-Cisco.pcap",
+    "size": 2718388,
+    "mtime": 1771436896,
+    "learned_at": 1776876226.0839648
+  },
+  "7d2c3d72229c3aaa314914a3f5ca76d0687df4f2": {
+    "path": "/Users/shivendraraj/Downloads/208014003630910-S1-SGS-S6a.pcap",
+    "name": "208014003630910-S1-SGS-S6a.pcap",
+    "size": 56372,
+    "mtime": 1752042181,
+    "learned_at": 1776876233.2551749
+  },
+  "a17458ceea7a9028c3e40cc4c02bfdc72c2d4cb5": {
+    "path": "/Users/shivendraraj/Downloads/208015701923217 11h-13h.pcap",
+    "name": "208015701923217 11h-13h.pcap",
+    "size": 151452,
+    "mtime": 1752042172,
+    "learned_at": 1776876241.5595388
+  },
+  "083fcfd2c140aaf281789108e2476494901833b1": {
+    "path": "/Users/shivendraraj/Downloads/214074200644838_map.pcap",
+    "name": "214074200644838_map.pcap",
+    "size": 21964,
+    "mtime": 1755782767,
+    "learned_at": 1776876244.871764
+  },
+  "24eebd0b42085f7cbac1e4ce299dbd27e00ad2c6": {
+    "path": "/Users/shivendraraj/Downloads/216301020915654 (1).pcap",
+    "name": "216301020915654 (1).pcap",
+    "size": 36526,
+    "mtime": 1761293204,
+    "learned_at": 1776876252.4757261
+  },
+  "eed0c9f989c0113f6765a78dba9fb4a8b4b9e92d": {
+    "path": "/Users/shivendraraj/Downloads/216301020915654.pcap",
+    "name": "216301020915654.pcap",
+    "size": 36526,
+    "mtime": 1748620694,
+    "learned_at": 1776876259.9664068
+  },
+  "99b70532dd05fa83ec35b6a9a9f2b2db7cc845e1": {
+    "path": "/Users/shivendraraj/Downloads/240075810996427.pcap",
+    "name": "240075810996427.pcap",
+    "size": 17204,
+    "mtime": 1752671516,
+    "learned_at": 1776876263.209559
+  },
+  "ec0cf616c824c543b4537105db46371d22e80eff": {
+    "path": "/Users/shivendraraj/Downloads/240075811353510 .pcap",
+    "name": "240075811353510 .pcap",
+    "size": 1888,
+    "mtime": 1752671469,
+    "learned_at": 1776876265.9625862
+  },
+  "018ce4e901e6007f06c198ddcf70474cc2fbcdb2": {
+    "path": "/Users/shivendraraj/Downloads/240075811353641.pcap",
+    "name": "240075811353641.pcap",
+    "size": 17204,
+    "mtime": 1752671487,
+    "learned_at": 1776876268.910634
+  },
+  "51a19c3c260cd9413e1f36d302860070b2f3e706": {
+    "path": "/Users/shivendraraj/Downloads/240075813988219_PCAP_24-Hours.pcap",
+    "name": "240075813988219_PCAP_24-Hours.pcap",
+    "size": 29988,
+    "mtime": 1771858343,
+    "learned_at": 1776876272.6354501
+  },
+  "228a76b8e8cb89fc6a93f45b2b870d87c26edbf3": {
+    "path": "/Users/shivendraraj/Downloads/240075822288636.pcap",
+    "name": "240075822288636.pcap",
+    "size": 5900,
+    "mtime": 1755225848,
+    "learned_at": 1776876275.880451
+  },
+  "cc1138dd14bc4fef620a851be9cc877b1468088f": {
+    "path": "/Users/shivendraraj/Downloads/240075824542527.pcap",
+    "name": "240075824542527.pcap",
+    "size": 36706,
+    "mtime": 1755962032,
+    "learned_at": 1776876280.026298
+  },
+  "02c81726568c101e9f2cab6d9ebc52744b94b124": {
+    "path": "/Users/shivendraraj/Downloads/240075824910592_1300-to-1600_PST_12th-Feb.pcap",
+    "name": "240075824910592_1300-to-1600_PST_12th-Feb.pcap",
+    "size": 780313,
+    "mtime": 1771088130,
+    "learned_at": 1776876520.772675
+  },
+  "f54e984365298dbd020b970f277c838dd883d93e": {
+    "path": "/Users/shivendraraj/Downloads/240075825233137-f284ea9b.pcap",
+    "name": "240075825233137-f284ea9b.pcap",
+    "size": 36797,
+    "mtime": 1776164876,
+    "learned_at": 1776876526.833447
+  },
+  "9f69f3f218138868c668453b38f53cdad15fad04": {
+    "path": "/Users/shivendraraj/Downloads/240075825233137.pcap",
+    "name": "240075825233137.pcap",
+    "size": 36797,
+    "mtime": 1774391217,
+    "learned_at": 1776876532.4871922
+  },
+  "d3ae4a563ce69811838cb5541b9255f4fa2296ff": {
+    "path": "/Users/shivendraraj/Downloads/240075825233137_DIAMETER.pcap",
+    "name": "240075825233137_DIAMETER.pcap",
+    "size": 19964,
+    "mtime": 1774392584,
+    "learned_at": 1776876536.013359
+  },
+  "2b32bb6899853dfcd645cf8ce1cdcf8f49184f4f": {
+    "path": "/Users/shivendraraj/Downloads/240076511905232.pcap",
+    "name": "240076511905232.pcap",
+    "size": 2624,
+    "mtime": 1737285569,
+    "learned_at": 1776876539.305131
+  },
+  "09b5335d154816963ca06115163411ba3a6493a1": {
+    "path": "/Users/shivendraraj/Downloads/241-upf.pcap",
+    "name": "241-upf.pcap",
+    "size": 5346389,
+    "mtime": 1747819404,
+    "learned_at": 1776876790.233082
+  },
+  "bbc530b79ea574df70151021f93fc60371969d9c": {
+    "path": "/Users/shivendraraj/Downloads/25_1815_26_1815_GMT_1761589270325.pcapng",
+    "name": "25_1815_26_1815_GMT_1761589270325.pcapng",
+    "size": 996,
+    "mtime": 1761589274,
+    "learned_at": 1776876794.472409
+  },
+  "a194b16ccf6279869c92df5fca73725d04929cda": {
+    "path": "/Users/shivendraraj/Downloads/265345_310170390007380_Nov30 0413amPST_PacketData_GTP-U.pcapng",
+    "name": "265345_310170390007380_Nov30 0413amPST_PacketData_GTP-U.pcapng",
+    "size": 18496,
+    "mtime": 1752552350,
+    "learned_at": 1776876798.411314
+  },
+  "21ee0211ac64ad27257d928d18e338bd12c8b0c1": {
+    "path": "/Users/shivendraraj/Downloads/265345_310170390007380_Nov30 0413amPST_PacketData_GTP-U_all trace.pcapng",
+    "name": "265345_310170390007380_Nov30 0413amPST_PacketData_GTP-U_all trace.pcapng",
+    "size": 23140,
+    "mtime": 1752552368,
+    "learned_at": 1776876802.275647
+  },
+  "54517acb529798c4df53741b1641c687d73f698e": {
+    "path": "/Users/shivendraraj/Downloads/26_1815_27_1815_GMT_1761589082326.pcapng",
+    "name": "26_1815_27_1815_GMT_1761589082326.pcapng",
+    "size": 13004,
+    "mtime": 1761589125,
+    "learned_at": 1776876811.917033
+  },
+  "98bc662b1e395f39654e9a6bbc5c8a952ee0d902": {
+    "path": "/Users/shivendraraj/Downloads/2G Data Register.pcap",
+    "name": "2G Data Register.pcap",
+    "size": 19204,
+    "mtime": 1751614369,
+    "learned_at": 1776876817.07324
+  },
+  "edeeb3e3275ed88e07d4aa5b083c0609803783a0": {
+    "path": "/Users/shivendraraj/Downloads/2G_4G_2G_4G_2G.pcap",
+    "name": "2G_4G_2G_4G_2G.pcap",
+    "size": 76737,
+    "mtime": 1754995569,
+    "learned_at": 1776876821.218068
+  },
+  "fb21915492a52736401e7083c22642d9d3bda1b3": {
+    "path": "/Users/shivendraraj/Downloads/2G_Attach_fail_20131022/Gb 20131022 attach problems.pcap",
+    "name": "Gb 20131022 attach problems.pcap",
+    "size": 459,
+    "mtime": 1382444279,
+    "learned_at": 1776876824.203766
+  },
+  "ac1de972f6ba58cbbbdcc890ada445557408a1f9": {
+    "path": "/Users/shivendraraj/Downloads/2G_attach_fail/2G attach problems 03102013 Gb_2.pcap",
+    "name": "2G attach problems 03102013 Gb_2.pcap",
+    "size": 315,
+    "mtime": 1380888396,
+    "learned_at": 1776876827.592792
+  },
+  "a99f3ad18fb84701fe4afad2a945ec262e68706d": {
+    "path": "/Users/shivendraraj/Downloads/2gtrace.pcap",
+    "name": "2gtrace.pcap",
+    "size": 129465,
+    "mtime": 1751462404,
+    "learned_at": 1776876832.6173599
+  },
+  "9b5a1db25d36b903c7eae6396703f12b8bcfd5d6": {
+    "path": "/Users/shivendraraj/Downloads/302690500000031.pcap",
+    "name": "302690500000031.pcap",
+    "size": 478,
+    "mtime": 1752671811,
+    "learned_at": 1776876835.8061981
+  },
+  "c983ce964fd03c108830b6faa4b80e113e27c1c2": {
+    "path": "/Users/shivendraraj/Downloads/302820290000004_Diameter_May5.pcap",
+    "name": "302820290000004_Diameter_May5.pcap",
+    "size": 16076,
+    "mtime": 1750334564,
+    "learned_at": 1776876841.590666
+  },
+  "c5adddb50c2fb145c12466ebe2f12b6a04a9b777": {
+    "path": "/Users/shivendraraj/Downloads/310170132154696_1754826769247.pcapng",
+    "name": "310170132154696_1754826769247.pcapng",
+    "size": 14146576,
+    "mtime": 1754827211,
+    "learned_at": 1776877785.313958
+  },
+  "ed48f87ae78ff4baedea79f9da775b88536f8d35": {
+    "path": "/Users/shivendraraj/Downloads/310170132161641.pcap",
+    "name": "310170132161641.pcap",
+    "size": 654840,
+    "mtime": 1736736559,
+    "learned_at": 1776877789.6198
+  },
+  "c9472a0e728b6de58ac8dd2c004a65b3f197c324": {
+    "path": "/Users/shivendraraj/Downloads/310170205145691_Dia.pcap",
+    "name": "310170205145691_Dia.pcap",
+    "size": 2400,
+    "mtime": 1751243422,
+    "learned_at": 1776877793.213415
+  },
+  "d9dace45f0c15f6a534632a5e44c6a2c25a39ee0": {
+    "path": "/Users/shivendraraj/Downloads/310170205145691_Map.pcap",
+    "name": "310170205145691_Map.pcap",
+    "size": 823,
+    "mtime": 1751246985,
+    "learned_at": 1776877796.320967
+  },
+  "22e998de2510950e3092c4fce7d6963976919d2a": {
+    "path": "/Users/shivendraraj/Downloads/310170210064673_1742530233896 (1).pcapng",
+    "name": "310170210064673_1742530233896 (1).pcapng",
+    "size": 110992,
+    "mtime": 1743137573,
+    "learned_at": 1776877800.353685
+  },
+  "f04e6595f74242028b1d34aa4fa6b7fb4a817dba": {
+    "path": "/Users/shivendraraj/Downloads/310170210064673_1742530233896.pcapng",
+    "name": "310170210064673_1742530233896.pcapng",
+    "size": 110992,
+    "mtime": 1742530456,
+    "learned_at": 1776877804.32773
+  },
+  "b1d175276415e0961b512cbcb55d760e88550317": {
+    "path": "/Users/shivendraraj/Downloads/310170210289490_1769668382747.pcapng",
+    "name": "310170210289490_1769668382747.pcapng",
+    "size": 2688,
+    "mtime": 1769668389,
+    "learned_at": 1776877807.8031092
+  },
+  "87e05dc84236fbe46f1e2a5dc639047058c21e56": {
+    "path": "/Users/shivendraraj/Downloads/310170210289490_2_1769668477174.pcapng",
+    "name": "310170210289490_2_1769668477174.pcapng",
+    "size": 2688,
+    "mtime": 1769668483,
+    "learned_at": 1776877811.6066298
+  },
+  "11f7baee597b0f46276564ae18369270bdd9446b": {
+    "path": "/Users/shivendraraj/Downloads/310170210289490_3_1769669005998.pcapng",
+    "name": "310170210289490_3_1769669005998.pcapng",
+    "size": 2688,
+    "mtime": 1769669007,
+    "learned_at": 1776877815.091398
+  },
+  "a9cbcc6ffed2c0bd53695297133ef084f6845d0a": {
+    "path": "/Users/shivendraraj/Downloads/310170210591659 - ABORT FTP (1).pcapng",
+    "name": "310170210591659 - ABORT FTP (1).pcapng",
+    "size": 2224,
+    "mtime": 1743582512,
+    "learned_at": 1776877818.383625
+  },
+  "0e40b324165490a9154dce69b96fbaa643a468f5": {
+    "path": "/Users/shivendraraj/Downloads/310170210591659 - ABORT FTP.pcapng",
+    "name": "310170210591659 - ABORT FTP.pcapng",
+    "size": 2224,
+    "mtime": 1743137568,
+    "learned_at": 1776877821.944652
+  },
+  "dfc9ecd8bf3adfd2657fca4774d74b58f8df8852": {
+    "path": "/Users/shivendraraj/Downloads/310170212082683_pcap.pcap",
+    "name": "310170212082683_pcap.pcap",
+    "size": 8879,
+    "mtime": 1750402238,
+    "learned_at": 1776877825.284748
+  },
+  "851c72ce6c09022e2f604190278a68226fcdb64e": {
+    "path": "/Users/shivendraraj/Downloads/310170215172689_1765978986072.pcapng",
+    "name": "310170215172689_1765978986072.pcapng",
+    "size": 2489168,
+    "mtime": 1765979175,
+    "learned_at": 1776877897.689593
+  },
+  "e4ba8165d530923714de40b807872fd495b47053": {
+    "path": "/Users/shivendraraj/Downloads/310170216968373_SMS_MT.pcap",
+    "name": "310170216968373_SMS_MT.pcap",
+    "size": 2180,
+    "mtime": 1743689190,
+    "learned_at": 1776877901.6540139
+  },
+  "7bc3bbad94fb7c9d63ce48f01f4546f6d69d561e": {
+    "path": "/Users/shivendraraj/Downloads/310170217724469_Dia.pcap",
+    "name": "310170217724469_Dia.pcap",
+    "size": 7860,
+    "mtime": 1752808927,
+    "learned_at": 1776877905.6558368
+  },
+  "7e6940d422f1bde5212303eac022e075aeb08ad7": {
+    "path": "/Users/shivendraraj/Downloads/310170217789287_24h.pcap",
+    "name": "310170217789287_24h.pcap",
+    "size": 4384,
+    "mtime": 1753241078,
+    "learned_at": 1776877909.852617
+  },
+  "2751904313819f00592036959e6015c5e662b5e0": {
+    "path": "/Users/shivendraraj/Downloads/310170219901113_1760709737526.pcapng",
+    "name": "310170219901113_1760709737526.pcapng",
+    "size": 24688,
+    "mtime": 1760709766,
+    "learned_at": 1776877913.665418
+  },
+  "6acd81717e8d1a85a4cf68a0c1a92b3cdfbd14e4": {
+    "path": "/Users/shivendraraj/Downloads/310170220959741 Diameter Error Unknown EPS Subscription.pcap",
+    "name": "310170220959741 Diameter Error Unknown EPS Subscription.pcap",
+    "size": 2032,
+    "mtime": 1752671271,
+    "learned_at": 1776877917.345115
+  },
+  "46a3bf90ee45859cc7e4efe87fb8b16d4caaa736": {
+    "path": "/Users/shivendraraj/Downloads/310170222403378_1748581466462.pcapng",
+    "name": "310170222403378_1748581466462.pcapng",
+    "size": 3183732,
+    "mtime": 1748581707,
+    "learned_at": 1776878075.344588
+  },
+  "e8ff8198dbfa68074606bce269c2f8de06ef3b7b": {
+    "path": "/Users/shivendraraj/Downloads/310170222403808_1748579257900.pcapng",
+    "name": "310170222403808_1748579257900.pcapng",
+    "size": 3209436,
+    "mtime": 1748581320,
+    "learned_at": 1776878155.932671
+  },
+  "0a0df803f46fb7184a40b9c77632548140a06d87": {
+    "path": "/Users/shivendraraj/Downloads/310170229254960_1743139989297.pcapng",
+    "name": "310170229254960_1743139989297.pcapng",
+    "size": 459500,
+    "mtime": 1743140089,
+    "learned_at": 1776878164.654073
+  },
+  "471b21d4c2289bd61e7f3522ed34f417dcea7548": {
+    "path": "/Users/shivendraraj/Downloads/310170233187538_89011703272331875381_18012025_0100-1100_1738780294594.pcapng",
+    "name": "310170233187538_89011703272331875381_18012025_0100-1100_1738780294594.pcapng",
+    "size": 356504,
+    "mtime": 1738780386,
+    "learned_at": 1776878182.9415271
+  },
+  "382136196ab98733b630f3cfdd7d6a50b83340fc": {
+    "path": "/Users/shivendraraj/Downloads/310170233766917_24h.pcap",
+    "name": "310170233766917_24h.pcap",
+    "size": 4392,
+    "mtime": 1753241869,
+    "learned_at": 1776878186.9687061
+  },
+  "4416282882d3f3f453f3f571dad12b8d9e2bb3cc": {
+    "path": "/Users/shivendraraj/Downloads/310170235066020 41.216.51.7 - 199.19.151.230 CS RP Successful.pcap",
+    "name": "310170235066020 41.216.51.7 - 199.19.151.230 CS RP Successful.pcap",
+    "size": 766,
+    "mtime": 1741853474,
+    "learned_at": 1776878190.143362
+  },
+  "a1bd4496684582d2e1bc1e810434eed738d9bde9": {
+    "path": "/Users/shivendraraj/Downloads/310170235066020 41.216.51.7 - 199.19.151.230 CS RP User Authentication Failed.pcap",
+    "name": "310170235066020 41.216.51.7 - 199.19.151.230 CS RP User Authentication Failed.pcap",
+    "size": 456,
+    "mtime": 1741853477,
+    "learned_at": 1776878193.442745
+  },
+  "90189a63d8f995b402edda566f0e1bb4cde27cab": {
+    "path": "/Users/shivendraraj/Downloads/310170235066020 User Authentication Failed 92.pcap",
+    "name": "310170235066020 User Authentication Failed 92.pcap",
+    "size": 456,
+    "mtime": 1741853490,
+    "learned_at": 1776878196.739617
+  },
+  "64d00ec5be38e3ab27771df2becc4f4e5131c79e": {
+    "path": "/Users/shivendraraj/Downloads/310170235066020_Cisco_0200_1741854769769(1).pcapng",
+    "name": "310170235066020_Cisco_0200_1741854769769(1).pcapng",
+    "size": 8036,
+    "mtime": 1755966244,
+    "learned_at": 1776878200.062876
+  },
+  "be9bfe45bb42d4f418ba78693ed5151d73dc4bae": {
+    "path": "/Users/shivendraraj/Downloads/310170235066020_Cisco_0200_1741854769769.pcapng",
+    "name": "310170235066020_Cisco_0200_1741854769769.pcapng",
+    "size": 8036,
+    "mtime": 1741854783,
+    "learned_at": 1776878204.094081
+  },
+  "de6609c8b98bf17506bdfd911e109a533ddd90dd": {
+    "path": "/Users/shivendraraj/Downloads/310170235700059-2_1758679517924.pcapng",
+    "name": "310170235700059-2_1758679517924.pcapng",
+    "size": 5096,
+    "mtime": 1758679524,
+    "learned_at": 1776878208.084437
+  },
+  "5a8b6acc3e121da1ba5f37772f39ad66860d244f": {
+    "path": "/Users/shivendraraj/Downloads/310170235700059_1758679423876.pcapng",
+    "name": "310170235700059_1758679423876.pcapng",
+    "size": 5096,
+    "mtime": 1758679432,
+    "learned_at": 1776878212.36297
+  },
+  "737dd949bf3d657581c76c9b51ff3acbd568a25b": {
+    "path": "/Users/shivendraraj/Downloads/310170236223434_0904 to 1104_1744350520155.pcapng",
+    "name": "310170236223434_0904 to 1104_1744350520155.pcapng",
+    "size": 3956,
+    "mtime": 1744350528,
+    "learned_at": 1776878216.122998
+  },
+  "6274aca357c24b9b2927281187b65f718cc9c070": {
+    "path": "/Users/shivendraraj/Downloads/310170236223434_24 hours_1744350135175.pcapng",
+    "name": "310170236223434_24 hours_1744350135175.pcapng",
+    "size": 2436,
+    "mtime": 1744350141,
+    "learned_at": 1776878219.5740328
+  },
+  "f810e3c632a81c81c98dedede25fa2dec25f39a4": {
+    "path": "/Users/shivendraraj/Downloads/310170236237049_89011703272362370492_1738820309985.pcapng",
+    "name": "310170236237049_89011703272362370492_1738820309985.pcapng",
+    "size": 5118500,
+    "mtime": 1738820751,
+    "learned_at": 1776878409.424246
+  },
+  "316a539110022544f2641a23447847fdc041257b": {
+    "path": "/Users/shivendraraj/Downloads/310170236288285_1306_to_1806_1750846729060.pcapng",
+    "name": "310170236288285_1306_to_1806_1750846729060.pcapng",
+    "size": 371852,
+    "mtime": 1750846787,
+    "learned_at": 1776878415.3014631
+  },
+  "1d8fcae407fcaab6a2655a9981c419ecebfa6e98": {
+    "path": "/Users/shivendraraj/Downloads/310170236916207_1758680298207.pcapng",
+    "name": "310170236916207_1758680298207.pcapng",
+    "size": 6472,
+    "mtime": 1758680306,
+    "learned_at": 1776878419.2134552
+  },
+  "b513c6d996cc9e9844ff153e554c555e76862d4a": {
+    "path": "/Users/shivendraraj/Downloads/310170237167811_0904 to 1104_1744356923629.pcapng",
+    "name": "310170237167811_0904 to 1104_1744356923629.pcapng",
+    "size": 1205316,
+    "mtime": 1744357455,
+    "learned_at": 1776878490.602491
+  },
+  "806e11167e3b585bc0771878660330885eb24c6b": {
+    "path": "/Users/shivendraraj/Downloads/310170237183998-try2_1744270653871.pcapng",
+    "name": "310170237183998-try2_1744270653871.pcapng",
+    "size": 124572,
+    "mtime": 1744270693,
+    "learned_at": 1776878495.484082
+  },
+  "49d2bae9621c9cbbef6779a30c362330c1a5a39e": {
+    "path": "/Users/shivendraraj/Downloads/310170237183998_1744269399983.pcapng",
+    "name": "310170237183998_1744269399983.pcapng",
+    "size": 124572,
+    "mtime": 1744269439,
+    "learned_at": 1776878500.119118
+  },
+  "943d01c0dd65aacd5bff50c6f32e7919772d8a1f": {
+    "path": "/Users/shivendraraj/Downloads/310170237834030_1746753359865.pcapng",
+    "name": "310170237834030_1746753359865.pcapng",
+    "size": 777644,
+    "mtime": 1746753485,
+    "learned_at": 1776878521.505696
+  },
+  "320bc0669a615701557a44838442e9449582f02b": {
+    "path": "/Users/shivendraraj/Downloads/310170238385710-24H_1744248796347.pcapng",
+    "name": "310170238385710-24H_1744248796347.pcapng",
+    "size": 57720,
+    "mtime": 1744248804,
+    "learned_at": 1776878526.59604
+  },
+  "f8ce6987c19ca3735430693101b549bfc3c90adb": {
+    "path": "/Users/shivendraraj/Downloads/310170238972639_gsm_filtered_2.pcap",
+    "name": "310170238972639_gsm_filtered_2.pcap",
+    "size": 83412,
+    "mtime": 1760940360,
+    "learned_at": 1776878541.6406631
+  },
+  "49d48c15056f1f1dea380dd49c8ed7a3a78e5a84": {
+    "path": "/Users/shivendraraj/Downloads/310170239009897_1758776200376.pcapng",
+    "name": "310170239009897_1758776200376.pcapng",
+    "size": 71932,
+    "mtime": 1758776405,
+    "learned_at": 1776878546.039881
+  },
+  "de23d2f290fd94e5464d9c30d4aedb332bf24b8a": {
+    "path": "/Users/shivendraraj/Downloads/310170239691262_1766553606565.pcapng",
+    "name": "310170239691262_1766553606565.pcapng",
+    "size": 18672,
+    "mtime": 1766553614,
+    "learned_at": 1776878550.365515
+  },
+  "f20e1e6a2987a69479c87d4198dd784f0652c55c": {
+    "path": "/Users/shivendraraj/Downloads/310170239691262_24Hr_1762492180090.pcapng",
+    "name": "310170239691262_24Hr_1762492180090.pcapng",
+    "size": 2101668,
+    "mtime": 1762492238,
+    "learned_at": 1776878583.671679
+  },
+  "65fc735c994bef69f7d40d963b8b83182ed5ed1a": {
+    "path": "/Users/shivendraraj/Downloads/310170242635922_13th_Aug_1755192209900.pcapng",
+    "name": "310170242635922_13th_Aug_1755192209900.pcapng",
+    "size": 641332,
+    "mtime": 1755221017,
+    "learned_at": 1776878605.30787
+  },
+  "3e553494d2a7323c514f68ae4bc2511b30d5d16c": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1756023772522.pcapng",
+    "name": "310170243667674_1756023772522.pcapng",
+    "size": 101692,
+    "mtime": 1756023864,
+    "learned_at": 1776878610.32618
+  },
+  "15a8ab8e36a8bd95783e32a53c3ae3cd921ea581": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1808_1755737669238.pcapng",
+    "name": "310170243667674_1808_1755737669238.pcapng",
+    "size": 6616,
+    "mtime": 1755738780,
+    "learned_at": 1776878614.1066308
+  },
+  "33bfb39f3fc9d34793778564df1ff5ae17b846de": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1808_1755737843628.pcapng",
+    "name": "310170243667674_1808_1755737843628.pcapng",
+    "size": 6616,
+    "mtime": 1755737853,
+    "learned_at": 1776878618.123727
+  },
+  "440c27a0909e0be31087d7f6a193aa7bccc8bdb5": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1808_UP.pcapng",
+    "name": "310170243667674_1808_UP.pcapng",
+    "size": 6616,
+    "mtime": 1755739355,
+    "learned_at": 1776878622.44864
+  },
+  "e2fe2dd1c3b673f4a0d7c1350b3658b7476f8b4a": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1808_UP_1755739094911.pcapng",
+    "name": "310170243667674_1808_UP_1755739094911.pcapng",
+    "size": 6616,
+    "mtime": 1755739101,
+    "learned_at": 1776878627.571869
+  },
+  "3978bdc3358ff15e6fa296ba7d9e5cbec791100b": {
+    "path": "/Users/shivendraraj/Downloads/310170243667674_1908_UP.pcapng",
+    "name": "310170243667674_1908_UP.pcapng",
+    "size": 239804,
+    "mtime": 1755738813,
+    "learned_at": 1776878633.423303
+  },
+  "dacbdb1195848291d8e77f169d8c9dcdab0681e5": {
+    "path": "/Users/shivendraraj/Downloads/310170255868200_04Feb-05Feb.pcapng",
+    "name": "310170255868200_04Feb-05Feb.pcapng",
+    "size": 30988,
+    "mtime": 1770381810,
+    "learned_at": 1776878637.8939772
+  },
+  "cf22941f9804aa07258caf6ef9314a2ce3d32aa0": {
+    "path": "/Users/shivendraraj/Downloads/310170255868200_0800UTC-to-1400UTC_4thFeb.pcapng",
+    "name": "310170255868200_0800UTC-to-1400UTC_4thFeb.pcapng",
+    "size": 10216,
+    "mtime": 1770265746,
+    "learned_at": 1776878642.465235
+  },
+  "b8eb2c6d1f3328ebc0758518c3822bd310fe861a": {
+    "path": "/Users/shivendraraj/Downloads/310170255868200_1770265395818.pcapng",
+    "name": "310170255868200_1770265395818.pcapng",
+    "size": 3244,
+    "mtime": 1770265405,
+    "learned_at": 1776878646.512578
+  },
+  "fb6bef98ea4ae9a2dd690fd115c3a5560b76c955": {
+    "path": "/Users/shivendraraj/Downloads/310170256018602_1754555027920.pcapng",
+    "name": "310170256018602_1754555027920.pcapng",
+    "size": 9608,
+    "mtime": 1754556596,
+    "learned_at": 1776878651.164709
+  },
+  "69de2220f3932b4aac7e9cc3c108448348b61aac": {
+    "path": "/Users/shivendraraj/Downloads/310170260490718_1758775569105.pcapng",
+    "name": "310170260490718_1758775569105.pcapng",
+    "size": 45108,
+    "mtime": 1758775682,
+    "learned_at": 1776878655.0316858
+  },
+  "7d403de9e85018d3aab3f8ee8bb0361d78cd55b3": {
+    "path": "/Users/shivendraraj/Downloads/310170260797143_22nd-23rd.pcapng",
+    "name": "310170260797143_22nd-23rd.pcapng",
+    "size": 18921476,
+    "mtime": 1761290519,
+    "learned_at": 1776879158.665189
+  },
+  "22487c155b992c80f12bf00d8e871815990c35b7": {
+    "path": "/Users/shivendraraj/Downloads/310170260797143_23rd-24th.pcapng",
+    "name": "310170260797143_23rd-24th.pcapng",
+    "size": 58039960,
+    "mtime": 1761288857,
+    "learned_at": 1776879564.9011872
+  },
+  "d9c568b8a3ca433b02ca4a582075e8d09eed33d4": {
+    "path": "/Users/shivendraraj/Downloads/310170261269953_1752480717435.pcapng",
+    "name": "310170261269953_1752480717435.pcapng",
+    "size": 2154676,
+    "mtime": 1752480854,
+    "learned_at": 1776879599.38343
+  },
+  "7e50b0dcd7e2205f01ac7c53f4708ec47fbebff5": {
+    "path": "/Users/shivendraraj/Downloads/310170261400546_1758680114261.pcapng",
+    "name": "310170261400546_1758680114261.pcapng",
+    "size": 55240,
+    "mtime": 1758680128,
+    "learned_at": 1776879603.927857
+  },
+  "9696fdb1cdf9f79e874fb31f65da71ec05fb5e93": {
+    "path": "/Users/shivendraraj/Downloads/310170262942267.pcapng",
+    "name": "310170262942267.pcapng",
+    "size": 32012,
+    "mtime": 1758186193,
+    "learned_at": 1776879608.286788
+  },
+  "ed13093b182e4d637a265e87dbe61c0a5a8c3e7c": {
+    "path": "/Users/shivendraraj/Downloads/310170262942379-Part_1_1758187225163.pcapng",
+    "name": "310170262942379-Part_1_1758187225163.pcapng",
+    "size": 54184,
+    "mtime": 1758187403,
+    "learned_at": 1776879612.27603
+  },
+  "b702ce05e5b12799cdfde679acaf6d0b52c027a3": {
+    "path": "/Users/shivendraraj/Downloads/310170262942379-Part_2_1758187347926.pcapng",
+    "name": "310170262942379-Part_2_1758187347926.pcapng",
+    "size": 450268,
+    "mtime": 1758187415,
+    "learned_at": 1776879620.4934468
+  },
+  "3950d5035c4eb3ba3771ab2e857f6a7e21cf718c": {
+    "path": "/Users/shivendraraj/Downloads/310170263417910_1758679874459.pcapng",
+    "name": "310170263417910_1758679874459.pcapng",
+    "size": 4480,
+    "mtime": 1758679882,
+    "learned_at": 1776879624.5673459
+  },
+  "ac5d378d84f92cb776dac568b8743c386eab84cc": {
+    "path": "/Users/shivendraraj/Downloads/310170263987916_1758680499636.pcapng",
+    "name": "310170263987916_1758680499636.pcapng",
+    "size": 2292,
+    "mtime": 1758680508,
+    "learned_at": 1776879628.601412
+  },
+  "3ddd30bc52649a88dc1bb5277391b786422b5d0e": {
+    "path": "/Users/shivendraraj/Downloads/310170264829449_PGW.pcapng",
+    "name": "310170264829449_PGW.pcapng",
+    "size": 221588,
+    "mtime": 1754532164,
+    "learned_at": 1776879633.297687
+  },
+  "1f4282a88899a66f206d6a20de0963b8c435f5ce": {
+    "path": "/Users/shivendraraj/Downloads/310170267141884.pcap",
+    "name": "310170267141884.pcap",
+    "size": 30086,
+    "mtime": 1761184631,
+    "learned_at": 1776879637.105999
+  },
+  "f52410b7ee211d69fa40c48e41b36c68fa327154": {
+    "path": "/Users/shivendraraj/Downloads/310170267141884_mt_sms_failure_094256_10062025.pcap",
+    "name": "310170267141884_mt_sms_failure_094256_10062025.pcap",
+    "size": 5028,
+    "mtime": 1760940646,
+    "learned_at": 1776879874.61344
+  },
+  "65350d215a96f0d71a1d26a38ae5b301f9b8d075": {
+    "path": "/Users/shivendraraj/Downloads/310170267141884_sip_10152025.pcap",
+    "name": "310170267141884_sip_10152025.pcap",
+    "size": 549376,
+    "mtime": 1760705525,
+    "learned_at": 1776879880.032115
+  },
+  "aadfeefe0a6233c743c24828a92568ea8a7a760f": {
+    "path": "/Users/shivendraraj/Downloads/310170270737765_ROCtrace.pcap",
+    "name": "310170270737765_ROCtrace.pcap",
+    "size": 42424,
+    "mtime": 1769496848,
+    "learned_at": 1776879886.703813
+  },
+  "05c2526d4dfff25ca5d2dbbd3ac6b859e09f1385": {
+    "path": "/Users/shivendraraj/Downloads/310170390447856_29th Dec.pcapng",
+    "name": "310170390447856_29th Dec.pcapng",
+    "size": 109788,
+    "mtime": 1766983994,
+    "learned_at": 1776879891.313365
+  },
+  "42b893ff02572002313b96a819150a3c5fb115f7": {
+    "path": "/Users/shivendraraj/Downloads/310170402115534_1103-1203.pcapng",
+    "name": "310170402115534_1103-1203.pcapng",
+    "size": 238092,
+    "mtime": 1773669642,
+    "learned_at": 1776879901.3466399
+  },
+  "340976dd3e96cee76df64e219b90bb6a95b1780a": {
+    "path": "/Users/shivendraraj/Downloads/310170408455508_1736901446227.pcapng",
+    "name": "310170408455508_1736901446227.pcapng",
+    "size": 2851260,
+    "mtime": 1736902551,
+    "learned_at": 1776920642.672284
+  },
+  "9af2f71a3710675e9fb08cf7b627fe41d23fafcd": {
+    "path": "/Users/shivendraraj/Downloads/310170408706646 April 13 Timeout(1).pcap",
+    "name": "310170408706646 April 13 Timeout(1).pcap",
+    "size": 359,
+    "mtime": 1744616770,
+    "learned_at": 1776920646.9976819
+  },
+  "ca759352633f3794281f2aa4a83a6ffeae712c94": {
+    "path": "/Users/shivendraraj/Downloads/310170408706646 April 13 Timeout.pcap",
+    "name": "310170408706646 April 13 Timeout.pcap",
+    "size": 359,
+    "mtime": 1744616428,
+    "learned_at": 1776920650.782403
+  },
+  "2b0ab66024ef25a94c74318f96c062399ad5eb81": {
+    "path": "/Users/shivendraraj/Downloads/310170409721655.pcap",
+    "name": "310170409721655.pcap",
+    "size": 926939,
+    "mtime": 1746183448,
+    "learned_at": 1776920656.810967
+  },
+  "e3f8c3488a641e8aaa355d5e5ca9be67f594b83c": {
+    "path": "/Users/shivendraraj/Downloads/310170409975280_1743140930851.pcapng",
+    "name": "310170409975280_1743140930851.pcapng",
+    "size": 704,
+    "mtime": 1743140937,
+    "learned_at": 1776920660.42001
+  },
+  "d31b46d2d86b92e5d9261dd8fadf8debc04a226f": {
+    "path": "/Users/shivendraraj/Downloads/310170409975366_1743141297351.pcapng",
+    "name": "310170409975366_1743141297351.pcapng",
+    "size": 1404,
+    "mtime": 1743141303,
+    "learned_at": 1776920664.674907
+  },
+  "3e421cba30bd62013ffa42e3262aab91f520490a": {
+    "path": "/Users/shivendraraj/Downloads/310170410028301_1743140759127.pcapng",
+    "name": "310170410028301_1743140759127.pcapng",
+    "size": 704,
+    "mtime": 1743140765,
+    "learned_at": 1776920668.293319
+  },
+  "59962fd1c77c83044008e0f7cd6d1982191f102a": {
+    "path": "/Users/shivendraraj/Downloads/310170410028513_1743141391892.pcapng",
+    "name": "310170410028513_1743141391892.pcapng",
+    "size": 1884,
+    "mtime": 1743141398,
+    "learned_at": 1776920672.788882
+  },
+  "55163a051a58e5284d05f5cb1cb041602aed849a": {
+    "path": "/Users/shivendraraj/Downloads/310170410028605_1742956220401.pcapng",
+    "name": "310170410028605_1742956220401.pcapng",
+    "size": 1652,
+    "mtime": 1742956226,
+    "learned_at": 1776920677.182515
+  },
+  "2e9a3fd66a5e0f86b6dfac44e286c2e2cc41ea50": {
+    "path": "/Users/shivendraraj/Downloads/310170412039928_NetScout_48Hours.pcapng",
+    "name": "310170412039928_NetScout_48Hours.pcapng",
+    "size": 373532,
+    "mtime": 1744616966,
+    "learned_at": 1776920687.548726
+  },
+  "25a9dca2e4f13381c10c6a40de082227ae40ad3e": {
+    "path": "/Users/shivendraraj/Downloads/310170412733005_1772120876075.pcapng",
+    "name": "310170412733005_1772120876075.pcapng",
+    "size": 6519020,
+    "mtime": 1772121364,
+    "learned_at": 1776922565.994359
+  },
+  "634e2872ac6d998658291efbc3dcd72efc520441": {
+    "path": "/Users/shivendraraj/Downloads/3101704133689618 MEXTL March 21.pcap",
+    "name": "3101704133689618 MEXTL March 21.pcap",
+    "size": 378,
+    "mtime": 1742786704,
+    "learned_at": 1776922571.021649
+  },
+  "cceaf2753ed1146ef79f70dbe5299cc7990b90a4": {
+    "path": "/Users/shivendraraj/Downloads/310170419261861_Diameter_0712_0620AM_PDT.pcap",
+    "name": "310170419261861_Diameter_0712_0620AM_PDT.pcap",
+    "size": 23028,
+    "mtime": 1752766640,
+    "learned_at": 1776923071.466464
+  },
+  "8578de55f04ae06067c9a69b604aa4483cd39c40": {
+    "path": "/Users/shivendraraj/Downloads/310170423321293_23May2025.pcapng",
+    "name": "310170423321293_23May2025.pcapng",
+    "size": 378432,
+    "mtime": 1747999634,
+    "learned_at": 1776923079.946916
+  },
+  "82ba9ba1e0a84b35f9ac01be4b2d9f1dfeae661f": {
+    "path": "/Users/shivendraraj/Downloads/310170424406941-Trace-2_1775832444958-fb423be3.pcapng",
+    "name": "310170424406941-Trace-2_1775832444958-fb423be3.pcapng",
+    "size": 76112,
+    "mtime": 1776161512,
+    "learned_at": 1776923086.1119459
+  },
+  "7061a35c7bad1d17624faf7327a8481bbf7503ed": {
+    "path": "/Users/shivendraraj/Downloads/310170424406941-Trace-2_1775832444958.pcapng",
+    "name": "310170424406941-Trace-2_1775832444958.pcapng",
+    "size": 76112,
+    "mtime": 1775832453,
+    "learned_at": 1776923092.177363
+  },
+  "d727b55fa496552aff73f2409ecf944579cab430": {
+    "path": "/Users/shivendraraj/Downloads/310170424406941_1775831412771-218636c8.pcapng",
+    "name": "310170424406941_1775831412771-218636c8.pcapng",
+    "size": 727208,
+    "mtime": 1776162515,
+    "learned_at": 1776923112.6276631
+  },
+  "3721306497ef3d47a73915cd9f5b75b3c2256735": {
+    "path": "/Users/shivendraraj/Downloads/310170424406941_1775831412771.pcapng",
+    "name": "310170424406941_1775831412771.pcapng",
+    "size": 727208,
+    "mtime": 1775831856,
+    "learned_at": 1776923131.912805
+  },
+  "dbf7f07b7a2e9063dc607814e14359846145850a": {
+    "path": "/Users/shivendraraj/Downloads/310170424509386_1752198671571.pcapng",
+    "name": "310170424509386_1752198671571.pcapng",
+    "size": 1955504,
+    "mtime": 1752198957,
+    "learned_at": 1776924308.82974
+  },
+  "bee891451ab74b5fe1c29d0b69ddd99173fbcea6": {
+    "path": "/Users/shivendraraj/Downloads/310170425668997-All_1733370870037.pcapng",
+    "name": "310170425668997-All_1733370870037.pcapng",
+    "size": 14804,
+    "mtime": 1733370876,
+    "learned_at": 1776924314.499538
+  },
+  "c4c1404def0f5ebd0b40a9e9bbc3dd39051bdc6a": {
+    "path": "/Users/shivendraraj/Downloads/310170425668997_UP_1733370149370.pcapng",
+    "name": "310170425668997_UP_1733370149370.pcapng",
+    "size": 10588,
+    "mtime": 1733370159,
+    "learned_at": 1776924319.9220428
+  },
+  "d6ae9b97182d2b7467940bd9bcc3c0bcffd16eb1": {
+    "path": "/Users/shivendraraj/Downloads/310170428790239.pcapng",
+    "name": "310170428790239.pcapng",
+    "size": 88832,
+    "mtime": 1747701486,
+    "learned_at": 1776924327.6636312
+  },
+  "768b399b6346f2af653d4740863096f75394404b": {
+    "path": "/Users/shivendraraj/Downloads/310170429404804.pcapng",
+    "name": "310170429404804.pcapng",
+    "size": 40480,
+    "mtime": 1747701508,
+    "learned_at": 1776924333.153306
   }
 }
