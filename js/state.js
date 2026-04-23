@@ -20,6 +20,7 @@ const STATE = {
   graph:     null,     // current graph (session or capture)
   graphNetwork: null,  // vis.js network instance for graph view
   graphPhysicsEnabled: true,
+  uiMode: "production", // "production" | "demo"
   viewMode:  "ladder", // "ladder" | "graph" | "causal"
   hydrationPending: false,
 

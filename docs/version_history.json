@@ -1,5 +1,18 @@
 [
   {
+    "version": "v1.2.0",
+    "date": "2026-04-23",
+    "title": "Guided Correlation And Failure Topology UX",
+    "changes": [
+      "Reworked the front dashboard around Trace Overview, Trace Briefing, Capture Analytics, Session RCA, and Failure Topology so the analyst workflow is more prominent and easier to follow.",
+      "Added a front-page service/failure topology view with clickable nodes and edges, drag-to-readjust positioning, auto-layout for larger node sets, and normal-session rendering that avoids red failure styling when no failure exists.",
+      "Upgraded Trace Briefing to show the selected correlation filter and anchors directly, including Call-ID, GTP TEID, Diameter Session-ID, PFCP SEID, access UE IDs, IMSI/MSISDN, and Subscriber IP where available.",
+      "Improved RCA readability by compacting repeated evidence lines into counted summaries instead of flooding the panel with duplicate error messages.",
+      "Added a Production/Demo mode toggle: Production stays quiet for analyst work, while Demo mode enables detailed hover/click coaching across tabs, upload, filters, session cards, visualizations, graph controls, legends, topology selections, learning controls, validation actions, and version history.",
+      "Moved Learning Control into its own tab and resized Capture Analytics, Session RCA, and Failure Topology to better match the dashboard investigation priority."
+    ]
+  },
+  {
     "version": "v1.1.0",
     "date": "2026-04-16",
     "title": "Trustworthy ML Operations And Model Governance",

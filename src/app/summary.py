@@ -158,6 +158,11 @@ def session_summary(session: dict) -> dict:
     analyst_brief = build_analyst_brief(session)
     protocol_recommendations = build_protocol_recommendations(session)
     recommendations = protocol_recommendations or rca.get("recommendations", [])
+    details_summary = build_session_details_summary(session)
+    failure_topology = _build_failure_topology(
+        session,
+        node_inventory=details_summary.get("node_inventory", []),
+    )
     packet_count = sum(
         len(value)
         for key, value in session.items()
@@ -208,7 +213,8 @@ def session_summary(session: dict) -> dict:
         "confidence_model": rca.get("confidence_model") or autonomous.get("confidence_model"),
         "knowledge_graph_summary": rca.get("knowledge_graph_summary") or autonomous.get("knowledge_graph_summary"),
         "timeseries_summary": rca.get("timeseries_summary") or autonomous.get("timeseries_summary"),
-        "details_summary": build_session_details_summary(session),
+        "details_summary": details_summary,
+        "failure_topology": failure_topology,
         "root_cause": rca.get("root_cause"),
         "contributing_factors": rca.get("contributing_factors", []),
         "correlation_confidence": rca.get("correlation_confidence", 0),
@@ -342,6 +348,7 @@ def build_capture_summary(parsed: dict, sessions: list, capture_meta: dict | Non
         "expert_findings": expert_findings,
         "details": details,
         "error_analysis": _build_error_analysis(parsed, sessions, capture_window, details),
+        "failure_topology": _build_capture_failure_topology(sessions, details),
         "kpis": {
             "total_sessions": len(sessions),
             "total_packets": capture_window["total_frames"] or total_packets,
@@ -737,6 +744,20 @@ def build_session_details_summary(session: dict) -> dict:
     call_type = _infer_session_type(session)
     a_party = _display_session_party(session)
     b_party = session.get("called") or "Unknown"
+    parsed_subset = _session_parsed_subset(session)
+    protocol_counts = {
+        key.upper(): len(value)
+        for key, value in parsed_subset.items()
+        if isinstance(value, list) and value
+    }
+    selected_filter = _build_session_selected_filter(session, parsed_subset)
+    correlation_anchors = _build_session_correlation_anchors(session, parsed_subset, selected_filter)
+    node_inventory = _build_session_node_inventory(session, parsed_subset, protocol_counts)
+    topology = _build_session_topology_inference(session, parsed_subset, protocol_counts)
+    anchor_preview = "; ".join(
+        f"{item['label']} {item['value']}"
+        for item in correlation_anchors[:4]
+    )
     return {
         "headline": f"{call_type} session",
         "call_type": call_type,
@@ -744,7 +765,13 @@ def build_session_details_summary(session: dict) -> dict:
         "b_party": b_party,
         "protocols": protocols,
         "technologies": technologies,
+        "selected_filter": selected_filter,
+        "correlation_anchors": correlation_anchors,
+        "node_inventory": node_inventory,
+        "topology": topology,
         "summary_lines": [
+            f"Selected filter: {selected_filter['label']} = {selected_filter['value']}",
+            f"Correlation anchors: {anchor_preview or 'No explicit identity anchors observed'}",
             f"Call/session type: {call_type}",
             f"Technologies: {', '.join(technologies) if technologies else 'Unknown'}",
             f"Protocols: {', '.join(protocols) if protocols else 'Unknown'}",
@@ -753,6 +780,555 @@ def build_session_details_summary(session: dict) -> dict:
             f"Flow summary: {session.get('flow_summary') or 'Unavailable'}",
         ],
     }
+
+
+def _build_session_selected_filter(session: dict, parsed_subset: dict) -> dict:
+    candidates = _session_anchor_candidates(session, parsed_subset)
+    preferred_labels = (
+        "Call-ID",
+        "Tunnel ID (TEID)",
+        "Diameter Session-ID",
+        "PFCP SEID",
+        "Access UE ID",
+        "IMSI",
+        "MSISDN",
+        "Subscriber IP",
+        "Session-ID",
+    )
+    for label in preferred_labels:
+        match = next((candidate for candidate in candidates if candidate["label"] == label), None)
+        if match:
+            return {
+                "label": match["label"],
+                "value": match["value"],
+                "source": match["source"],
+            }
+
+    session_id = session.get("session_id") or session.get("call_id") or "Unknown"
+    return {
+        "label": "Session-ID",
+        "value": str(session_id),
+        "source": "Session seed",
+    }
+
+
+def _build_session_correlation_anchors(session: dict, parsed_subset: dict, selected_filter: dict) -> list[dict]:
+    candidates = _session_anchor_candidates(session, parsed_subset)
+    anchors: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(anchor: dict) -> None:
+        label = str(anchor.get("label") or "").strip()
+        value = str(anchor.get("value") or "").strip()
+        if not label or not value:
+            return
+        key = (label, value)
+        if key in seen:
+            return
+        seen.add(key)
+        anchors.append({
+            "label": label,
+            "value": value,
+            "source": anchor.get("source") or "Correlation engine",
+        })
+
+    if selected_filter:
+        add(selected_filter)
+
+    order = {
+        "Call-ID": 0,
+        "Diameter Session-ID": 1,
+        "Tunnel ID (TEID)": 2,
+        "GTP F-TEID": 3,
+        "GTP TID": 4,
+        "PFCP SEID": 5,
+        "Access UE ID": 6,
+        "IMSI": 7,
+        "MSISDN": 8,
+        "Subscriber IP": 9,
+        "APN": 10,
+        "Stream ID": 11,
+        "Transaction ID": 12,
+        "Session-ID": 13,
+    }
+    for candidate in sorted(candidates, key=lambda item: order.get(item["label"], 99)):
+        add(candidate)
+
+    return anchors[:10]
+
+
+def _session_anchor_candidates(session: dict, parsed_subset: dict) -> list[dict]:
+    candidates: list[dict] = []
+
+    def add(label: str, value: str | None, source: str) -> None:
+        text = str(value or "").strip()
+        if not text:
+            return
+        candidates.append({"label": label, "value": text, "source": source})
+
+    sip_msgs = parsed_subset.get("sip", []) or session.get("sip_msgs", [])
+    dia_msgs = parsed_subset.get("diameter", []) or session.get("dia_msgs", [])
+    gtp_msgs = parsed_subset.get("gtp", []) or session.get("gtp_msgs", [])
+    access_msgs = [
+        *(parsed_subset.get("s1ap", []) or []),
+        *(parsed_subset.get("ngap", []) or []),
+        *(parsed_subset.get("ranap", []) or []),
+        *(parsed_subset.get("bssap", []) or []),
+    ]
+    pfcp_msgs = parsed_subset.get("pfcp", []) or session.get("pfcp_msgs", [])
+    generic_msgs = session.get("generic_msgs", [])
+
+    if sip_msgs:
+        add("Call-ID", _first_value(sip_msgs, ("call_id",)) or session.get("call_id"), "SIP identity seed")
+    add("Diameter Session-ID", _first_value(dia_msgs, ("session_id",)), "Diameter subscriber/auth session")
+    add("Tunnel ID (TEID)", _first_value(gtp_msgs, ("gtp.teid",)), "GTP tunnel identity")
+    add("GTP F-TEID", _first_value(gtp_msgs, ("gtp.f_teid",)), "GTP forwarding tunnel identity")
+    add("GTP TID", _first_value(gtp_msgs, ("gtp.tid",)), "GTP transaction identity")
+    add("PFCP SEID", _first_value(pfcp_msgs, ("pfcp.seid",)), "PFCP N4 session identity")
+    add(
+        "Access UE ID",
+        _first_value(access_msgs + generic_msgs, ("s1ap_mme_ue_id", "s1ap_enb_ue_id", "ngap_amf_ue_id", "ngap_ran_ue_id")),
+        "Access control-plane UE identity",
+    )
+    add(
+        "IMSI",
+        session.get("imsi")
+        or _first_value(dia_msgs, ("imsi",))
+        or _first_value(gtp_msgs, ("gtpv2.imsi", "imsi"))
+        or _first_value(access_msgs + generic_msgs, ("imsi",)),
+        "Subscriber identity",
+    )
+    add(
+        "MSISDN",
+        session.get("msisdn")
+        or _first_value(dia_msgs, ("msisdn",))
+        or _first_value(access_msgs + generic_msgs, ("msisdn",)),
+        "Subscriber number",
+    )
+    add(
+        "Subscriber IP",
+        session.get("subscriber_ip")
+        or _first_value(dia_msgs, ("framed_ip",))
+        or _first_value(gtp_msgs, ("gtp.subscriber_ip",))
+        or _first_value(access_msgs + generic_msgs, ("radius_framed_ip",)),
+        "UE IP / framed IP anchor",
+    )
+    add("APN", _first_value(gtp_msgs, ("gtp.apn",)), "Packet data network context")
+    add("Stream ID", _first_value(access_msgs + generic_msgs, ("stream_id",)), "Transport stream fallback")
+    add("Transaction ID", _first_value(access_msgs + generic_msgs, ("transaction_id",)), "Generic transaction fallback")
+    add("Session-ID", session.get("session_id") or session.get("call_id"), "Session seed")
+
+    return candidates
+
+
+def _first_value(items: list, keys: tuple[str, ...]) -> str | None:
+    for item in items:
+        for key in keys:
+            value = item.get(key) if isinstance(item, dict) else None
+            if value:
+                return str(value)
+    return None
+
+
+def _session_parsed_subset(session: dict) -> dict:
+    return {
+        "sip": session.get("sip_msgs", []),
+        "diameter": session.get("dia_msgs", []),
+        "inap": session.get("inap_msgs", []),
+        "gtp": session.get("gtp_msgs", []),
+        "s1ap": session.get("s1ap_msgs", []),
+        "ngap": session.get("ngap_msgs", []),
+        "ranap": session.get("ranap_msgs", []),
+        "bssap": session.get("bssap_msgs", []),
+        "map": session.get("map_msgs", []),
+        "http": session.get("http_msgs", []),
+        "tcp": session.get("tcp_msgs", []),
+        "udp": session.get("udp_msgs", []),
+        "sctp": session.get("sctp_msgs", []),
+        "dns": session.get("dns_msgs", []),
+        "icmp": session.get("icmp_msgs", []),
+        "nas_eps": session.get("nas_eps_msgs", []),
+        "nas_5gs": session.get("nas_5gs_msgs", []),
+        "pfcp": session.get("pfcp_msgs", []),
+        "radius": session.get("radius_msgs", []),
+    }
+
+
+def _build_session_node_inventory(session: dict, parsed_subset: dict, protocol_counts: dict) -> list[dict]:
+    inventory = list(_build_node_inventory(parsed_subset, protocol_counts))
+    seen = {(item.get("role"), item.get("ip")) for item in inventory}
+
+    subscriber_ip = session.get("subscriber_ip")
+    if subscriber_ip and ("UE", subscriber_ip) not in seen:
+        inventory.insert(
+            0,
+            {
+                "role": "UE",
+                "ip": subscriber_ip,
+                "protocols": [proto.upper() for proto in session.get("protocols", [])[:3]],
+                "evidence": "Subscriber IP recovered from correlated Diameter / GTP context",
+                "confidence": "high",
+            },
+        )
+
+    return inventory
+
+
+def _build_session_topology_inference(session: dict, parsed_subset: dict, protocol_counts: dict) -> dict:
+    return _build_topology_inference(
+        parsed_subset,
+        protocol_counts,
+        session.get("imsi"),
+        _display_session_party(session),
+        session.get("called"),
+    )
+
+
+def _build_capture_failure_topology(sessions: list, details: dict) -> dict:
+    focus_session = _select_focus_failure_session(sessions)
+    if not focus_session:
+        return {
+            "title": "Failure topology unavailable",
+            "narrative": "Upload a capture with correlated sessions to generate an analyst-style break-path view.",
+            "nodes": [],
+            "edges": [],
+            "insights": [],
+        }
+
+    topology = _build_failure_topology(
+        focus_session,
+        node_inventory=_build_session_node_inventory(
+            focus_session,
+            _session_parsed_subset(focus_session),
+            {
+                key.upper(): len(value)
+                for key, value in _session_parsed_subset(focus_session).items()
+                if isinstance(value, list) and value
+            },
+        ),
+        capture_node_inventory=details.get("node_inventory", []),
+    )
+    topology["scope"] = "capture-lead"
+    topology["focus_session_id"] = focus_session.get("session_id") or focus_session.get("call_id")
+    return topology
+
+
+def _select_focus_failure_session(sessions: list) -> dict | None:
+    if not sessions:
+        return None
+
+    abnormal = [
+        session
+        for session in sessions
+        if _session_has_abnormal_rca(session)
+    ]
+    candidates = abnormal or list(sessions)
+    return max(
+        candidates,
+        key=lambda session: (
+            float((session.get("hybrid_rca") or session.get("rca", {})).get("priority_score", session.get("priority_score", 0)) or 0),
+            float((session.get("hybrid_rca") or session.get("rca", {})).get("confidence_pct", 0) or 0),
+            float(session.get("duration_ms", 0) or 0),
+        ),
+    )
+
+
+def _build_failure_topology(
+    session: dict,
+    *,
+    node_inventory: list[dict] | None = None,
+    capture_node_inventory: list[dict] | None = None,
+) -> dict:
+    flow = [
+        item for item in session.get("flow", [])
+        if item.get("src") and item.get("dst")
+    ]
+    if not flow:
+        return {
+            "title": "Failure topology unavailable",
+            "narrative": "No session flow data is available for analyst-style topology rendering.",
+            "nodes": [],
+            "edges": [],
+            "insights": [],
+        }
+
+    preferred_flow = [
+        item for item in flow
+        if str(item.get("protocol") or "").upper() not in {"TCP", "UDP", "SCTP"}
+    ] or flow
+    rca = session.get("hybrid_rca") or session.get("rca", {})
+    has_failure_marker = any(
+        _flow_item_is_failure(item)
+        for item in preferred_flow
+    )
+    abnormal = _session_has_abnormal_rca(session) or has_failure_marker
+    failure_event = next(
+        (item for item in reversed(preferred_flow) if _flow_item_is_failure(item)),
+        None,
+    )
+
+    inventory_by_address = {}
+    for item in [*(node_inventory or []), *(capture_node_inventory or [])]:
+        address = str(item.get("ip") or item.get("address") or "").strip()
+        if address and address not in inventory_by_address:
+            inventory_by_address[address] = item
+
+    nodes_by_id: dict[str, dict] = {}
+    edges_by_key: dict[tuple[str, str, str], dict] = {}
+    failure_edge_key: tuple[str, str, str] | None = None
+    failure_anchor_id: str | None = None
+
+    for item in preferred_flow:
+        src_node = _resolve_failure_topology_node(item.get("src"), inventory_by_address)
+        dst_node = _resolve_failure_topology_node(item.get("dst"), inventory_by_address)
+        nodes_by_id.setdefault(src_node["id"], src_node)
+        nodes_by_id.setdefault(dst_node["id"], dst_node)
+        if src_node["id"] == dst_node["id"]:
+            continue
+
+        protocol = str(item.get("protocol") or "UNKNOWN").upper()
+        key = (src_node["id"], dst_node["id"], protocol)
+        edge = edges_by_key.setdefault(
+            key,
+            {
+                "source": src_node["id"],
+                "target": dst_node["id"],
+                "protocol": protocol,
+                "label": _failure_edge_label(item),
+                "count": 0,
+                "status": "normal",
+            },
+        )
+        edge["count"] += 1
+        if _flow_item_is_failure(item):
+            edge["status"] = "failure-path"
+
+        if item is failure_event:
+            failure_edge_key = key
+            failure_anchor_id = _failure_anchor_node_id(item, src_node["id"], dst_node["id"])
+
+    if abnormal and failure_event and failure_anchor_id:
+        failure_label = _failure_sink_label(session, rca, failure_event)
+        nodes_by_id["failure"] = {
+            "id": "failure",
+            "label": failure_label,
+            "role": "Failure",
+            "address": "",
+            "status": "failure",
+            "confidence": "high" if rca.get("confidence_pct", 0) else "medium",
+            "evidence": rca.get("rca_summary") or rca.get("rca_detail") or "Failure sink inferred from RCA and last break marker",
+            "protocols": [],
+        }
+        edges_by_key[(failure_anchor_id, "failure", "FAILURE")] = {
+            "source": failure_anchor_id,
+            "target": "failure",
+            "protocol": "FAILURE",
+            "label": _failure_edge_label(failure_event),
+            "count": 1,
+            "status": "failure",
+        }
+        anchor = nodes_by_id.get(failure_anchor_id)
+        if anchor and anchor.get("status") != "failure":
+            anchor["status"] = "implicated"
+
+    if abnormal and failure_edge_key and failure_edge_key in edges_by_key:
+        edge = edges_by_key[failure_edge_key]
+        edge["status"] = "failure-path"
+        nodes_by_id[edge["source"]]["status"] = nodes_by_id[edge["source"]].get("status") or "implicated"
+        if nodes_by_id[edge["source"]].get("status") != "failure":
+            nodes_by_id[edge["source"]]["status"] = "implicated"
+        if nodes_by_id[edge["target"]].get("status") not in {"failure", "implicated"}:
+            nodes_by_id[edge["target"]]["status"] = "implicated"
+
+    nodes = list(nodes_by_id.values())
+    edges = sorted(
+        edges_by_key.values(),
+        key=lambda edge: (
+            0 if edge.get("status") == "failure" else 1 if edge.get("status") == "failure-path" else 2,
+            -int(edge.get("count", 0)),
+            edge.get("protocol", ""),
+        ),
+    )[:7]
+
+    narrative = _failure_topology_narrative(session, rca, failure_event, nodes)
+    insights = _failure_topology_insights(session, rca, failure_event, nodes, edges)
+    title = (
+        f"Failure Topology · {rca.get('rca_title') or rca.get('rca_label', 'Session View').replace('_', ' ').title()}"
+        if abnormal
+        else "Service Path Topology"
+    )
+
+    return {
+        "title": title,
+        "narrative": narrative,
+        "focus_session_id": session.get("session_id") or session.get("call_id"),
+        "rca_label": rca.get("rca_label", "UNKNOWN"),
+        "has_failure": bool(abnormal and failure_event),
+        "nodes": nodes,
+        "edges": edges,
+        "insights": insights,
+    }
+
+
+def _session_has_abnormal_rca(session: dict) -> bool:
+    rca = session.get("hybrid_rca") or session.get("rca", {})
+    label = str(rca.get("rca_label") or "").upper().strip()
+    if not label or label == "UNKNOWN":
+        return False
+    if label.startswith("NORMAL"):
+        return False
+    return True
+
+
+def _resolve_failure_topology_node(node_label: str | None, inventory_by_address: dict) -> dict:
+    raw_type, address = _parse_topology_node_label(node_label)
+    inventory = inventory_by_address.get(address) if address else None
+    role = str(inventory.get("role") if inventory else "").strip() or _friendly_node_role(raw_type, address)
+    collapse_roles = {
+        "UE",
+        "P-CSCF",
+        "I/S-CSCF",
+        "HSS/PCRF",
+        "MME",
+        "AMF",
+        "AMF/MME",
+        "gNB",
+        "eNB",
+        "gNB/eNB",
+        "UPF/SGW",
+        "SMF/PGW-C",
+        "NAS / Access Device",
+        "RADIUS Server",
+        "HLR/HSS",
+    }
+    node_id = role if role in collapse_roles else (address or role or "Unknown")
+    label = role if role in collapse_roles else (_mask_ip(address) if address else role or "Unknown")
+    return {
+        "id": node_id,
+        "label": label,
+        "role": role or "Unknown",
+        "address": address,
+        "status": "normal",
+        "confidence": (inventory or {}).get("confidence", "low"),
+        "evidence": (inventory or {}).get("evidence", ""),
+        "protocols": (inventory or {}).get("protocols", []),
+        "zone": raw_type,
+    }
+
+
+def _parse_topology_node_label(node_label: str | None) -> tuple[str, str]:
+    text = str(node_label or "").strip()
+    if not text:
+        return "UNKNOWN", ""
+    if "\n" not in text:
+        return "UNKNOWN", text
+    role, address = text.split("\n", 1)
+    return role.strip(), address.strip()
+
+
+def _friendly_node_role(raw_type: str, address: str) -> str:
+    normalized = str(raw_type or "").upper()
+    if normalized == "IMS":
+        return "IMS Core"
+    if normalized == "CORE":
+        return "Core Node"
+    if normalized in {"EXT", "EXTERNAL"}:
+        return f"External {_mask_ip(address)}" if address else "External Peer"
+    if normalized == "UE":
+        return "UE"
+    return _mask_ip(address) if address else "Unknown"
+
+
+def _flow_item_is_failure(item: dict) -> bool:
+    if item.get("failure"):
+        return True
+
+    protocol = str(item.get("protocol") or "").upper()
+    message = str(item.get("message") or item.get("short_label") or "").upper()
+    details = item.get("details") or {}
+
+    if protocol == "SIP":
+        match = re.match(r"^(\d{3})", message)
+        if match:
+            code = int(match.group(1))
+            return code >= 400 and code not in {401, 407}
+        return any(marker in message for marker in ("TIMEOUT", "REJECT", "DECLINE", "NOT FOUND", "FAIL"))
+
+    if protocol == "DIAMETER":
+        return bool(item.get("failure")) or bool(details.get("result_code")) and str(details.get("result_code")) not in {"2001", "1001"}
+
+    if protocol == "GTP":
+        cause = str(details.get("cause_code") or "").strip()
+        if cause and cause not in {"16", "128"}:
+            return True
+        return any(marker in message for marker in ("REJECT", "FAIL", "ERROR", "NOT FOUND"))
+
+    return any(marker in message for marker in ("REJECT", "FAIL", "ERROR", "TIMEOUT", "ABORT", "DENIED", "UNREACHABLE"))
+
+
+def _failure_anchor_node_id(item: dict, source_id: str, target_id: str) -> str:
+    protocol = str(item.get("protocol") or "").upper()
+    message = str(item.get("message") or "").upper()
+    if protocol == "SIP" and re.match(r"^\d{3}", message):
+        return target_id
+    return source_id
+
+
+def _failure_sink_label(session: dict, rca: dict, failure_event: dict | None) -> str:
+    if (rca.get("rca_label") or "").upper() == "SUBSCRIBER_UNREACHABLE":
+        return "UE Failure"
+    if rca.get("rca_title"):
+        return rca["rca_title"]
+    if rca.get("rca_label") and rca.get("rca_label") != "UNKNOWN":
+        return str(rca["rca_label"]).replace("_", " ").title()
+    if failure_event:
+        return _failure_edge_label(failure_event)
+    return "Failure"
+
+
+def _failure_edge_label(item: dict | None) -> str:
+    if not item:
+        return "Failure"
+    label = str(item.get("short_label") or item.get("message") or item.get("protocol") or "Failure").strip()
+    label = re.sub(r"\s+", " ", label)
+    return label[:42]
+
+
+def _failure_topology_narrative(session: dict, rca: dict, failure_event: dict | None, nodes: list[dict]) -> str:
+    visible_roles = [node.get("label") for node in nodes if node.get("role") != "Failure"][:4]
+    path_text = " -> ".join(visible_roles) if visible_roles else "correlated service nodes"
+    if failure_event:
+        return (
+            f"The correlated path traverses {path_text}. "
+            f"The highlighted break marker is {_failure_edge_label(failure_event)} on {failure_event.get('protocol') or 'UNKNOWN'}, "
+            f"which is being used to explain the {rca.get('rca_title') or rca.get('rca_label', 'current RCA').replace('_', ' ').lower()} outcome."
+        )
+    if rca.get("rca_summary"):
+        return rca["rca_summary"]
+    return f"The correlated path traverses {path_text}. No strong failure edge was isolated for this session."
+
+
+def _failure_topology_insights(session: dict, rca: dict, failure_event: dict | None, nodes: list[dict], edges: list[dict]) -> list[str]:
+    insights: list[str] = []
+    if failure_event:
+        insights.append(f"Break marker: {_failure_edge_label(failure_event)} ({failure_event.get('protocol') or 'UNKNOWN'})")
+    if rca.get("confidence_pct"):
+        insights.append(f"RCA confidence: {int(round(float(rca.get('confidence_pct', 0))))}%")
+    implicated = [node for node in nodes if node.get("status") in {"implicated", "failure"}]
+    if implicated:
+        focus = implicated[0]
+        if focus.get("evidence"):
+            insights.append(f"Focus node: {focus.get('label')} inferred from {focus.get('evidence')}")
+        else:
+            insights.append(f"Focus node: {focus.get('label')} ({focus.get('role')})")
+    if session.get("correlation_methods"):
+        method_text = ", ".join(str(method).split(":")[-1].replace("_", " ") for method in session.get("correlation_methods", [])[:3])
+        insights.append(f"Correlation path: {method_text}")
+    if session.get("subscriber_ip"):
+        insights.append(f"Subscriber IP anchor: {session.get('subscriber_ip')}")
+    if not insights and edges:
+        insights.append(f"Observed {len(edges)} correlated edge(s) across the selected session.")
+    return insights[:4]
 
 
 def _display_session_party(session: dict) -> str:

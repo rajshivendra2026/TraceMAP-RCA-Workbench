@@ -86,6 +86,47 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertEqual(details["a_party"], "14105331485")
         self.assertEqual(details["b_party"], "10.3.160.10")
 
+    def test_session_details_summary_exposes_selected_sip_filter(self):
+        details = build_session_details_summary(
+            {
+                "session_id": "call-abc",
+                "call_id": "call-abc",
+                "protocols": ["sip", "tcp"],
+                "technologies": ["IMS", "Transport"],
+                "sip_msgs": [{"call_id": "call-abc", "method": "INVITE"}],
+            }
+        )
+
+        self.assertEqual(details["selected_filter"]["label"], "Call-ID")
+        self.assertEqual(details["selected_filter"]["value"], "call-abc")
+        self.assertIn("Selected filter: Call-ID = call-abc", details["summary_lines"])
+        self.assertTrue(any(anchor["label"] == "Call-ID" for anchor in details["correlation_anchors"]))
+
+    def test_session_details_summary_exposes_selected_gtp_tunnel_filter(self):
+        details = build_session_details_summary(
+            {
+                "session_id": "gtp-1001",
+                "call_id": "gtp-1001",
+                "protocols": ["gtp"],
+                "technologies": ["LTE/4G"],
+                "subscriber_ip": "10.23.45.67",
+                "gtp_msgs": [
+                    {
+                        "gtp.teid": "1001",
+                        "gtp.f_teid": "2002",
+                        "gtp.subscriber_ip": "10.23.45.67",
+                        "gtpv2.imsi": "001010123456789",
+                    }
+                ],
+            }
+        )
+
+        self.assertEqual(details["selected_filter"]["label"], "Tunnel ID (TEID)")
+        self.assertEqual(details["selected_filter"]["value"], "1001")
+        anchor_map = {anchor["label"]: anchor["value"] for anchor in details["correlation_anchors"]}
+        self.assertEqual(anchor_map["Tunnel ID (TEID)"], "1001")
+        self.assertEqual(anchor_map["Subscriber IP"], "10.23.45.67")
+
     def test_map_trace_summary_mentions_map(self):
         parsed = {
             "map": [
@@ -322,6 +363,205 @@ class TraceSummaryTests(unittest.TestCase):
         self.assertIn("SIP — 401 Unauthorized", titles)
         self.assertIn("TCP Transport Issues", titles)
         self.assertIn("GTPv2 — Context Not Found", titles)
+
+    def test_session_summary_emits_failure_topology_with_inferred_roles(self):
+        session = {
+            "session_id": "call-1",
+            "call_id": "call-1",
+            "calling": "+4915167536469",
+            "called": "+491706543966",
+            "subscriber_ip": "10.23.45.67",
+            "protocols": ["sip", "diameter", "gtp"],
+            "technologies": ["IMS", "LTE/4G"],
+            "sip_msgs": [
+                {
+                    "call_id": "call-1",
+                    "method": "INVITE",
+                    "timestamp": 1.0,
+                    "src_ip": "62.156.115.252",
+                    "dst_ip": "62.156.113.12",
+                    "from_uri": "sip:+4915167536469@ims.example.net",
+                    "to_uri": "sip:+491706543966@ims.example.net",
+                    "frame_number": 1,
+                },
+                {
+                    "call_id": "call-1",
+                    "status_code": "408",
+                    "message": "408 Request Timeout",
+                    "timestamp": 2.4,
+                    "src_ip": "62.156.113.12",
+                    "dst_ip": "62.156.115.252",
+                    "frame_number": 2,
+                },
+            ],
+            "dia_msgs": [
+                {
+                    "session_id": "dia-1",
+                    "command_name": "LIR",
+                    "command_code": "302",
+                    "timestamp": 1.2,
+                    "src_ip": "10.114.0.6",
+                    "dst_ip": "10.114.1.10",
+                    "result_code": "5001",
+                    "is_failure": True,
+                    "frame_number": 3,
+                }
+            ],
+            "gtp_msgs": [
+                {
+                    "timestamp": 1.4,
+                    "src_ip": "10.100.196.40",
+                    "dst_ip": "10.100.196.153",
+                    "message": "Create Session Request",
+                    "gtp.teid": "1001",
+                    "gtp.subscriber_ip": "10.23.45.67",
+                    "frame_number": 4,
+                }
+            ],
+            "flow": [
+                {"protocol": "SIP", "message": "INVITE", "src": "EXT\n62.156.115.252", "dst": "EXT\n62.156.113.12", "time": 1.0},
+                {"protocol": "DIAMETER", "message": "LIR 5001", "short_label": "LIR 5001", "failure": True, "src": "CORE\n10.114.0.6", "dst": "CORE\n10.114.1.10", "time": 1.2, "details": {"result_code": "5001"}},
+                {"protocol": "GTP", "message": "Create Session Request", "src": "CORE\n10.100.196.40", "dst": "CORE\n10.100.196.153", "time": 1.4},
+                {"protocol": "SIP", "message": "408 Request Timeout", "src": "EXT\n62.156.113.12", "dst": "EXT\n62.156.115.252", "time": 2.4},
+            ],
+            "flow_summary": "INVITE -> LIR 5001 -> 408",
+            "correlation_methods": ["identity:sip:call_id", "identity:diameter:session_id"],
+            "hybrid_rca": {
+                "rca_label": "SUBSCRIBER_UNREACHABLE",
+                "rca_title": "Subscriber Unreachable",
+                "rca_summary": "Subscriber lookup and call setup timed out.",
+                "confidence_pct": 86,
+            },
+        }
+
+        payload = session_summary(session)
+        topology = payload["failure_topology"]
+        node_labels = {item["label"] for item in topology["nodes"]}
+        edge_targets = {item["target"] for item in topology["edges"]}
+
+        self.assertEqual(topology["rca_label"], "SUBSCRIBER_UNREACHABLE")
+        self.assertIn("P-CSCF", node_labels)
+        self.assertIn("HSS/PCRF", node_labels)
+        self.assertIn("UE Failure", node_labels)
+        self.assertIn("failure", edge_targets)
+        self.assertTrue(any("Break marker:" in insight for insight in topology["insights"]))
+
+    def test_capture_summary_includes_front_page_failure_topology(self):
+        parsed = {
+            "sip": [
+                {
+                    "call_id": "call-1",
+                    "method": "INVITE",
+                    "timestamp": 1.0,
+                    "src_ip": "62.156.115.252",
+                    "dst_ip": "62.156.113.12",
+                    "from_uri": "sip:+4915167536469@ims.example.net",
+                    "to_uri": "sip:+491706543966@ims.example.net",
+                    "frame_number": 1,
+                },
+                {
+                    "call_id": "call-1",
+                    "status_code": "408",
+                    "message": "408 Request Timeout",
+                    "timestamp": 2.4,
+                    "src_ip": "62.156.113.12",
+                    "dst_ip": "62.156.115.252",
+                    "frame_number": 2,
+                },
+            ],
+            "diameter": [
+                {
+                    "session_id": "dia-1",
+                    "command_name": "LIR",
+                    "command_code": "302",
+                    "timestamp": 1.2,
+                    "src_ip": "10.114.0.6",
+                    "dst_ip": "10.114.1.10",
+                    "result_code": "5001",
+                    "is_failure": True,
+                    "frame_number": 3,
+                }
+            ],
+            "gtp": [],
+            "s1ap": [],
+            "ngap": [],
+            "inap": [],
+            "ranap": [],
+            "bssap": [],
+            "map": [],
+            "http": [],
+            "tcp": [],
+            "udp": [],
+            "pfcp": [],
+            "dns": [],
+            "icmp": [],
+            "nas_eps": [],
+            "nas_5gs": [],
+            "sctp": [],
+        }
+
+        session = {
+            "session_id": "call-1",
+            "call_id": "call-1",
+            "protocols": ["sip", "diameter"],
+            "technologies": ["IMS"],
+            "priority_score": 90,
+            "duration_ms": 2400,
+            "sip_msgs": parsed["sip"],
+            "dia_msgs": parsed["diameter"],
+            "gtp_msgs": [],
+            "inap_msgs": [],
+            "generic_msgs": [],
+            "flow": [
+                {"protocol": "SIP", "message": "INVITE", "src": "EXT\n62.156.115.252", "dst": "EXT\n62.156.113.12", "time": 1.0},
+                {"protocol": "DIAMETER", "message": "LIR 5001", "short_label": "LIR 5001", "failure": True, "src": "CORE\n10.114.0.6", "dst": "CORE\n10.114.1.10", "time": 1.2, "details": {"result_code": "5001"}},
+                {"protocol": "SIP", "message": "408 Request Timeout", "src": "EXT\n62.156.113.12", "dst": "EXT\n62.156.115.252", "time": 2.4},
+            ],
+            "hybrid_rca": {
+                "rca_label": "SUBSCRIBER_UNREACHABLE",
+                "rca_title": "Subscriber Unreachable",
+                "confidence_pct": 86,
+            },
+        }
+
+        summary = build_capture_summary(parsed, [session])
+        topology = summary["failure_topology"]
+        self.assertEqual(topology["scope"], "capture-lead")
+        self.assertEqual(topology["focus_session_id"], "call-1")
+        self.assertTrue(topology["nodes"])
+        self.assertTrue(topology["edges"])
+
+    def test_normal_session_topology_does_not_emit_failure_sink(self):
+        session = {
+            "session_id": "normal-1",
+            "call_id": "normal-1",
+            "protocols": ["ngap", "nas_5gs"],
+            "technologies": ["5G"],
+            "ngap_msgs": [
+                {"timestamp": 1.0, "src_ip": "172.17.0.5", "dst_ip": "192.168.123.10", "message": "Initial UE Message"},
+                {"timestamp": 2.0, "src_ip": "192.168.123.10", "dst_ip": "172.17.0.5", "message": "UE Context Release"},
+            ],
+            "generic_msgs": [],
+            "flow": [
+                {"protocol": "NGAP", "message": "Initial UE Message", "src": "EXT\n172.17.0.5", "dst": "CORE\n192.168.123.10", "time": 1.0},
+                {"protocol": "NGAP", "message": "UE Context Release", "src": "CORE\n192.168.123.10", "dst": "EXT\n172.17.0.5", "time": 2.0},
+            ],
+            "hybrid_rca": {
+                "rca_label": "NORMAL_SESSION",
+                "rca_title": "Normal Session",
+                "rca_summary": "The trace shows a normal service establishment and clean teardown pattern.",
+                "confidence_pct": 100,
+            },
+        }
+
+        payload = session_summary(session)
+        topology = payload["failure_topology"]
+
+        self.assertFalse(topology["has_failure"])
+        self.assertEqual(topology["title"], "Service Path Topology")
+        self.assertNotIn("failure", {node["id"] for node in topology["nodes"]})
+        self.assertFalse(any(edge["status"] in {"failure", "failure-path"} for edge in topology["edges"]))
+        self.assertFalse(any("Break marker:" in insight for insight in topology["insights"]))
 
     def test_session_summary_builds_analyst_brief_from_known_diameter_semantics(self):
         session = {

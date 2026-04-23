@@ -183,6 +183,9 @@ function renderSessions() {
       ...(s.protocols || []).slice(0, 3).map(p => `<span class="chip">${String(p).toUpperCase()}</span>`),
       ...(s.technologies || []).slice(0, 2).map(t => `<span class="chip">${t}</span>`),
     ].join("");
+    div.dataset.helpTitle = "Session card";
+    div.dataset.help = `Click to load this correlated session into Trace Briefing, RCA, topology, and visual views. RCA: ${rca}. Filter anchor: ${s.details_summary?.selected_filter?.label || "Session-ID"} ${s.details_summary?.selected_filter?.value || s.call_id || "unknown"}.`;
+    div.dataset.helpDetail = "How it works: this card represents one correlated session produced by the session builder. Selecting it refreshes all session-aware panels from the same normalized session payload, so RCA, topology, evidence, and visual flow stay aligned.";
 
     div.innerHTML = `
       <div class="session-line1">
@@ -199,6 +202,9 @@ function renderSessions() {
     div.onclick = () => selectSession(s);
     list.appendChild(div);
   });
+  if (typeof refreshContextHelpAffordances === "function") {
+    refreshContextHelpAffordances(list);
+  }
   if (typeof window.traceDebug === "function") {
     window.traceDebug("renderSessions.done", {
       rendered: Math.min(sessions.length, 100),
@@ -243,6 +249,7 @@ function renderOverview() {
   _renderEndpointList("topEndpoints", summary.top_endpoints || []);
   _renderMetricList("rcaDistribution", summary.rca_distribution || {});
   _renderExpertFindings(summary.expert_findings || [], sessions);
+  _renderFailureTopologyPanel(summary.failure_topology || null);
   _renderErrorAnalysis(summary.error_analysis || null);
   _renderTrafficTrendChart(sessions, summary.protocol_counts || {});
   _renderProtocolShareChart(summary.protocol_counts || {});
@@ -309,6 +316,7 @@ function selectSession(s) {
   _setText("corr",          s.correlation_summary || s.dia_correlation || "No correlation");
   _setText("tech",          (s.technologies || []).join(", ") || "Unknown technology");
   _renderCorrelationInspector(s);
+  _renderFailureTopologyPanel(s.failure_topology || STATE.summary?.failure_topology || null);
   _renderEvidence(s.evidence || []);
   _renderActions(s.recommendations || []);
   _renderDetails(s.details_summary || null, false);
@@ -751,8 +759,21 @@ function _renderGraphStats(model) {
   ];
 
   el.innerHTML = stats
-    .map(([label, value]) => `<span class="graph-stat"><strong>${value}</strong>${label}</span>`)
+    .map(([label, value]) => `<span class="graph-stat" data-help-title="${_escapeHtml(label)}" data-help="${_escapeHtml(_graphStatHelp(label))}" data-help-detail="How it works: graph statistics are derived from the currently selected graph model, so they change when you switch session, view mode, or protocol filter."><strong>${value}</strong>${label}</span>`)
     .join("");
+  if (typeof refreshContextHelpAffordances === "function") {
+    refreshContextHelpAffordances(el);
+  }
+}
+
+function _graphStatHelp(label) {
+  const descriptions = {
+    Endpoints: "Number of distinct endpoint or event nodes currently visible in this graph.",
+    Paths: "Number of protocol or causal links connecting the displayed nodes.",
+    Messages: "Messages represented by this graph after the current session and protocol filters.",
+    Protocols: "Distinct protocol families contributing to the visible topology.",
+  };
+  return descriptions[label] || "Graph statistic for the currently selected session.";
 }
 
 function _renderGraphLegend(protocols, nodeTypes) {
@@ -763,14 +784,14 @@ function _renderGraphLegend(protocols, nodeTypes) {
     .slice(0, 10)
     .map(protocol => {
       const color = (PROTOCOL_STYLE[protocol] || { color: "#94a3b8" }).color;
-      return `<div class="graph-legend-item"><span class="graph-legend-swatch" style="background:${color}"></span>${protocol}</div>`;
+      return `<div class="graph-legend-item" data-help-title="${_escapeHtml(protocol)} path" data-help="Edges with this color represent ${_escapeHtml(protocol)} traffic in the selected session graph." data-help-detail="How it works: each visible edge is created from normalized flow events. Repeated messages between the same endpoints are aggregated into the edge count and width."><span class="graph-legend-swatch" style="background:${color}"></span>${_escapeHtml(protocol)}</div>`;
     })
     .join("");
 
   const nodeTypeHtml = (nodeTypes || [])
     .map(type => {
       const style = NODE_TYPE_STYLE[type] || NODE_TYPE_STYLE.NODE;
-      return `<div class="graph-legend-item"><span class="graph-legend-swatch" style="background:${style.background}"></span>${type}</div>`;
+      return `<div class="graph-legend-item" data-help-title="${_escapeHtml(type)} node" data-help="Nodes marked as ${_escapeHtml(type)} represent this inferred role or causal event type in the selected graph." data-help-detail="How it works: node roles are inferred from endpoint labels, protocol adjacency, known telecom function patterns, and causal graph event metadata."><span class="graph-legend-swatch" style="background:${style.background}"></span>${_escapeHtml(type)}</div>`;
     })
     .join("");
 
@@ -784,6 +805,9 @@ function _renderGraphLegend(protocols, nodeTypes) {
       ${protocolHtml || '<div class="graph-legend-item">No protocol edges</div>'}
     </div>
   `;
+  if (typeof refreshContextHelpAffordances === "function") {
+    refreshContextHelpAffordances(el);
+  }
 }
 
 function _showGraphNodeDetails(node, model) {
@@ -876,6 +900,15 @@ function _formatGraphNodeLabel(label, type, activity) {
 
 function _nodeTypeFromLabel(label) {
   return String(label || "NODE").split("\n", 1)[0] || "NODE";
+}
+
+function _escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function _parseNodeLabel(nodeLabel) {
@@ -1500,17 +1533,35 @@ function _renderEvidence(evidence) {
   if (!list) return;
   list.innerHTML = "";
 
-  if (!evidence.length) {
+  const compactEvidence = _compactRepeatedTextItems(evidence);
+  if (!compactEvidence.length) {
     const item = document.createElement("li");
     item.innerText = "No evidence available";
     list.appendChild(item);
     return;
   }
 
-  evidence.forEach(text => {
+  compactEvidence.forEach(text => {
     const item = document.createElement("li");
     item.innerText = text;
     list.appendChild(item);
+  });
+}
+
+function _compactRepeatedTextItems(items) {
+  const counts = new Map();
+  const display = new Map();
+  (Array.isArray(items) ? items : []).forEach(item => {
+    const text = String(item || "").replace(/\s+/g, " ").trim();
+    if (!text) return;
+    const key = text.toLowerCase();
+    counts.set(key, (counts.get(key) || 0) + 1);
+    if (!display.has(key)) display.set(key, text);
+  });
+
+  return [...display.entries()].map(([key, text]) => {
+    const count = counts.get(key) || 0;
+    return count > 1 ? `${text} x${count}` : text;
   });
 }
 
@@ -1625,7 +1676,7 @@ function _renderCorrelationInspector(session) {
   if (!methodsEl || !evidenceEl) return;
 
   const methods = Array.isArray(session?.correlation_methods) ? session.correlation_methods : [];
-  const evidence = Array.isArray(session?.correlation_evidence) ? session.correlation_evidence : [];
+  const evidence = _compactRepeatedTextItems(session?.correlation_evidence);
 
   methodsEl.innerHTML = "";
   if (!methods.length) {
@@ -1799,14 +1850,53 @@ function _renderDetails(details, isCaptureSummary) {
     return;
   }
 
-  const lines = [];
-  if (details.headline) lines.push(details.headline);
-  if (details.summary_lines?.length) {
-    lines.push("");
-    details.summary_lines.forEach(line => lines.push(`- ${line}`));
-  }
+  const selectedFilter = details.selected_filter || {};
+  const selectedLabel = selectedFilter.label || "Session-ID";
+  const selectedValue = selectedFilter.value || "Unknown";
+  const selectedSource = selectedFilter.source || "Session seed";
+  const summaryRows = [
+    ["Call/session type", details.call_type || "Unknown"],
+    ["Technologies", (details.technologies || []).join(", ") || "Unknown"],
+    ["Protocols", (details.protocols || []).join(", ") || "Unknown"],
+    ["A-party", details.a_party || "Unknown"],
+    ["B-party", details.b_party || "Unknown"],
+    ["Flow summary", (details.summary_lines || []).find(line => String(line).startsWith("Flow summary:"))?.replace(/^Flow summary:\s*/, "") || "Unavailable"],
+  ].map(([label, value]) => `
+    <div class="summary-table-row">
+      <span>${_escapeHtml(label)}</span>
+      <strong>${_escapeHtml(value)}</strong>
+    </div>
+  `).join("");
+  const anchorRows = (details.correlation_anchors || [])
+    .map(item => `
+      <div class="summary-table-row summary-table-row-anchor">
+        <span>${_escapeHtml(item.label)}</span>
+        <strong>${_escapeHtml(item.value)}</strong>
+        <div class="summary-subtext">${_escapeHtml(item.source || "Correlation engine")}</div>
+      </div>
+    `)
+    .join("");
 
-  el.innerText = lines.join("\n");
+  el.innerHTML = `
+    <div class="capture-summary-sections session-briefing-sections">
+      <section class="summary-section">
+        <h4>Selected Session Filter</h4>
+        <div class="selected-filter-card">
+          <div class="selected-filter-label">${_escapeHtml(selectedLabel)}</div>
+          <div class="selected-filter-value">${_escapeHtml(selectedValue)}</div>
+          <div class="selected-filter-source">${_escapeHtml(selectedSource)}</div>
+        </div>
+      </section>
+      <section class="summary-section">
+        <h4>Correlation Anchors</h4>
+        <div class="summary-table">${anchorRows || '<div class="trace-summary-item">No explicit identity anchors observed.</div>'}</div>
+      </section>
+      <section class="summary-section">
+        <h4>Session Brief</h4>
+        <div class="summary-table">${summaryRows}</div>
+      </section>
+    </div>
+  `;
 }
 
 function _renderTraceOverview(details) {
@@ -1838,6 +1928,535 @@ function _renderTraceOverview(details) {
     item.innerText = line;
     list.appendChild(item);
   });
+}
+
+function _renderFailureTopologyPanel(topology) {
+  const titleEl = document.getElementById("failureTopologyTitle");
+  const narrativeEl = document.getElementById("failureTopologyNarrative");
+  const canvasEl = document.getElementById("failureTopologyCanvas");
+  const insightsEl = document.getElementById("failureTopologyInsights");
+  const selectionEl = document.getElementById("failureTopologySelection");
+  if (!titleEl || !narrativeEl || !canvasEl || !insightsEl) return;
+
+  _setText("failureTopologyTitle", topology?.title || "Failure topology unavailable");
+  _setText(
+    "failureTopologyNarrative",
+    topology?.narrative || "Select a correlated session to synthesize the break path across inferred network functions."
+  );
+
+  insightsEl.innerHTML = "";
+  const insights = Array.isArray(topology?.insights) ? topology.insights : [];
+  if (!insights.length) {
+    const item = document.createElement("li");
+    item.innerText = "No analyst signals available.";
+    insightsEl.appendChild(item);
+  } else {
+    insights.forEach(text => {
+      const item = document.createElement("li");
+      item.innerText = text;
+      insightsEl.appendChild(item);
+    });
+  }
+
+  canvasEl.innerHTML = "";
+  _setFailureTopologySelection(selectionEl, "Click a node or highlighted path to inspect the inferred role, address, evidence, and failure context.");
+  if (!Array.isArray(topology?.nodes) || !topology.nodes.length) {
+    const empty = document.createElement("div");
+    empty.className = "trace-summary-item";
+    empty.innerText = "No failure topology available.";
+    canvasEl.appendChild(empty);
+    return;
+  }
+
+  const hasFailure = Boolean(
+    topology?.has_failure
+    || (topology.nodes || []).some(node => node.status === "failure")
+    || (topology.edges || []).some(edge => edge.status === "failure" || edge.status === "failure-path")
+  );
+  document.querySelectorAll(".failure-topology-legend .failure-only").forEach(item => {
+    item.style.display = hasFailure ? "flex" : "none";
+  });
+
+  const width = Math.max(620, canvasEl.clientWidth || 760);
+  const height = Math.max(430, Math.min(720, 330 + (topology.nodes || []).length * 34));
+  const svg = _makeSVGEl("svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", String(height));
+  svg.setAttribute("class", "failure-topology-svg");
+
+  const defs = _makeSVGEl("defs");
+  defs.innerHTML = `
+    <filter id="failureGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  `;
+  svg.appendChild(defs);
+
+  const positions = _layoutFailureTopology(topology.nodes, width, height);
+  const topologyKey = _failureTopologyStateKey(topology);
+  _applySavedFailureTopologyPositions(topologyKey, positions);
+  let labelLayout = _buildFailureTopologyLabelLayout(topology.nodes, positions);
+  const nodeMeta = new Map((topology.nodes || []).map(node => [String(node.id), node]));
+  const edgeMeta = new Map();
+  const edgeElements = [];
+  const nodeElements = new Map();
+
+  (topology.edges || []).forEach((edge, index) => {
+    const source = positions.get(edge.source);
+    const target = positions.get(edge.target);
+    if (!source || !target) return;
+    const isFailure = hasFailure && (edge.status === "failure" || edge.status === "failure-path");
+    const edgeKey = `edge-${index}`;
+    edgeMeta.set(edgeKey, edge);
+    const line = _makeSVGEl("line");
+    line.setAttribute("x1", String(source.x));
+    line.setAttribute("y1", String(source.y));
+    line.setAttribute("x2", String(target.x));
+    line.setAttribute("y2", String(target.y));
+    line.setAttribute("stroke", isFailure ? "#ef4444" : "#9eb3d2");
+    line.setAttribute("stroke-width", isFailure ? "2.8" : "2.2");
+    line.setAttribute("stroke-linecap", "round");
+    if (isFailure) line.setAttribute("stroke-dasharray", "7 6");
+    line.dataset.ftype = "edge";
+    line.dataset.fkey = edgeKey;
+    svg.appendChild(line);
+
+    const midX = (source.x + target.x) / 2;
+    const midY = (source.y + target.y) / 2 - (isFailure ? 10 : 14);
+    const label = _compactFailureTopologyLabel(edge.label || edge.protocol || "Flow");
+    const labelWidth = Math.max(54, label.length * 7.1 + 18);
+    const badge = _makeSVGEl("rect");
+    badge.setAttribute("x", String(midX - labelWidth / 2));
+    badge.setAttribute("y", String(midY - 14));
+    badge.setAttribute("width", String(labelWidth));
+    badge.setAttribute("height", "24");
+    badge.setAttribute("rx", "6");
+    badge.setAttribute("fill", isFailure ? "#fff1f2" : "#f1f7ff");
+    badge.setAttribute("stroke", isFailure ? "#fca5a5" : "#bfd2ef");
+    badge.dataset.ftype = "edge";
+    badge.dataset.fkey = edgeKey;
+    svg.appendChild(badge);
+
+    const labelText = _makeSVGEl("text");
+    labelText.setAttribute("x", String(midX));
+    labelText.setAttribute("y", String(midY + 2));
+    labelText.setAttribute("text-anchor", "middle");
+    labelText.setAttribute("font-size", "12");
+    labelText.setAttribute("font-family", FONT_FAMILY);
+    labelText.setAttribute("font-weight", isFailure ? "700" : "600");
+    labelText.setAttribute("fill", isFailure ? "#b91c1c" : "#365272");
+    labelText.textContent = label;
+    labelText.dataset.ftype = "edge";
+    labelText.dataset.fkey = edgeKey;
+    svg.appendChild(labelText);
+    edgeElements.push({ edge, line, badge, labelText, labelWidth, isFailure });
+  });
+
+  topology.nodes.forEach(node => {
+    const point = positions.get(node.id);
+    if (!point) return;
+    const style = _failureTopologyNodeStyle(node, hasFailure);
+    const labelPos = labelLayout.get(node.id) || {
+      primaryY: point.y + style.radius + 26,
+      secondaryY: point.y + style.radius + 45,
+    };
+
+    const glow = _makeSVGEl("circle");
+    glow.setAttribute("cx", String(point.x));
+    glow.setAttribute("cy", String(point.y));
+    glow.setAttribute("r", String(style.radius + 8));
+    glow.setAttribute("fill", style.glow);
+    glow.setAttribute("opacity", style.glowOpacity);
+    glow.setAttribute("filter", "url(#failureGlow)");
+    glow.dataset.ftype = "node";
+    glow.dataset.fkey = String(node.id);
+    glow.style.cursor = "grab";
+    svg.appendChild(glow);
+
+    const circle = _makeSVGEl("circle");
+    circle.setAttribute("cx", String(point.x));
+    circle.setAttribute("cy", String(point.y));
+    circle.setAttribute("r", String(style.radius));
+    circle.setAttribute("fill", style.fill);
+    circle.setAttribute("stroke", style.stroke);
+    circle.setAttribute("stroke-width", style.strokeWidth);
+    circle.dataset.ftype = "node";
+    circle.dataset.fkey = String(node.id);
+    circle.style.cursor = "grab";
+    svg.appendChild(circle);
+
+    const label = _makeSVGEl("text");
+    label.setAttribute("x", String(point.x));
+    label.setAttribute("y", String(labelPos.primaryY));
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-size", "15");
+    label.setAttribute("font-family", "Inter, sans-serif");
+    label.setAttribute("font-weight", node.status === "failure" ? "800" : "700");
+    label.setAttribute("fill", style.text);
+    label.textContent = node.label || node.role || "Node";
+    label.dataset.ftype = "node";
+    label.dataset.fkey = String(node.id);
+    label.style.cursor = "grab";
+    svg.appendChild(label);
+
+    if (node.address) {
+      const sub = _makeSVGEl("text");
+      sub.setAttribute("x", String(point.x));
+      sub.setAttribute("y", String(labelPos.secondaryY));
+      sub.setAttribute("text-anchor", "middle");
+      sub.setAttribute("font-size", "11");
+      sub.setAttribute("font-family", FONT_FAMILY);
+      sub.setAttribute("fill", node.status === "failure" ? "#fbcaca" : "#9fb4da");
+      sub.textContent = node.address;
+      sub.dataset.ftype = "node";
+      sub.dataset.fkey = String(node.id);
+      sub.style.cursor = "grab";
+      svg.appendChild(sub);
+    }
+
+    nodeElements.set(String(node.id), { node, glow, circle, label, sub: node.address ? svg.lastChild : null, style });
+  });
+
+  let draggedNodeId = null;
+  let dragOffset = { x: 0, y: 0 };
+  let dragMoved = false;
+
+  const toSvgPoint = event => {
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    return point.matrixTransform(svg.getScreenCTM().inverse());
+  };
+
+  const redrawGeometry = () => {
+    labelLayout = _buildFailureTopologyLabelLayout(topology.nodes, positions);
+    nodeElements.forEach((entry, nodeId) => {
+      const point = positions.get(nodeId);
+      if (!point) return;
+      const labelPos = labelLayout.get(nodeId) || {
+        primaryY: point.y + entry.style.radius + 26,
+        secondaryY: point.y + entry.style.radius + 45,
+      };
+      entry.glow.setAttribute("cx", String(point.x));
+      entry.glow.setAttribute("cy", String(point.y));
+      entry.circle.setAttribute("cx", String(point.x));
+      entry.circle.setAttribute("cy", String(point.y));
+      entry.label.setAttribute("x", String(point.x));
+      entry.label.setAttribute("y", String(labelPos.primaryY));
+      if (entry.sub) {
+        entry.sub.setAttribute("x", String(point.x));
+        entry.sub.setAttribute("y", String(labelPos.secondaryY));
+      }
+    });
+
+    edgeElements.forEach(entry => {
+      const source = positions.get(entry.edge.source);
+      const target = positions.get(entry.edge.target);
+      if (!source || !target) return;
+      entry.line.setAttribute("x1", String(source.x));
+      entry.line.setAttribute("y1", String(source.y));
+      entry.line.setAttribute("x2", String(target.x));
+      entry.line.setAttribute("y2", String(target.y));
+      const midX = (source.x + target.x) / 2;
+      const midY = (source.y + target.y) / 2 - (entry.isFailure ? 10 : 14);
+      entry.badge.setAttribute("x", String(midX - entry.labelWidth / 2));
+      entry.badge.setAttribute("y", String(midY - 14));
+      entry.labelText.setAttribute("x", String(midX));
+      entry.labelText.setAttribute("y", String(midY + 2));
+    });
+  };
+
+  svg.addEventListener("pointerdown", event => {
+    const target = event.target;
+    if (target?.dataset?.ftype !== "node") return;
+    draggedNodeId = target.dataset.fkey;
+    dragMoved = false;
+    const point = toSvgPoint(event);
+    const current = positions.get(draggedNodeId);
+    if (!current) return;
+    dragOffset = { x: point.x - current.x, y: point.y - current.y };
+    target.setPointerCapture?.(event.pointerId);
+    svg.classList.add("dragging");
+  });
+
+  svg.addEventListener("pointermove", event => {
+    if (!draggedNodeId) return;
+    event.preventDefault();
+    const point = toSvgPoint(event);
+    const next = {
+      x: Math.max(54, Math.min(width - 54, point.x - dragOffset.x)),
+      y: Math.max(54, Math.min(height - 70, point.y - dragOffset.y)),
+    };
+    const current = positions.get(draggedNodeId);
+    if (current && (Math.abs(next.x - current.x) > 2 || Math.abs(next.y - current.y) > 2)) {
+      dragMoved = true;
+    }
+    positions.set(draggedNodeId, next);
+    _saveFailureTopologyPosition(topologyKey, draggedNodeId, next);
+    redrawGeometry();
+  });
+
+  svg.addEventListener("pointerup", event => {
+    if (!draggedNodeId) return;
+    event.target?.releasePointerCapture?.(event.pointerId);
+    draggedNodeId = null;
+    svg.classList.remove("dragging");
+    window.setTimeout(() => { dragMoved = false; }, 0);
+  });
+
+  svg.addEventListener("click", event => {
+    if (dragMoved) return;
+    const target = event.target;
+    const kind = target?.dataset?.ftype;
+    const key = target?.dataset?.fkey;
+    if (!kind || !key) return;
+
+    if (kind === "node") {
+      const node = nodeMeta.get(key);
+      if (node) _setFailureTopologySelection(selectionEl, _formatFailureTopologyNodeDetails(node));
+      return;
+    }
+
+    if (kind === "edge") {
+      const edge = edgeMeta.get(key);
+      if (edge) _setFailureTopologySelection(selectionEl, _formatFailureTopologyEdgeDetails(edge, nodeMeta));
+    }
+  });
+
+  const defaultNode = (topology.nodes || []).find(node => node.status === "failure")
+    || (topology.nodes || []).find(node => node.status === "implicated")
+    || topology.nodes[0];
+  if (defaultNode) {
+    _setFailureTopologySelection(selectionEl, _formatFailureTopologyNodeDetails(defaultNode));
+  }
+
+  canvasEl.appendChild(svg);
+}
+
+function _layoutFailureTopology(nodes, width, height) {
+  const positions = new Map();
+  const failureNode = nodes.find(node => node.status === "failure") || null;
+  const regularNodes = nodes
+    .filter(node => node.id !== failureNode?.id)
+    .slice()
+    .sort((left, right) => _failureTopologyRoleOrder(left.role) - _failureTopologyRoleOrder(right.role));
+
+  if (regularNodes.length > 4) {
+    const columns = Math.ceil(Math.sqrt(regularNodes.length * 1.45));
+    const rows = Math.ceil(regularNodes.length / columns);
+    const xStart = width * 0.14;
+    const xEnd = width * 0.86;
+    const yStart = height * 0.18;
+    const yEnd = height * (failureNode ? 0.64 : 0.78);
+    regularNodes.forEach((node, index) => {
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      const x = columns === 1 ? width * 0.5 : xStart + (col / (columns - 1)) * (xEnd - xStart);
+      const y = rows === 1 ? height * 0.42 : yStart + (row / (rows - 1)) * (yEnd - yStart);
+      positions.set(node.id, { x, y });
+    });
+    if (failureNode) {
+      positions.set(failureNode.id, { x: width * 0.5, y: height * 0.86 });
+    }
+    return positions;
+  }
+
+  const preset = {
+    1: [[0.5, 0.34]],
+    2: [[0.3, 0.46], [0.7, 0.46]],
+    3: [[0.5, 0.18], [0.24, 0.52], [0.76, 0.52]],
+    4: [[0.5, 0.16], [0.2, 0.4], [0.8, 0.4], [0.5, 0.56]],
+  };
+  const slots = preset[regularNodes.length] || [];
+
+  regularNodes.forEach((node, index) => {
+    let point = slots[index];
+    if (!point) {
+      const angle = Math.PI - (index / Math.max(1, regularNodes.length - 1)) * Math.PI;
+      point = [
+        0.5 + Math.cos(angle) * 0.34,
+        0.42 - Math.sin(angle) * 0.22,
+      ];
+    }
+    positions.set(node.id, { x: width * point[0], y: height * point[1] });
+  });
+
+  if (failureNode) {
+    positions.set(failureNode.id, { x: width * 0.5, y: height * 0.84 });
+  }
+
+  return positions;
+}
+
+function _buildFailureTopologyLabelLayout(nodes, positions) {
+  const layout = new Map();
+  const points = (nodes || []).map(node => {
+    const point = positions.get(node.id);
+    if (!point) return null;
+    return {
+      node,
+      point,
+      style: _failureTopologyNodeStyle(node, true),
+    };
+  }).filter(Boolean);
+
+  points.forEach(entry => {
+    const { node, point, style } = entry;
+    const overlappingBelow = points.some(other => {
+      if (other.node.id === node.id) return false;
+      const dx = Math.abs(other.point.x - point.x);
+      const dy = other.point.y - point.y;
+      return dx < 110 && dy > 0 && dy < 120;
+    });
+    const overlappingAbove = points.some(other => {
+      if (other.node.id === node.id) return false;
+      const dx = Math.abs(other.point.x - point.x);
+      const dy = point.y - other.point.y;
+      return dx < 110 && dy > 0 && dy < 96;
+    });
+
+    let placeAbove = false;
+    if (String(node.status || "").toLowerCase() !== "failure") {
+      placeAbove = overlappingBelow && !overlappingAbove;
+    }
+
+    layout.set(node.id, placeAbove
+      ? {
+          primaryY: point.y - style.radius - 24,
+          secondaryY: point.y - style.radius - 8,
+        }
+      : {
+          primaryY: point.y + style.radius + 26,
+          secondaryY: point.y + style.radius + 45,
+        }
+    );
+  });
+
+  return layout;
+}
+
+function _failureTopologyRoleOrder(role) {
+  const order = {
+    "IMS Core": 0,
+    "I/S-CSCF": 1,
+    "AMF/MME": 2,
+    "AMF": 2,
+    "MME": 2,
+    "HSS/PCRF": 3,
+    "P-CSCF": 4,
+    "SMF/PGW-C": 5,
+    "UPF/SGW": 6,
+    "gNB/eNB": 7,
+    "gNB": 7,
+    "eNB": 7,
+    "UE": 8,
+  };
+  return order[String(role || "").trim()] ?? 99;
+}
+
+function _failureTopologyNodeStyle(node, hasFailure = true) {
+  const status = String(node?.status || "normal").toLowerCase();
+  if (hasFailure && status === "failure") {
+    return {
+      radius: 28,
+      fill: "#fff1f2",
+      stroke: "#ef4444",
+      strokeWidth: 2.6,
+      glow: "#fca5a5",
+      glowOpacity: "0.38",
+      text: "#991b1b",
+    };
+  }
+  if (hasFailure && status === "implicated") {
+    return {
+      radius: 26,
+      fill: "#eff6ff",
+      stroke: "#2563eb",
+      strokeWidth: 2.2,
+      glow: "#93c5fd",
+      glowOpacity: "0.34",
+      text: "#1e3a8a",
+    };
+  }
+  return {
+    radius: 24,
+    fill: "#ffffff",
+    stroke: "#8ca4c7",
+    strokeWidth: 2,
+    glow: "#bfdbfe",
+    glowOpacity: "0.22",
+    text: "#26364d",
+  };
+}
+
+function _compactFailureTopologyLabel(label) {
+  const text = String(label || "").trim();
+  if (!text) return "Flow";
+  return text.length > 18 ? `${text.slice(0, 16)}…` : text;
+}
+
+function _setFailureTopologySelection(el, text) {
+  if (!el) return;
+  el.innerText = text || "Click a node or highlighted path to inspect the inferred role, address, evidence, and failure context.";
+}
+
+function _failureTopologyStateKey(topology) {
+  return String(topology?.focus_session_id || topology?.title || "capture");
+}
+
+function _applySavedFailureTopologyPositions(topologyKey, positions) {
+  const saved = STATE.failureTopologyPositions?.[topologyKey] || {};
+  Object.entries(saved).forEach(([nodeId, point]) => {
+    if (!positions.has(nodeId)) return;
+    const x = Number(point?.x);
+    const y = Number(point?.y);
+    if (Number.isFinite(x) && Number.isFinite(y)) {
+      positions.set(nodeId, { x, y });
+    }
+  });
+}
+
+function _saveFailureTopologyPosition(topologyKey, nodeId, point) {
+  STATE.failureTopologyPositions = STATE.failureTopologyPositions || {};
+  STATE.failureTopologyPositions[topologyKey] = STATE.failureTopologyPositions[topologyKey] || {};
+  STATE.failureTopologyPositions[topologyKey][nodeId] = {
+    x: Math.round(point.x * 10) / 10,
+    y: Math.round(point.y * 10) / 10,
+  };
+}
+
+function _formatFailureTopologyNodeDetails(node) {
+  const protocols = Array.isArray(node?.protocols) && node.protocols.length ? node.protocols.join(", ") : "No direct protocol list";
+  return [
+    `${node?.label || node?.role || "Node"}`,
+    "",
+    `Role        ${node?.role || "Unknown"}`,
+    `Address     ${node?.address || "Not exposed"}`,
+    `Status      ${String(node?.status || "normal").replace(/-/g, " ")}`,
+    `Confidence  ${String(node?.confidence || "low").toUpperCase()}`,
+    `Protocols   ${protocols}`,
+    `Evidence    ${node?.evidence || "Role inferred from protocol adjacency and session context."}`,
+  ].join("\n");
+}
+
+function _formatFailureTopologyEdgeDetails(edge, nodeMeta) {
+  const source = nodeMeta.get(String(edge?.source || "")) || { label: edge?.source || "Unknown" };
+  const target = nodeMeta.get(String(edge?.target || "")) || { label: edge?.target || "Unknown" };
+  return [
+    `${edge?.label || edge?.protocol || "Path"}`,
+    "",
+    `Protocol    ${edge?.protocol || "Unknown"}`,
+    `From        ${source.label || edge?.source || "Unknown"}`,
+    `To          ${target.label || edge?.target || "Unknown"}`,
+    `Status      ${String(edge?.status || "normal").replace(/-/g, " ")}`,
+    `Hits        ${edge?.count ?? 1}`,
+    `Meaning     ${edge?.status === "failure" || edge?.status === "failure-path" ? "Highlighted as the likely break or failure-bearing path." : "Observed service path between inferred nodes."}`,
+  ].join("\n");
 }
 
 function _renderErrorAnalysis(report) {
@@ -2245,13 +2864,16 @@ function renderValidationQueue(payload) {
       <div class="validation-item-body">Session ${_truncateMiddle(item.session_id || "—", 64)} · confidence ${Math.round((Number(item.confidence_score || 0)) * 100)}%</div>
       <div class="validation-item-body">${item.agent_conflict ? "Agent conflict detected" : "Awaiting expert confirmation"}</div>
       <div class="validation-actions">
-        <button type="button" onclick="submitValidationAction('${item.validation_id}', 'approve')">Approve</button>
-        <button type="button" onclick="submitValidationAction('${item.validation_id}', 'reject')">Reject</button>
-        <button type="button" onclick="submitValidationAction('${item.validation_id}', 'defer')">Defer</button>
+        <button type="button" data-help-title="Approve learning" data-help="Accept this reviewed RCA or pattern so it can reinforce the knowledge base." onclick="submitValidationAction('${item.validation_id}', 'approve')">Approve</button>
+        <button type="button" data-help-title="Reject learning" data-help="Reject this proposed learning when the RCA, label, or evidence is not trustworthy." onclick="submitValidationAction('${item.validation_id}', 'reject')">Reject</button>
+        <button type="button" data-help-title="Defer review" data-help="Keep this item in the queue when more analyst review or source evidence is needed." onclick="submitValidationAction('${item.validation_id}', 'defer')">Defer</button>
       </div>
     `;
     container.appendChild(card);
   });
+  if (typeof refreshContextHelpAffordances === "function") {
+    refreshContextHelpAffordances(container);
+  }
 }
 
 function renderVersionInfo(payload) {
