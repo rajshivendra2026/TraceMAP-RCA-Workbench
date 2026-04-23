@@ -29,7 +29,7 @@ from pathlib import Path
 from loguru import logger
 
 from src.config import cfg, cfg_path
-from src.parser.tshark_runner   import TSharkRunner
+from src.parser.tshark_runner   import TSharkParseError, TSharkRunner
 from src.parser.sip_parser      import parse_sip_packets
 from src.parser.diameter_parser import parse_diameter_packets
 from src.parser.inap_parser     import parse_inap_packets
@@ -294,6 +294,42 @@ SCTP_FIELDS = [
     "sctp.srcport", "sctp.dstport", "sctp.ppid", "sctp.chunk_type",
 ]
 
+OPTIONAL_FILTER_FALLBACKS = {
+    # Many tshark/Wireshark builds expose IKEv2 dissection under ISAKMP.
+    "ikev2": ("isakmp",),
+}
+
+
+def _extract_optional_protocol(runner: TSharkRunner,
+                               pcap_path: str,
+                               key: str,
+                               display_filter: str,
+                               fields: list[str]) -> list[dict]:
+    """Extract best-effort protocols without failing the entire upload."""
+    filters_to_try = []
+    for candidate in (display_filter, *OPTIONAL_FILTER_FALLBACKS.get(key, ())):
+        if candidate and candidate not in filters_to_try:
+            filters_to_try.append(candidate)
+
+    for index, candidate in enumerate(filters_to_try):
+        try:
+            return runner.extract(pcap_path, candidate, fields)
+        except TSharkParseError as exc:
+            has_fallback = index < len(filters_to_try) - 1
+            if has_fallback:
+                logger.warning(
+                    f"Optional {key} extraction failed for filter "
+                    f"{candidate!r}: {exc}; retrying fallback"
+                )
+                continue
+            logger.warning(
+                f"Skipping optional {key} extraction because tshark "
+                f"rejected filter {candidate!r}: {exc}"
+            )
+            return []
+
+    return []
+
 
 # ══════════════════════════════════════════════════════════════
 #  MAIN ENTRY POINT
@@ -388,7 +424,7 @@ def load_pcap(pcap_path: str,
         ("bssap", filters.get("bssap", "bssap"), BSSAP_FIELDS, "BSSAP"),
         ("map", filters.get("map", "gsm_map or tcap"), MAP_FIELDS, "MAP"),
         ("http", filters.get("http", "http or http2 or tls"), HTTP_FIELDS, "HTTP"),
-        ("ikev2", filters.get("ikev2", "ikev2 or isakmp"), IKEV2_FIELDS, "IKEV2"),
+        ("ikev2", filters.get("ikev2", "isakmp"), IKEV2_FIELDS, "IKEV2"),
         ("radius", filters.get("radius", "radius"), RADIUS_FIELDS, "RADIUS"),
         ("dns", filters.get("dns", "dns"), DNS_FIELDS, "DNS"),
         ("icmp", filters.get("icmp", "icmp or icmpv6"), ICMP_FIELDS, "ICMP"),
@@ -403,7 +439,9 @@ def load_pcap(pcap_path: str,
     extra_results = {}
     for key, display_filter, fields, protocol_name in protocol_specs:
         logger.info(f"Extracting {protocol_name} packets...")
-        raw_packets = runner.extract(pcap_path, display_filter, fields)
+        raw_packets = _extract_optional_protocol(
+            runner, pcap_path, key, display_filter, fields
+        )
         extra_results[key] = parse_network_packets(raw_packets, protocol_name)
         logger.info(f"  {protocol_name}: {len(extra_results[key])} packets parsed")
 
